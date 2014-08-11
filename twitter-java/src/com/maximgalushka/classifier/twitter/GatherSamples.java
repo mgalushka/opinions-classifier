@@ -4,6 +4,7 @@ import com.maximgalushka.classifier.twitter.model.Tweet;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -20,9 +21,17 @@ public class GatherSamples {
 
         List<Tweet> tweets = client.search(token, "Ukraine");
 
+        HashSet<String> texts = new HashSet<String>();
         for (Tweet t : tweets) {
-            if (!t.isRetweeted()) {
-                String text = t.getText().replaceAll("\\s+", " ");
+            boolean to_add = true;
+            String text = t.getText().replaceAll("\\s+", " ").replaceAll("\\.+", ".").trim();
+            if (!t.isRetweeted()) to_add = false;
+            if (texts.contains(text)) {
+                System.out.printf("Duplicate: [%s]\n", text);
+                to_add = false;
+            }
+            texts.add(text);
+            if (to_add) {
                 pw.println(String.format("'%s, %s'", text, t.getAuthor().getScreenName()));
             }
         }

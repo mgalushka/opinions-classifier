@@ -54,7 +54,7 @@ public class TwitterClient {
     public List<Tweet> search(String token, String query) {
         Client client = proxyHttpClient();
         WebTarget search = client.target("https://api.twitter.com/1.1/search/tweets.json");
-        WebTarget callTarget = search.queryParam("q", query).queryParam("count", 200);
+        WebTarget callTarget = search.queryParam("q", query).queryParam("count", 200).queryParam("lang", "en");
 
         Invocation.Builder invocationBuilder = callTarget.request();
 

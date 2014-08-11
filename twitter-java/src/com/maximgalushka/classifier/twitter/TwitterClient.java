@@ -5,7 +5,6 @@ import com.maximgalushka.classifier.twitter.model.Statuses;
 import com.maximgalushka.classifier.twitter.model.Tweet;
 import com.maximgalushka.classifier.twitter.model.TwitterOAuthToken;
 import org.apache.commons.codec.binary.Base64;
-import org.glassfish.jersey.apache.connector.ApacheClientProperties;
 import org.glassfish.jersey.apache.connector.ApacheConnectorProvider;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
@@ -22,6 +21,7 @@ public class TwitterClient {
 
     public static final String PROXY_ADDRESS = "http://localhost:4545";
     private Gson gson;
+    private TwitterSettings settings = new TwitterSettings();
 
     public TwitterClient() {
         this.gson = new Gson();
@@ -40,7 +40,8 @@ public class TwitterClient {
 
         invocationBuilder.header("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
 
-        String secret = String.format("%s:%s", TwitterSettings.CONSUMER_KEY, TwitterSettings.CONSUMER_SECRET);
+        String secret = String.format("%s:%s",
+                settings.value(TwitterSettings.CONSUMER_KEY), settings.value(TwitterSettings.CONSUMER_SECRET));
         String encoded = new String(Base64.encodeBase64(secret.getBytes()));
         invocationBuilder.header("Authorization", String.format("Basic %s", encoded));
 

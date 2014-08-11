@@ -1,14 +1,7 @@
 package com.maximgalushka.classifier.twitter;
 
 import com.maximgalushka.classifier.twitter.model.Tweet;
-import org.glassfish.jersey.apache.connector.ApacheClientProperties;
-import org.glassfish.jersey.client.ClientConfig;
-import org.glassfish.jersey.client.ClientProperties;
-import org.glassfish.jersey.client.spi.Connector;
-import org.glassfish.jersey.apache.connector.ApacheClientProperties;
 
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.List;
@@ -17,10 +10,6 @@ import java.util.List;
  * @author Maxim Galushka
  */
 public class GatherSamples {
-
-    public List<String> samples(String query) {
-        return null;
-    }
 
     public static void main(String[] args) throws FileNotFoundException {
         if (args.length == 0) return;
@@ -40,7 +29,6 @@ public class GatherSamples {
         pw.flush();
         pw.close();
     }
-
 
 
 }

@@ -1,6 +1,7 @@
 import sys
 from nltk import NaiveBayesClassifier
 from collections import defaultdict
+import codecs
 
 
 def sentence_features(sentence):
@@ -8,7 +9,7 @@ def sentence_features(sentence):
     :param sentence:
     :return: Extracts features from input sentence
     """
-    words = sentence.split(" ")
+    words = sentence.encode("utf-8").split(" ")
     map = defaultdict(int)
     for w in words:
         w = w.lower().strip()
@@ -28,7 +29,7 @@ feature_probdist = []
 
 train_set = []
 
-f = file(sys.argv[1], "r")
+f = codecs.open(sys.argv[1], "r", "utf-8")
 l = "x"
 while l:
     l = f.readline()
@@ -45,6 +46,11 @@ classifier = NaiveBayesClassifier.train(train_set)
 
 # dummy test
 print(classifier.classify(sentence_features(
-    ".@promothos Secondly, &most important, the fascist behavior THE GOVT demonstrated implementing E.#Ukraine genocide @JamieK_UNB @sn0wba111")))
+    "@promothos Secondly, &most important, the fascist behavior THE GOVT demonstrated implementing E.#Ukraine genocide @JamieK_UNB @sn0wba111")))
 
+print(classifier.classify(sentence_features(
+    "rebels just started their attack")))
+
+
+print classifier.show_most_informative_features()
 

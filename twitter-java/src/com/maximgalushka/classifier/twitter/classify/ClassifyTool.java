@@ -9,9 +9,11 @@ import java.util.Scanner;
 public class ClassifyTool {
 
     public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader("D:\\projects\\classifier\\200.txt"));
+        if (args.length < 2) return;
+
+        BufferedReader br = new BufferedReader(new FileReader(args[0]));
         PrintWriter out = new PrintWriter(
-                new BufferedWriter(new FileWriter("D:\\projects\\classifier\\200-out.txt", true)));
+                new BufferedWriter(new FileWriter(args[1], true)));
         Scanner s = new Scanner(System.in);
         String line;
         while ((line = br.readLine()) != null) {

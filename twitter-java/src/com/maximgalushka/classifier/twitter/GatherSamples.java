@@ -1,7 +1,14 @@
 package com.maximgalushka.classifier.twitter;
 
 import com.maximgalushka.classifier.twitter.model.Tweet;
+import org.glassfish.jersey.apache.connector.ApacheClientProperties;
+import org.glassfish.jersey.client.ClientConfig;
+import org.glassfish.jersey.client.ClientProperties;
+import org.glassfish.jersey.client.spi.Connector;
+import org.glassfish.jersey.apache.connector.ApacheClientProperties;
 
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.List;
@@ -16,16 +23,13 @@ public class GatherSamples {
     }
 
     public static void main(String[] args) throws FileNotFoundException {
-        PrintWriter all = new PrintWriter("D:\\projects\\classifier\\200-all.txt");
-        PrintWriter pw = new PrintWriter("D:\\projects\\classifier\\200.txt");
+        if (args.length == 0) return;
+
+        PrintWriter pw = new PrintWriter(args[0]);
         TwitterClient client = new TwitterClient();
         String token = client.oauth();
 
         List<Tweet> tweets = client.search(token, "Ukraine");
-        System.out.println(tweets);
-        all.println(tweets);
-        all.flush();
-        all.close();
 
         for (Tweet t : tweets) {
             if (!t.isRetweeted()) {
@@ -36,5 +40,7 @@ public class GatherSamples {
         pw.flush();
         pw.close();
     }
+
+
 
 }

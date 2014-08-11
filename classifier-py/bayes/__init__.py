@@ -44,13 +44,17 @@ f.close()
 
 classifier = NaiveBayesClassifier.train(train_set)
 
-# dummy test
-print(classifier.classify(sentence_features(
-    "@promothos Secondly, &most important, the fascist behavior THE GOVT demonstrated implementing E.#Ukraine genocide @JamieK_UNB @sn0wba111")))
+# test on some real data
+classify_file = codecs.open(sys.argv[2], "r", "utf-8")
+l = "x"
+while l:
+    l = classify_file.readline()
+    feature = sentence_features(l)
+    c = classifier.classify(feature)
+    if c == "ukraine" or c == "russia":
+        print "%s -> %s" % (c, l)
 
-print(classifier.classify(sentence_features(
-    "rebels just started their attack")))
-
+classify_file.close()
 
 print classifier.show_most_informative_features()
 

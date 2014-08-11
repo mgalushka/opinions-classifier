@@ -5,7 +5,10 @@ import com.maximgalushka.classifier.twitter.model.Statuses;
 import com.maximgalushka.classifier.twitter.model.Tweet;
 import com.maximgalushka.classifier.twitter.model.TwitterOAuthToken;
 import org.apache.commons.codec.binary.Base64;
+import org.glassfish.jersey.apache.connector.ApacheClientProperties;
+import org.glassfish.jersey.apache.connector.ApacheConnectorProvider;
 import org.glassfish.jersey.client.ClientConfig;
+import org.glassfish.jersey.client.ClientProperties;
 
 import javax.ws.rs.client.*;
 import javax.ws.rs.core.MediaType;
@@ -17,6 +20,7 @@ import java.util.List;
  */
 public class TwitterClient {
 
+    public static final String PROXY_ADDRESS = "http://localhost:4545";
     private Gson gson;
 
     public TwitterClient() {
@@ -27,7 +31,8 @@ public class TwitterClient {
      * @return access token
      */
     public String oauth() {
-        Client client = ClientBuilder.newClient(new ClientConfig());
+        Client client = proxyHttpClient();
+
         WebTarget target = client.target("https://api.twitter.com/oauth2/token");
         WebTarget callTarget = target.queryParam("grant_type", "client_credentials");
 
@@ -46,7 +51,7 @@ public class TwitterClient {
     }
 
     public List<Tweet> search(String token, String query) {
-        Client client = ClientBuilder.newClient(new ClientConfig());
+        Client client = proxyHttpClient();
         WebTarget search = client.target("https://api.twitter.com/1.1/search/tweets.json");
         WebTarget callTarget = search.queryParam("q", query).queryParam("count", 200);
 
@@ -59,5 +64,12 @@ public class TwitterClient {
         String json = response.readEntity(String.class);
 
         return gson.fromJson(json, Statuses.class).getTweets();
+    }
+
+    private Client proxyHttpClient() {
+        ClientConfig cc = new ClientConfig();
+        cc.property(ClientProperties.PROXY_URI, PROXY_ADDRESS);
+        cc.connectorProvider(new ApacheConnectorProvider());
+        return ClientBuilder.newClient(cc);
     }
 }

@@ -91,7 +91,7 @@ public class TwitterClient {
      * Taken from https://github.com/twitter/hbc project
      */
     @SuppressWarnings("deprecation")
-    public BasicClient stream(String token, BlockingQueue<String> output) {
+    public BasicClient stream(BlockingQueue<String> output) {
         // Set up your blocking queues: Be sure to size these properly based on expected TPS of your stream
         //BlockingQueue<String> msgQueue = new LinkedBlockingQueue<String>(100000);
         BlockingQueue<Event> eventQueue = new LinkedBlockingQueue<Event>(1000);

@@ -1,38 +1,19 @@
-__author__ = 'mgalushka'
-
 import sys
-from nltk import NaiveBayesClassifier
 import web
-from collections import defaultdict
-import pickle
 import urllib
+import WordExistsFeatures
+import Classifier
 
 urls = (
-    '/classify', 'hello'
+    '/classify'
 )
 app = web.application(urls, globals())
-f = open(sys.argv[2])
-classifier = pickle.load(f)
-f.close()
 
-def sentence_features(sentence):
-    """
-    :param sentence:
-    :return: Extracts features from input sentence
-    """
-    words = sentence.encode("utf-8").split(" ")
-    map = defaultdict(int)
-    for w in words:
-        w = w.lower().strip()
-        # exclude URLs
-        if w.startswith("http"):
-            continue
-        map[w] += 1
-    features = {}
-    for k in map.iterkeys():
-        if k:
-            features["contains('%s')" % k] = True
-    return features
+# loading trained classifier from configuration file
+extractor = WordExistsFeatures.WordExistsFeaturesExtractor()
+classifier = Classifier.NaiveBayesNews(extractor)
+classifier.load(sys.argv[1])
+
 
 class hello:
     def GET(self):
@@ -40,10 +21,11 @@ class hello:
         if not inpt.tweet:
             return ""
         t = urllib.unquote(inpt.tweet)
-        feature = sentence_features(t)
-        c = classifier.classify(feature)
+        features = extractor.extract(t)
+        c = classifier.classify(features)
         print "%s -> %s" % (c, t)
         return c
+
 
 if __name__ == "__main__":
     app.run()

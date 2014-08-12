@@ -10,7 +10,7 @@ urls = (
 app = web.application(urls, globals())
 
 # loading trained classifier from configuration file
-extractor = WordExistsFeatures.WordExistsFeaturesExtractor()
+extractor = WordExistsFeatures.WordExistsFeaturesExtractor(sys.argv[3])
 classifier = Classifier.NaiveBayesNews(extractor)
 classifier.load(sys.argv[2])
 

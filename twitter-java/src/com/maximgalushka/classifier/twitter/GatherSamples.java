@@ -25,7 +25,7 @@ public class GatherSamples {
         for (Tweet t : tweets) {
             boolean to_add = true;
             String text = t.getText().replaceAll("\\s+", " ").replaceAll("\\.+", ".").trim();
-            if (!t.isRetweeted()) to_add = false;
+            if (t.isRetweeted()) to_add = false;
             if (texts.contains(text)) {
                 System.out.printf("Duplicate: [%s]\n", text);
                 to_add = false;

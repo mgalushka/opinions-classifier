@@ -1,8 +1,6 @@
-import sys
 import codecs
 import pickle
 from nltk import NaiveBayesClassifier
-from collections import defaultdict
 
 
 class NaiveBayesNews:

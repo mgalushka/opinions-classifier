@@ -5,14 +5,14 @@ import WordExistsFeatures
 import Classifier
 
 urls = (
-    '/classify'
+    '/classify', 'hello'
 )
 app = web.application(urls, globals())
 
 # loading trained classifier from configuration file
 extractor = WordExistsFeatures.WordExistsFeaturesExtractor()
 classifier = Classifier.NaiveBayesNews(extractor)
-classifier.load(sys.argv[1])
+classifier.load(sys.argv[2])
 
 
 class hello:

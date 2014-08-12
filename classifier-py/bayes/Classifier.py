@@ -7,10 +7,10 @@ from collections import defaultdict
 
 class NaiveBayesNews:
     def __init__(self, _extractor, labeled_path=None):
-        self.labeled_file = codecs.open(labeled_path, "r", "utf-8")
         self.classifier = None
         self.extractor = _extractor
         if labeled_path:
+            self.labeled_file = codecs.open(labeled_path, "r", "utf-8")
             self.train()
 
     def train(self):

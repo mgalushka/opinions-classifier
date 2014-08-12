@@ -3,9 +3,13 @@ import WordExistsFeatures
 import Classifier
 
 if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        print "train.py [labeled_file] [output_file]"
+        exit()
     # Train classified on manually labeled data
     extractor = WordExistsFeatures.WordExistsFeaturesExtractor()
     classifier = Classifier.NaiveBayesNews(extractor, sys.argv[1])  # NaiveBayesClassifier.train(train_set)
+    classifier.store(sys.argv[1])
     classifier.print_details()
 
 

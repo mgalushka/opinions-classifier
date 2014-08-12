@@ -19,7 +19,8 @@ def sentence_features(sentence):
         map[w] += 1
     features = {}
     for k in map.iterkeys():
-        features["count('%s')" % k] = map[k]
+        if k:
+            features["contains('%s')" % k] = True
     return features
 
 

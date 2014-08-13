@@ -1,6 +1,7 @@
 import codecs
 from collections import defaultdict
 import nltk
+import re
 
 
 class WordExistsFeaturesExtractor:
@@ -8,12 +9,16 @@ class WordExistsFeaturesExtractor:
         self.excluded = set()
         self.preprocess(full_data_file)
 
+    def clean(self, text):
+        # http://stackoverflow.com/a/6883094/2075157
+        return re.sub(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', text, '', flags=re.MULTILINE)
+
     def preprocess(self, full_data_file):
         labeled_file = codecs.open(full_data_file, "r", "utf-8")
         all_word_counts = defaultdict(int)
         line = "x"
         while line:
-            line = labeled_file.readline().encode("utf-8")
+            line = self.clean(labeled_file.readline().encode("utf-8"))
             raw_tweet_text = line[line.find(",") + 1:-1]
             tokens = nltk.wordpunct_tokenize(raw_tweet_text)
             for w in tokens:
@@ -31,7 +36,8 @@ class WordExistsFeaturesExtractor:
         :param sentence:
         :return: Extracts features from input sentence
         """
-        words = sentence.encode("utf-8").split(" ")
+        raw_text = self.clean(sentence.encode("utf-8"))
+        words = nltk.wordpunct_tokenize(raw_text)
         map = defaultdict(int)
         for w in words:
             w = w.lower().strip()

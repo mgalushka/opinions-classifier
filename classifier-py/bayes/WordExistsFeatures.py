@@ -1,5 +1,6 @@
 import codecs
 from collections import defaultdict
+import nltk
 
 
 class WordExistsFeaturesExtractor:
@@ -9,20 +10,20 @@ class WordExistsFeaturesExtractor:
 
     def preprocess(self, full_data_file):
         labeled_file = codecs.open(full_data_file, "r", "utf-8")
-        words = defaultdict(int)
-        l = "x"
-        while l:
-            l = labeled_file.readline().encode("utf-8")
-            s = l.find(",")
-            wrds = l[s:].split(" ")
-            for w in wrds:
+        all_word_counts = defaultdict(int)
+        line = "x"
+        while line:
+            line = labeled_file.readline().encode("utf-8")
+            raw_tweet_text = line[line.find(",") + 1:-1]
+            tokens = nltk.wordpunct_tokenize(raw_tweet_text)
+            for w in tokens:
                 w = w.lower().strip()
                 if w:
-                    words[w] += 1
+                    all_word_counts[w] += 1
         labeled_file.close()
-        T = max(words.values()) / 4
-        for w in words:
-            if words[w] >= T:
+        T = max(all_word_counts.values()) / 4
+        for w in all_word_counts:
+            if all_word_counts[w] >= T:
                 self.excluded.add(w)
 
     def extract(self, sentence):

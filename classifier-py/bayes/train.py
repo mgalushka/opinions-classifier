@@ -7,7 +7,7 @@ if __name__ == "__main__":
         print "train.py [labeled_file] [output_file]"
         exit()
     # Train classified on manually labeled data
-    extractor = WordExistsFeatures.WordExistsFeaturesExtractor(sys.argv[2])
+    extractor = WordExistsFeatures.WordExistsFeaturesExtractor(sys.argv[1])
     classifier = Classifier.NaiveBayesNews(extractor, sys.argv[1])  # NaiveBayesClassifier.train(train_set)
     classifier.store(sys.argv[3])
     classifier.print_details()

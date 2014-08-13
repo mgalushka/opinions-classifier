@@ -40,10 +40,6 @@ class WordExistsFeaturesExtractor:
         words = nltk.wordpunct_tokenize(raw_text)
         map = defaultdict(int)
         for w in words:
-            w = w.lower().strip()
-            # exclude URLs
-            if w.startswith("http"):
-                continue
             map[w] += 1
         features = {}
         for k in map.iterkeys():

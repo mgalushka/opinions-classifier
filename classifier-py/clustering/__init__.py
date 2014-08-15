@@ -1,4 +1,5 @@
+# -*- coding: utf-8 -*-
 import features
 
 f = features.StemExistsFeaturesExtractor()
-print f.extract("RT @shaunwalker7: My day's work - chased a humanitarian convoy that stopped short of border, stumbled upon an actual mini-invasion. http://")
+print f.extract("RT @TomBartonJourno: Reuters news agency is reporting that a Ukrainian humanitarian aid convoy has reached the city of Luhansk in eastern русский")

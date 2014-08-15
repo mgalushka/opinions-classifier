@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import re
 import nltk
 from nltk.stem.snowball import SnowballStemmer
@@ -7,7 +8,7 @@ from nltk.stem.snowball import SnowballStemmer
 class StemExistsFeaturesExtractor:
     def __init__(self):
         # manually exclude all punctuation signs
-        self.excluded = {"'", "!", ".", ",", ":", "-", "\"", "@", "/", "\\"}
+        self.excluded = {"'", "!", ".", ",", ":", "-", "\"", "@", "/", "\\", "_"}
         self.stemmer = SnowballStemmer("english")
         self.mention = re.compile(r'^@.*')
 

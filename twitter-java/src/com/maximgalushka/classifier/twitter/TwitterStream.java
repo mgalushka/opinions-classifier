@@ -17,37 +17,59 @@ import java.util.concurrent.BlockingQueue;
  */
 public class TwitterStream {
 
+    private static boolean NO_CLASSIFICATION = false;
+
+    @SuppressWarnings("InfiniteLoopStatement")
     public static void main(String[] args) throws FileNotFoundException, UnsupportedEncodingException {
         if (args.length == 0) return;
+        if (args.length > 1) {
+            String second = args[1];
+            if (second != null && !"".equals(second.trim())) {
+                if ("--no-classification".equals(second.trim())) {
+                    System.out.println("Running stream without classification");
+                    NO_CLASSIFICATION = true;
+                }
+            }
+        }
 
         System.setProperty("http.proxyHost", "localhost");
         System.setProperty("http.proxyPort", "4545");
 
         Gson gson = new Gson();
 
-        PrintWriter pw = new PrintWriter(args[0]);
+        final PrintWriter pw = new PrintWriter(args[0]);
         TwitterClient client = new TwitterClient();
 
         BlockingQueue<String> q = new ArrayBlockingQueue<String>(100);
-        Client hosebirdClient = client.stream(q);
+        final Client hosebirdClient = client.stream(q);
         hosebirdClient.connect();
 
         ClassifyClient cc = new ClassifyClient();
 
-        int c = 10000;
-        while (c-- > 0) {
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                System.out.println("Shutdown");
+                pw.close();
+                hosebirdClient.stop();
+            }
+        });
+        while (true) {
             try {
                 String json = q.take();
                 Tweet tweet = gson.fromJson(json, Tweet.class);
-                pw.println(tweet);
-                Classification classification = cc.classify(tweet.getText());
-                System.out.printf("%s -> %s\n", classification, tweet);
+                String tweetSingleLine = tweet.getText().trim().replaceAll("\r?\n", " ");
+                pw.println(tweetSingleLine);
+                if (!NO_CLASSIFICATION) {
+                    Classification classification = cc.classify(tweet.getText());
+                    System.out.printf("%s -> %s\n", classification, tweetSingleLine);
+                } else {
+                    System.out.printf("%s\n", tweetSingleLine);
+                }
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
             pw.flush();
         }
-        pw.close();
-        hosebirdClient.stop();
     }
 }

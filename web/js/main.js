@@ -15,16 +15,17 @@ $( document ).ready(function() {
 		msnry.layout();
 	});
 	
-	
-	(function poll(){
-		setTimeout(function(){
-		  $.ajax({ url: "http://localhost:8080", success: function(data){
-			//Update your dashboard gauge
-			//salesGauge.setValue(data.value);
-
-			//Setup the next poll recursively
-			poll();
-		  }, dataType: "json"});
-		}, 30000);
-	})();
 });
+
+(function poll(){
+	setTimeout(function(){
+	  $.ajax({ url: "http://localhost", 
+		success: function(data){
+			poll();
+		}, 
+		error: function(data){
+			poll();
+		}, 
+		dataType: "json"});
+	}, 10000);
+})();

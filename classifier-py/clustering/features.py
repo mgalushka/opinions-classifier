@@ -12,6 +12,9 @@ class StemExistsFeaturesExtractor:
         self.stemmer = SnowballStemmer("english")
         self.mention = re.compile(r'^@.*')
 
+    def clean_all(self, text):
+        return self.clean_mentions(self.clean_urls(text))
+
     def clean_urls(self, text):
         """
         Removes all URLS from text

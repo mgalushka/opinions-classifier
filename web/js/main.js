@@ -9,7 +9,9 @@ $( document ).ready(function() {
 	
 	$( ".item" ).on( "click", function() {
 		console.log( "click" );
-		$(this).toggleClass('gigante');
+		//$(this).toggleClass('gigante');
+		var w = $(this).width();
+		$(this).width(w + 60);
 		msnry.layout();
 	});
 	

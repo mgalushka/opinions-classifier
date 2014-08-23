@@ -1,7 +1,7 @@
 opinions-classifier
 ===================
 
-This is small attempt to create application which analyzes real-time stream of data (via twitter streaming API) and clustering different posts according to their meaning.
+This is small attempt to create application which analyzes real-time stream of data (via twitter streaming API) and cluster different posts according to their meaning. It is planned to use for grouping tweets in real-time and to visualize trends in observed topic.
 
 Various clustering algorithms are planned to be tested as part of this app.
 

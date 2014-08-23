@@ -5,10 +5,13 @@ This is small attempt to create application which analyzes real-time stream of d
 
 Various clustering algorithms are planned to be tested as part of this app.
 
-One of the approaches is using Lingo algorithms from [carrot2](https://github.com/carrot2/carrot2)
+See discussion on stackoverflow here: http://datascience.stackexchange.com/questions/979/algorithms-for-text-clustering
 
-Also web-based interface is proposed to observe real-time clusters fluctuations.
+One of the approaches is using Lingo algorithm from [carrot2](https://github.com/carrot2/carrot2)
 
-[Sequence diagram](https://github.com/mgalushka/opinions-classifier/wiki/Architecture)
+Also web-based interface is proposed to observe real-time clusters' fluctuations.
+To simplify clusters presentation - [Masonry](http://masonry.desandro.com) javascript layout is used
+
+[Application diagram](https://github.com/mgalushka/opinions-classifier/wiki/Architecture)
 
 

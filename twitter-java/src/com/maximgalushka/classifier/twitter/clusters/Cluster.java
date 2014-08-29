@@ -1,7 +1,6 @@
 package com.maximgalushka.classifier.twitter.clusters;
 
 import com.google.gson.annotations.SerializedName;
-import com.maximgalushka.classifier.twitter.model.User;
 
 import java.util.ArrayList;
 import java.util.List;

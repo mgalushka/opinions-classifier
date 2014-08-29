@@ -1,6 +1,7 @@
 package com.maximgalushka.classifier.twitter;
 
 import com.maximgalushka.classifier.twitter.model.Tweet;
+import org.apache.log4j.Logger;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -11,6 +12,8 @@ import java.util.List;
  * @author Maxim Galushka
  */
 public class GatherSamples {
+
+    public static final Logger log = Logger.getLogger(GatherSamples.class);
 
     public static void main(String[] args) throws FileNotFoundException {
         if (args.length == 0) return;
@@ -27,12 +30,13 @@ public class GatherSamples {
             String text = t.getText().replaceAll("\\s+", " ").replaceAll("\\.+", ".").trim();
             if (t.isRetweeted()) to_add = false;
             if (texts.contains(text)) {
-                System.out.printf("Duplicate: [%s]\n", text);
+                log.trace(String.format("Duplicate: [%s]\n", text));
                 to_add = false;
             }
             texts.add(text);
             if (to_add) {
                 pw.println(String.format("'%s, %s'", text, t.getAuthor().getScreenName()));
+                log.debug(String.format("%s", t));
             }
         }
         pw.flush();

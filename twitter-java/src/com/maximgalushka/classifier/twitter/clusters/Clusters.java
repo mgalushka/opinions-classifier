@@ -11,6 +11,17 @@ import java.util.List;
  */
 public class Clusters {
 
-    @SerializedName("statuses")
-    private List<Tweet> clusters = new ArrayList<Tweet>();
+    @SerializedName("clusters")
+    private List<Cluster> clusters = new ArrayList<Cluster>();
+
+    public Clusters() {
+    }
+
+    public List<Cluster> getClusters() {
+        return clusters;
+    }
+
+    public void setClusters(List<Cluster> clusters) {
+        this.clusters = clusters;
+    }
 }

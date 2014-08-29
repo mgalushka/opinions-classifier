@@ -13,9 +13,13 @@ public class Cluster {
     private int id;
     private String label;
     private ClusterOperation operation;
-    private List<Long> tweets = new ArrayList<Long>();
+    private String message;
 
-    public Cluster() {
+    public Cluster(int id, String label, String message, ClusterOperation operation) {
+        this.id = id;
+        this.label = label;
+        this.message = message;
+        this.operation = operation;
     }
 
     public int getId() {
@@ -42,16 +46,16 @@ public class Cluster {
         this.operation = operation;
     }
 
-    public List<Long> getTweets() {
-        return tweets;
+    public String getMessage() {
+        return message;
     }
 
-    public void setTweets(List<Long> tweets) {
-        this.tweets = tweets;
+    public void setMessage(String message) {
+        this.message = message;
     }
 
     public String toString() {
-        return String.format("[%d, %s: [%s]", id, label, tweets);
+        return String.format("[%d, %s: [%s]", id, label, message);
     }
 
 }

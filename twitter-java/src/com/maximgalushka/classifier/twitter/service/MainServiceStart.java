@@ -77,8 +77,8 @@ public class MainServiceStart implements Container, Updatable<Clusters> {
     @Override
     public void update(Clusters model) {
         synchronized (model) {
-            this.model.cleanTweets();
-            this.model.addClusters(model.getClusters());
+            //this.model.cleanTweets();
+            //this.model.addClusters(model.getClusters());
             this.updated = true;
         }
     }

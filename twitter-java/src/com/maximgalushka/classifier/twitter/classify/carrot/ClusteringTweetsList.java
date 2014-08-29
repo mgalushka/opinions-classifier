@@ -1,11 +1,11 @@
 package com.maximgalushka.classifier.twitter.classify.carrot;
 
-import com.maximgalushka.classifier.twitter.classify.Tools;
-import com.maximgalushka.classifier.twitter.clusters.Clusters;
+import com.maximgalushka.classifier.twitter.clusters.*;
 import com.maximgalushka.classifier.twitter.model.Tweet;
 import org.apache.log4j.Logger;
 import org.carrot2.clustering.lingo.LingoClusteringAlgorithm;
 import org.carrot2.core.*;
+import org.carrot2.core.Cluster;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -55,21 +55,26 @@ public class ClusteringTweetsList {
         log.debug(String.format("Found [%d] clusters:\n%s", clustersByTopic.size(), printClusters(clustersByTopic)));
 
         if (previousClusters != null) {
-            compareWithPrev(previousClusters, clustersByTopic);
+            compareWithPrev(previousClusters, clustersByTopic, result);
         }
         previousClusters = clustersByTopic;
         return result;
     }
 
-    private void compareWithPrev(List<Cluster> prev, List<Cluster> current) {
-        // documentId -> Current cluster id
-        HashMap<String, Integer> currMap = new HashMap<String, Integer>();
+    private void compareWithPrev(List<Cluster> prev, List<Cluster> current, Clusters model) {
+        // documentId -> Current cluster
+        HashMap<String, Cluster> currMap = new HashMap<String, Cluster>();
+
+        // reversed index on cluster id - to find cluster
+        HashMap<Integer, Cluster> clusterIdsMap = new HashMap<Integer, Cluster>();
+
         for (Cluster c : current) {
-            Integer clusterId = c.getId();
+            clusterIdsMap.put(c.getId(), c);
             for (Document d : c.getAllDocuments()) {
-                currMap.put(d.getStringId(), clusterId);
+                currMap.put(d.getStringId(), c);
             }
         }
+
         // threshold to determine if cluster stayed the same.
         // if >= this threshold elements stayed in this cluster - it is considered to stay the same
         double SAME = 0.6d;
@@ -80,8 +85,9 @@ public class ClusteringTweetsList {
             HashMap<Integer, Integer> howManyMovedAndWhere = new HashMap<Integer, Integer>();
             for (Document d : docs) {
                 String docId = d.getStringId();
-                Integer toClusterId = currMap.get(docId);
-                if (toClusterId != null) {
+                Cluster toCluster = currMap.get(docId);
+                if (toCluster != null) {
+                    Integer toClusterId = toCluster.getId();
                     Integer to = howManyMovedAndWhere.get(toClusterId);
                     if (to == null) {
                         howManyMovedAndWhere.put(toClusterId, 0);
@@ -95,13 +101,20 @@ public class ClusteringTweetsList {
             for (Integer clusterId : howManyMovedAndWhere.keySet()) {
                 int count = howManyMovedAndWhere.get(clusterId);
                 double ratio = (double) count / totalMoved;
+                Cluster currentCluster = clusterIdsMap.get(clusterId);
                 if (ratio >= SAME) {
+                    // TODO: find better way to determine representative message from cluster instead just taking first one
+                    String message = currentCluster.getAllDocuments().get(0).getSummary();
+                    model.updateCluster(p.getId(), clusterId, currentCluster.getLabel(), message, ClusterOperation.STAY);
                     log.debug(String.format("Cluster [%s] moved to [%s]", p.getId(), clusterId));
                     split = false;
                     break;
                 }
             }
             if (split) {
+                // TODO: find better way to determine representative message from cluster instead just taking first one
+                String message = p.getAllDocuments().get(0).getSummary();
+                model.updateCluster(p.getId(), p.getId(), p.getLabel(), message, ClusterOperation.REMOVE);
                 log.debug(String.format("Cluster [%s] splitted", p.getId()));
             }
         }
@@ -172,7 +185,7 @@ public class ClusteringTweetsList {
             log.debug(String.format("Found [%d] clusters:\n%s", clustersByTopic.size(), c.printClusters(clustersByTopic)));
 
             if (prev != null) {
-                c.compareWithPrev(prev, clustersByTopic);
+                c.compareWithPrev(prev, clustersByTopic, new Clusters());
             }
             prev = clustersByTopic;
 

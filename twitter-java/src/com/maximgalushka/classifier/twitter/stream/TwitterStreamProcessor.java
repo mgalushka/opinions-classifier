@@ -43,10 +43,10 @@ public class TwitterStreamProcessor implements Runnable {
         final Client hosebirdClient = client.stream(q);
         hosebirdClient.connect();
 
-        int BATCH_SIZE = 1000;
+        int BATCH_SIZE = 100;
 
         // TODO: experiment to find better ratio
-        int STEP = BATCH_SIZE / 10;
+        int STEP = BATCH_SIZE / 20;
 
         ArrayDeque<Tweet> batch = new ArrayDeque<Tweet>();
         while (true) {

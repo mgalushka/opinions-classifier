@@ -24,4 +24,8 @@ public class Clusters {
     public void setClusters(List<Cluster> clusters) {
         this.clusters = clusters;
     }
+
+    public void addCluster(){
+
+    }
 }

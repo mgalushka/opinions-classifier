@@ -17,6 +17,8 @@ public class Cluster {
     @SerializedName("tweets")
     private List<Long> tweets = new ArrayList<Long>();
 
+    private ClusterOperation operation;
+
     public Cluster() {
     }
 
@@ -26,6 +28,14 @@ public class Cluster {
 
     public void setLabel(String label) {
         this.label = label;
+    }
+
+    public ClusterOperation getOperation() {
+        return operation;
+    }
+
+    public void setOperation(ClusterOperation operation) {
+        this.operation = operation;
     }
 
     public List<Long> getTweets() {

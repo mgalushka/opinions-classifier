@@ -5,6 +5,8 @@ $( document ).ready(function() {
 		itemSelector: '.item'
 	});
 	
+	var clusters = {};
+	
 	var msnry = $('.masonry').data('masonry');
 	
 	var clickHandler = function() {
@@ -50,7 +52,7 @@ $( document ).ready(function() {
 	
 	function poll(){
 		setTimeout(function(){
-		  $.ajax({ url: "http://localhost", 
+		  $.ajax({ url: "http://localhost:8090", 
 			success: function(data){
 				prepend();
 				poll();
@@ -60,7 +62,7 @@ $( document ).ready(function() {
 				poll();
 			}, 
 			dataType: "json"});
-		}, 5000);
+		}, 60000);
 	};
 	
 	poll();

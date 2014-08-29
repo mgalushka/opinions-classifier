@@ -1,6 +1,7 @@
-package com.maximgalushka.classifier.twitter;
+package com.maximgalushka.classifier.twitter.stream;
 
 import com.google.gson.Gson;
+import com.maximgalushka.classifier.twitter.TwitterClient;
 import com.maximgalushka.classifier.twitter.classify.carrot.ClusteringTweetsList;
 import com.maximgalushka.classifier.twitter.clusters.Clusters;
 import com.maximgalushka.classifier.twitter.model.Tweet;
@@ -16,9 +17,9 @@ import static com.maximgalushka.classifier.twitter.classify.Tools.*;
 /**
  * @since 8/11/2014.
  */
-public class TwitterStream {
+public class TwitterStreamStandalone {
 
-    public static final Logger log = Logger.getLogger(TwitterStream.class);
+    public static final Logger log = Logger.getLogger(TwitterStreamStandalone.class);
     private static boolean NO_CLASSIFICATION = false;
 
     @SuppressWarnings("InfiniteLoopStatement")
@@ -65,7 +66,6 @@ public class TwitterStream {
             try {
                 String json = q.take();
                 Tweet tweet = gson.fromJson(json, Tweet.class);
-                String tweetSingleLine = tweet.getText().trim().replaceAll("\r?\n", " ");
                 if (!NO_CLASSIFICATION) {
                     try {
                         // we need to collect full batch of elements and then classify the whole batch
@@ -82,6 +82,7 @@ public class TwitterStream {
                         log.error(e);
                     }
                 } else {
+                    String tweetSingleLine = tweet.getText().trim().replaceAll("\r?\n", " ");
                     log.debug(String.format("%s", tweetSingleLine));
                 }
             } catch (InterruptedException e) {

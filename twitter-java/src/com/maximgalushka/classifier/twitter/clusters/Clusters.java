@@ -11,9 +11,22 @@ import java.util.List;
  */
 public class Clusters {
 
+    private boolean updated = false;
     private List<Cluster> clusters = new ArrayList<Cluster>();
 
     public Clusters() {
+    }
+
+    public Clusters(boolean updated) {
+        this.updated = updated;
+    }
+
+    public boolean isUpdated() {
+        return updated;
+    }
+
+    public void setUpdated(boolean updated) {
+        this.updated = updated;
     }
 
     public List<Cluster> getClusters() {
@@ -24,8 +37,12 @@ public class Clusters {
         this.clusters = clusters;
     }
 
-    public void addCluster() {
+    public void cleanTweets() {
+        clusters.clear();
+    }
 
+    public void addClusters(List<Cluster> clusters) {
+        this.clusters.addAll(clusters);
     }
 
     @Override

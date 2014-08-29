@@ -7,6 +7,7 @@ import com.google.gson.annotations.SerializedName;
  */
 public class Tweet {
 
+    private long id;
     private String text;
 
     @SerializedName("user")
@@ -14,6 +15,14 @@ public class Tweet {
     private boolean retweeted;
 
     public Tweet() {
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getText() {
@@ -42,6 +51,6 @@ public class Tweet {
 
     @Override
     public String toString() {
-        return String.format("['%s', %s]", text, author);
+        return String.format("[%d, '%s', %s]", id, text, author);
     }
 }

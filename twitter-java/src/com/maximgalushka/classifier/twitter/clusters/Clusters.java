@@ -11,7 +11,6 @@ import java.util.List;
  */
 public class Clusters {
 
-    @SerializedName("clusters")
     private List<Cluster> clusters = new ArrayList<Cluster>();
 
     public Clusters() {
@@ -25,7 +24,12 @@ public class Clusters {
         this.clusters = clusters;
     }
 
-    public void addCluster(){
+    public void addCluster() {
 
+    }
+
+    @Override
+    public String toString() {
+        return clusters.toString();
     }
 }

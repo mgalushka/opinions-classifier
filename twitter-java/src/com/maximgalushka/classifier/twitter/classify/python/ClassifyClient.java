@@ -1,4 +1,4 @@
-package com.maximgalushka.classifier.twitter.classify;
+package com.maximgalushka.classifier.twitter.classify.python;
 
 import javax.ws.rs.client.*;
 import javax.ws.rs.core.Response;

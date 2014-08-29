@@ -10,15 +10,20 @@ import java.util.List;
  */
 public class Cluster {
 
-    @SerializedName("label")
+    private int id;
     private String label;
-
-    @SerializedName("tweets")
+    private ClusterOperation operation;
     private List<Long> tweets = new ArrayList<Long>();
 
-    private ClusterOperation operation;
-
     public Cluster() {
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getLabel() {
@@ -46,7 +51,7 @@ public class Cluster {
     }
 
     public String toString() {
-        return String.format("[%s]: [%s]", label, tweets);
+        return String.format("[%d, %s: [%s]", id, label, tweets);
     }
 
 }

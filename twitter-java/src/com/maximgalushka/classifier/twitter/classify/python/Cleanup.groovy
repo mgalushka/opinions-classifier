@@ -1,4 +1,4 @@
-package com.maximgalushka.classifier.twitter.classify
+package com.maximgalushka.classifier.twitter.classify.python
 
 /**
  *

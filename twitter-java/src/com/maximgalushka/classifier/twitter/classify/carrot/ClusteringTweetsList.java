@@ -123,7 +123,7 @@ public class ClusteringTweetsList {
     private List<Document> readTweetsToDocs(List<Tweet> tweets) throws IOException {
         List<Document> docs = new ArrayList<Document>(tweets.size());
         for (Tweet t : tweets) {
-            docs.add(new Document(null, t.getText(), null, LanguageCode.ENGLISH, Integer.toString(ai.incrementAndGet())));
+            docs.add(new Document(null, t.getText(), null, LanguageCode.ENGLISH, Long.toString(t.getId())));
         }
         return docs;
     }
@@ -147,6 +147,9 @@ public class ClusteringTweetsList {
         StringBuilder sb = new StringBuilder();
         for (Cluster c : clusters) {
             sb.append(c.getLabel()).append("\n");
+            for (Document d : c.getAllDocuments()) {
+                sb.append("\t").append(d.getStringId()).append("\n");
+            }
         }
         return sb.toString();
     }

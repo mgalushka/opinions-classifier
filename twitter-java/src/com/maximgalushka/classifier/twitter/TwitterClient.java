@@ -121,9 +121,12 @@ public class TwitterClient {
                 .processor(new StringDelimitedProcessor(output))
                 .eventMessageQueue(eventQueue);                          // optional: use this if you want to process client events
 
-        HttpHost proxy = new HttpHost("localhost", 4545);
         HttpParams params = new BasicHttpParams();
-        params.setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
+        boolean useProxy = Boolean.parseBoolean(settings.value(LocalSettings.USE_PROXY));
+        if (useProxy) {
+            HttpHost proxy = new HttpHost("localhost", 4545);
+            params.setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
+        }
 
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         ScheduledExecutorService scheduled = Executors.newScheduledThreadPool(1);

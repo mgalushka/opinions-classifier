@@ -1,6 +1,7 @@
 package com.maximgalushka.classifier.twitter.stream;
 
 import com.google.gson.Gson;
+import com.maximgalushka.classifier.twitter.LocalSettings;
 import com.maximgalushka.classifier.twitter.TwitterClient;
 import com.maximgalushka.classifier.twitter.classify.carrot.ClusteringTweetsList;
 import com.maximgalushka.classifier.twitter.clusters.Clusters;
@@ -24,6 +25,7 @@ public class TwitterStreamProcessor implements Runnable {
     public static final Logger log = Logger.getLogger(TwitterStreamProcessor.class);
 
     private Updatable<Clusters> model;
+    private LocalSettings settings = LocalSettings.settings();
 
     public TwitterStreamProcessor(Updatable<Clusters> model) {
         this.model = model;
@@ -32,8 +34,11 @@ public class TwitterStreamProcessor implements Runnable {
     @Override
     @SuppressWarnings("InfiniteLoopStatement")
     public void run() {
-        System.setProperty("http.proxyHost", "localhost");
-        System.setProperty("http.proxyPort", "4545");
+        boolean useProxy = Boolean.parseBoolean(settings.value(LocalSettings.USE_PROXY));
+        if (useProxy) {
+            System.setProperty("http.proxyHost", "localhost");
+            System.setProperty("http.proxyPort", "4545");
+        }
 
         ClusteringTweetsList clustering = ClusteringTweetsList.getAlgorithm();
         Gson gson = new Gson();

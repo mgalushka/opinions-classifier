@@ -9,6 +9,7 @@ $( document ).ready(function() {
 	
 	var msnry = $('.masonry').data('masonry');
 	
+	// TODO: open associated link with cluster in a new tab
 	var clickHandler = function() {
 		console.log( "click" );
 		//$(this).toggleClass('gigante');
@@ -26,15 +27,15 @@ $( document ).ready(function() {
 		var widthClass = wRand > 0.92 ? 'w4' : wRand > 0.84 ? 'w3' : wRand > 0.65 ? 'w2' : '';
 		var heightClass = hRand > 0.85 ? 'h4' : hRand > 0.6 ? 'h3' : hRand > 0.35 ? 'h2' : '';
 		elem.className = 'item ' + widthClass + ' ' + heightClass;
-		elem.background = '#de3';
 		$(elem).on("click", clickHandler);
 		return elem;
 	}
 
-	function prepend(){
+	function refresh(data){
 		var container = $('.masonry');
-		//var msnry = $('.masonry').data('masonry');
-		// create new item elements
+		// iterate over elements and if cluster exists - refresh with updated relative weight
+		// if missed - create new
+		// TODO: all existing clusters which are not in passed object should be removed from screen
 		var elems = [];
 		var fragment = document.createDocumentFragment();
 		for ( var i = 0; i < 3; i++ ) {
@@ -54,11 +55,13 @@ $( document ).ready(function() {
 		setTimeout(function(){
 		  $.ajax({ url: "http://localhost:8090", 
 			success: function(data){
-				prepend();
+				console.log(data.clusters.length);
+				refresh(data);
 				poll();
 			}, 
 			error: function(data){
-				prepend();
+				console.log(data.clusters.length);
+				refresh(data);
 				poll();
 			}, 
 			dataType: "json"});

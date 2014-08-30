@@ -15,7 +15,7 @@ public class Clusters {
 
     private boolean updated = false;
     private List<Cluster> clusters = new ArrayList<Cluster>();
-    private Map<Integer, Cluster> reversedIndex;
+    private transient Map<Integer, Cluster> reversedIndex;
 
     public Clusters() {
         this.reversedIndex = new HashMap<Integer, Cluster>();

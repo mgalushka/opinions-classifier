@@ -11,7 +11,6 @@ import com.twitter.hbc.core.Constants;
 import com.twitter.hbc.core.Hosts;
 import com.twitter.hbc.core.HttpHosts;
 import com.twitter.hbc.core.endpoint.StatusesFilterEndpoint;
-import com.twitter.hbc.core.endpoint.StatusesSampleEndpoint;
 import com.twitter.hbc.core.event.Event;
 import com.twitter.hbc.core.processor.StringDelimitedProcessor;
 import com.twitter.hbc.httpclient.BasicClient;
@@ -41,7 +40,7 @@ public class TwitterClient {
 
     public static final String PROXY_ADDRESS = "http://localhost:4545";
     private Gson gson;
-    private TwitterSettings settings = new TwitterSettings();
+    private LocalSettings settings = LocalSettings.settings();
 
     public TwitterClient() {
         this.gson = new Gson();
@@ -61,7 +60,7 @@ public class TwitterClient {
         invocationBuilder.header("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
 
         String secret = String.format("%s:%s",
-                settings.value(TwitterSettings.CONSUMER_KEY), settings.value(TwitterSettings.CONSUMER_SECRET));
+                settings.value(LocalSettings.CONSUMER_KEY), settings.value(LocalSettings.CONSUMER_SECRET));
         String encoded = new String(Base64.encodeBase64(secret.getBytes()));
         invocationBuilder.header("Authorization", String.format("Basic %s", encoded));
 
@@ -110,8 +109,8 @@ public class TwitterClient {
 
         // These secrets should be read from a config file
         Authentication hosebirdAuth = new OAuth1(
-                settings.value(TwitterSettings.CONSUMER_KEY), settings.value(TwitterSettings.CONSUMER_SECRET),
-                settings.value(TwitterSettings.ACCESS_TOKEN), settings.value(TwitterSettings.ACCESS_TOKEN_SECRET));
+                settings.value(LocalSettings.CONSUMER_KEY), settings.value(LocalSettings.CONSUMER_SECRET),
+                settings.value(LocalSettings.ACCESS_TOKEN), settings.value(LocalSettings.ACCESS_TOKEN_SECRET));
 
         com.twitter.hbc.ClientBuilder builder = new com.twitter.hbc.ClientBuilder()
                 .name("Hosebird-Client-01")                              // optional: mainly for the logs

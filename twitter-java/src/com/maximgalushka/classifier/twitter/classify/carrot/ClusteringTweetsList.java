@@ -51,7 +51,6 @@ public class ClusteringTweetsList {
         final ProcessingResult byTopicClusters = controller.process(docs, null, LingoClusteringAlgorithm.class);
         final List<Cluster> clustersByTopic = byTopicClusters.getClusters();
 
-        //ConsoleFormatter.displayClusters(clustersByTopic);
         log.debug(String.format("Found [%d] clusters:\n%s", clustersByTopic.size(), printClusters(clustersByTopic)));
 
         if (previousClusters != null) {
@@ -184,7 +183,6 @@ public class ClusteringTweetsList {
             // Perform clustering by topic using the Lingo algorithm.
             final ProcessingResult byTopicClusters = controller.process(docs, null, LingoClusteringAlgorithm.class);
             final List<Cluster> clustersByTopic = byTopicClusters.getClusters();
-            //ConsoleFormatter.displayClusters(clustersByTopic);
             log.debug(String.format("Found [%d] clusters:\n%s", clustersByTopic.size(), c.printClusters(clustersByTopic)));
 
             if (prev != null) {

@@ -1,18 +1,20 @@
 package com.maximgalushka.classifier.twitter.service;
 
-import java.io.PrintStream;
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
-
 import com.google.gson.Gson;
 import com.maximgalushka.classifier.twitter.clusters.Clusters;
 import com.maximgalushka.classifier.twitter.stream.TwitterStreamProcessor;
 import org.apache.log4j.Logger;
-import org.simpleframework.http.*;
-import org.simpleframework.http.core.*;
+import org.simpleframework.http.Request;
+import org.simpleframework.http.Response;
+import org.simpleframework.http.core.Container;
+import org.simpleframework.http.core.ContainerServer;
 import org.simpleframework.transport.Server;
 import org.simpleframework.transport.connect.Connection;
 import org.simpleframework.transport.connect.SocketConnection;
+
+import java.io.PrintStream;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 
 /**
  * TODO: 1 thread server, design is very bad
@@ -77,8 +79,8 @@ public class MainServiceStart implements Container, Updatable<Clusters> {
     @Override
     public void update(Clusters model) {
         synchronized (model) {
-            //this.model.cleanTweets();
-            //this.model.addClusters(model.getClusters());
+            this.model.cleanClusters();
+            this.model.addClusters(model.getClusters());
             this.updated = true;
         }
     }

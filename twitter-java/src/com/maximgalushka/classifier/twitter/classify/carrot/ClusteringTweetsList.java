@@ -102,18 +102,15 @@ public class ClusteringTweetsList {
                 double ratio = (double) count / totalMoved;
                 Cluster currentCluster = clusterIdsMap.get(clusterId);
                 if (ratio >= SAME) {
-                    // TODO: find better way to determine representative message from cluster instead just taking first one
                     String message = currentCluster.getAllDocuments().get(0).getSummary();
-                    model.updateCluster(p.getId(), clusterId, currentCluster.getLabel(), message, ClusterOperation.STAY);
+                    model.updateCluster(p.getId(), clusterId, currentCluster.getLabel(), message);
                     log.debug(String.format("Cluster [%s] moved to [%s]", p.getId(), clusterId));
                     split = false;
                     break;
                 }
             }
             if (split) {
-                // TODO: find better way to determine representative message from cluster instead just taking first one
-                String message = p.getAllDocuments().get(0).getSummary();
-                model.updateCluster(p.getId(), p.getId(), p.getLabel(), message, ClusterOperation.REMOVE);
+                model.removeCluster(p.getId());
                 log.debug(String.format("Cluster [%s] splitted", p.getId()));
             }
         }
@@ -145,7 +142,7 @@ public class ClusteringTweetsList {
     private String printClusters(List<Cluster> clusters) {
         StringBuilder sb = new StringBuilder();
         for (Cluster c : clusters) {
-            sb.append(c.getLabel()).append("\n");
+            sb.append(c.getId()).append(": ").append(c.getLabel()).append("\n");
             for (Document d : c.getAllDocuments()) {
                 sb.append("\t").append(d.getStringId()).append("\n");
             }
@@ -183,7 +180,8 @@ public class ClusteringTweetsList {
             // Perform clustering by topic using the Lingo algorithm.
             final ProcessingResult byTopicClusters = controller.process(docs, null, LingoClusteringAlgorithm.class);
             final List<Cluster> clustersByTopic = byTopicClusters.getClusters();
-            log.debug(String.format("Found [%d] clusters:\n%s", clustersByTopic.size(), c.printClusters(clustersByTopic)));
+            log.debug(String.format("Found [%d] clusters:\n%s", clustersByTopic.size(),
+                    c.printClusters(clustersByTopic)));
 
             if (prev != null) {
                 c.compareWithPrev(prev, clustersByTopic, new Clusters());

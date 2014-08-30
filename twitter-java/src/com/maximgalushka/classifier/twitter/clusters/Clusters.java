@@ -1,8 +1,5 @@
 package com.maximgalushka.classifier.twitter.clusters;
 
-import com.google.gson.annotations.SerializedName;
-import com.maximgalushka.classifier.twitter.model.Tweet;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -29,7 +26,7 @@ public class Clusters {
     private void rebuildIndex() {
         reversedIndex.clear();
         for (Cluster c : clusters) {
-            reversedIndex.put(c.getId(), c);
+            reversedIndex.put(c.getTrackingId(), c);
         }
     }
 
@@ -41,8 +38,9 @@ public class Clusters {
         return clusters;
     }
 
-    public void cleanTweets() {
-        clusters.clear();
+    public void cleanClusters() {
+        this.clusters.clear();
+        rebuildIndex();
     }
 
     public void addClusters(List<Cluster> clusters) {
@@ -50,20 +48,22 @@ public class Clusters {
         rebuildIndex();
     }
 
-    public void updateCluster(int id, int newId, String label, String message, ClusterOperation ops) {
+    public void updateCluster(int id, int newId, String label, String message) {
         Cluster update = this.reversedIndex.get(id);
         if (update != null) {
-            // TODO: somehow untouched clusters which disappeared should be completely removed from list
-            // TODO: or it will grow infinitely
-            update.setOperation(ops);
-            update.setId(newId);
+            update.setTrackingId(newId);
             this.reversedIndex.remove(id);
             this.reversedIndex.put(newId, update);
         } else {
-            Cluster added = new Cluster(id, label, message, ops);
+            Cluster added = new Cluster(id, label, message);
             clusters.add(added);
             this.reversedIndex.put(id, added);
         }
+    }
+
+    public void removeCluster(int id) {
+        Cluster c = this.reversedIndex.remove(id);
+        this.clusters.remove(c);
     }
 
     @Override

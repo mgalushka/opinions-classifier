@@ -12,7 +12,6 @@ $( document ).ready(function() {
 	// TODO: open associated link with cluster in a new tab
 	var clickHandler = function() {
 		console.log( "click" );
-		//$(this).toggleClass('gigante');
 		var w = $(this).width();
 		$(this).width(w + 60);
 		msnry.layout();
@@ -20,12 +19,21 @@ $( document ).ready(function() {
 	
 	$(".item").on("click", clickHandler);
 	
-	function getItemElement() {
+	function createClusterElement(id, text, score) {
 		var elem = document.createElement('div');
+		elem['id'] = id;
+		
+		// insert text
+		var t = document.createTextNode(text);
+		elem.appendChild(t); 
+		
+		// TODO: here size should depend on cluster overall score
 		var wRand = Math.random();
 		var hRand = Math.random();
 		var widthClass = wRand > 0.92 ? 'w4' : wRand > 0.84 ? 'w3' : wRand > 0.65 ? 'w2' : '';
 		var heightClass = hRand > 0.85 ? 'h4' : hRand > 0.6 ? 'h3' : hRand > 0.35 ? 'h2' : '';
+		
+		// assign corresponding class
 		elem.className = 'item ' + widthClass + ' ' + heightClass;
 		$(elem).on("click", clickHandler);
 		return elem;
@@ -37,18 +45,24 @@ $( document ).ready(function() {
 		// if missed - create new
 		// TODO: all existing clusters which are not in passed object should be removed from screen
 		var elems = [];
-		var fragment = document.createDocumentFragment();
-		for ( var i = 0; i < 3; i++ ) {
-		  var elem = getItemElement();
-		  fragment.appendChild( elem );
-		  elems.push( elem );
-		}
-		// prepend elements to container
-		$('.item').first().before(fragment);
+		var updated_clusters = data.clusters;
+		for (var i = 0; i < updated_clusters.length; i++) {
+			var cluster = updated_clusters[i];
+			var existing = clusters[cluster.id];
+			if(existing){
+				// TODO: resize depending on score
+			}
+			else{
+				// create new
+				var new_cluster = createClusterElement(cluster.id, cluster.label, 0);
+				// prepend new cluster element to container
+				$('.item').first().before(new_cluster);
+				elems.push(new_cluster);
+			}
+		}		
 		// add and lay out newly prepended elements
-		msnry.prepended( elems );
-	    //msnry.layout();
-		console.log( "prepended" );
+		msnry.prepended(elems);
+		console.log("completed layout processing");
 	}
 	
 	function poll(){

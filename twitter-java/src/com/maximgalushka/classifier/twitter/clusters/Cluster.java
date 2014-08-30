@@ -1,25 +1,30 @@
 package com.maximgalushka.classifier.twitter.clusters;
 
-import com.google.gson.annotations.SerializedName;
-
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * @since 8/29/2014.
  */
 public class Cluster {
 
+    /**
+     * Original cluster id - how it is displayed on GUI
+     */
     private int id;
+
+    /**
+     * Current cluster id according Lingo algorithm - also cluster can be found in reversed index by this id
+     */
+    private transient int trackingId;
+
     private String label;
-    private ClusterOperation operation;
+    private transient ClusterOperation operation;
     private String message;
 
-    public Cluster(int id, String label, String message, ClusterOperation operation) {
+    public Cluster(int id, String label, String message) {
         this.id = id;
+        // at creation both id and trackingId are the same
+        this.trackingId = id;
         this.label = label;
         this.message = message;
-        this.operation = operation;
     }
 
     public int getId() {
@@ -28,6 +33,14 @@ public class Cluster {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public int getTrackingId() {
+        return trackingId;
+    }
+
+    public void setTrackingId(int trackingId) {
+        this.trackingId = trackingId;
     }
 
     public String getLabel() {

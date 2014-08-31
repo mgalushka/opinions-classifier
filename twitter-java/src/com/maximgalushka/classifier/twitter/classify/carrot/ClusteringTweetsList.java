@@ -38,7 +38,10 @@ public class ClusteringTweetsList {
     }
 
     /**
-     * 1 thread processing because we need to keep previous batch.
+     * 1 thread processing because we need to keep previous batch. <br/>
+     * <p/>
+     * TODO: result of this method should be map:<br>
+     * from cluster id: to cluster id
      */
     public synchronized Clusters classify(List<Tweet> batch) throws IOException {
         Clusters result = new Clusters();

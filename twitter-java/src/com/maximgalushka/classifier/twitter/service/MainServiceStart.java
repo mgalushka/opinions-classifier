@@ -17,7 +17,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
 /**
- * TODO: 1 thread server, design is very bad
+ * TODO: 1 thread server, design is exceptionally bad
  *
  * @since 8/29/2014.
  */

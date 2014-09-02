@@ -5,19 +5,26 @@ $( document ).ready(function() {
 		itemSelector: '.item'
 	});
 	
+	var autorefresh = true;
 	var clusters = {};
 	
 	var msnry = $('.masonry').data('masonry');
 	
 	// TODO: open associated link with cluster in a new tab
 	var clickHandler = function() {
-		console.log( "click" );
+		console.log("click");
 		var w = $(this).width();
 		$(this).width(w + 60);
 		msnry.layout();
 	}
 	
 	$(".item").on("click", clickHandler);
+	
+	$("#stopBtn").on("click", function() {
+		console.log("pause/resume");
+		autorefresh = !autorefresh;
+		poll();
+	});
 	
 	function createClusterElement(id, text, score) {
 		var elem = document.createElement('div');
@@ -71,15 +78,19 @@ $( document ).ready(function() {
 			success: function(data){
 				console.log(data.clusters.length);
 				refresh(data);
-				poll();
+				if(autorefresh){
+					poll();
+				}
 			}, 
 			error: function(data){
 				console.log(data.clusters.length);
 				refresh(data);
-				poll();
+				if(autorefresh){
+					poll();
+				}
 			}, 
 			dataType: "json"});
-		}, 60000);
+		}, 5000);
 	};
 	
 	poll();

@@ -78,6 +78,7 @@ public class MainServiceStart implements Container, Updatable<Clusters> {
     @SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
     @Override
     public void update(Clusters model) {
+        // TODO: don't do this
         synchronized (model) {
             this.model.cleanClusters();
             this.model.addClusters(model.getClusters());

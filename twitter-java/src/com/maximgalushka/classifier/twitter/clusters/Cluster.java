@@ -16,15 +16,17 @@ public class Cluster {
     private transient int trackingId;
 
     private String label;
-    private transient ClusterOperation operation;
     private String message;
 
-    public Cluster(int id, String label, String message) {
+    private int score;
+
+    public Cluster(int id, String label, String message, int score) {
         this.id = id;
         // at creation both id and trackingId are the same
         this.trackingId = id;
         this.label = label;
         this.message = message;
+        this.score = score;
     }
 
     public int getId() {
@@ -51,14 +53,6 @@ public class Cluster {
         this.label = label;
     }
 
-    public ClusterOperation getOperation() {
-        return operation;
-    }
-
-    public void setOperation(ClusterOperation operation) {
-        this.operation = operation;
-    }
-
     public String getMessage() {
         return message;
     }
@@ -67,8 +61,23 @@ public class Cluster {
         this.message = message;
     }
 
+    public int getScore() {
+        return score;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
+    }
+
     public String toString() {
         return String.format("[%d, %s: [%s]", id, label, message);
     }
 
+    @SuppressWarnings({"CloneDoesntDeclareCloneNotSupportedException", "CloneDoesntCallSuperClone"})
+    @Override
+    public Cluster clone() {
+        Cluster copy = new Cluster(id, label, message, score);
+        copy.setTrackingId(trackingId);
+        return copy;
+    }
 }

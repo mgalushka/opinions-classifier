@@ -21,14 +21,14 @@ import java.net.SocketAddress;
  *
  * @since 8/29/2014.
  */
-public class MainServiceStart implements Container, Updatable<Clusters> {
+public class MainServiceStart implements Container {
 
     public static final Logger log = Logger.getLogger(MainServiceStart.class);
 
-    private static final Clusters EMPTY = new Clusters(false);
-    private final Clusters model = new Clusters();
+    //private static final Clusters EMPTY = new Clusters();
+    private static final Clusters model = new Clusters();
     private volatile boolean updated = false;
-    private Gson gson;
+    private final Gson gson;
 
     public MainServiceStart() {
         this.gson = new Gson();
@@ -47,14 +47,7 @@ public class MainServiceStart implements Container, Updatable<Clusters> {
         try {
             headers(request, response);
             PrintStream body = response.getPrintStream();
-            synchronized (model) {
-                if (!updated) {
-                    body.println(gson.toJson(EMPTY));
-                } else {
-                    body.println(gson.toJson(model));
-                    updated = false;
-                }
-            }
+            body.println(gson.toJson(model));
             body.close();
             log.debug("Response sent");
         } catch (Exception e) {
@@ -71,18 +64,8 @@ public class MainServiceStart implements Container, Updatable<Clusters> {
         log.debug("Server started");
 
         // TODO: via executors
-        new Thread(new TwitterStreamProcessor(container)).start();
+        new Thread(new TwitterStreamProcessor(model)).start();
         log.debug("Twitter stream processor started");
     }
 
-    @SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
-    @Override
-    public void update(Clusters model) {
-        // TODO: don't do this
-        synchronized (model) {
-            this.model.cleanClusters();
-            this.model.addClusters(model.getClusters());
-            this.updated = true;
-        }
-    }
 }

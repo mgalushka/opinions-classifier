@@ -6,7 +6,6 @@ import com.maximgalushka.classifier.twitter.TwitterClient;
 import com.maximgalushka.classifier.twitter.classify.carrot.ClusteringTweetsList;
 import com.maximgalushka.classifier.twitter.clusters.Clusters;
 import com.maximgalushka.classifier.twitter.model.Tweet;
-import com.maximgalushka.classifier.twitter.service.Updatable;
 import com.twitter.hbc.core.Client;
 import org.apache.log4j.Logger;
 
@@ -24,10 +23,10 @@ import static com.maximgalushka.classifier.twitter.classify.Tools.slice;
 public class TwitterStreamProcessor implements Runnable {
     public static final Logger log = Logger.getLogger(TwitterStreamProcessor.class);
 
-    private Updatable<Clusters> model;
+    private Clusters model;
     private LocalSettings settings = LocalSettings.settings();
 
-    public TwitterStreamProcessor(Updatable<Clusters> model) {
+    public TwitterStreamProcessor(Clusters model) {
         this.model = model;
     }
 
@@ -62,14 +61,10 @@ public class TwitterStreamProcessor implements Runnable {
                     // we need to collect full batch of elements and then classify the whole batch
                     if (batch.size() == (BATCH_SIZE + STEP)) {
                         log.debug("Start batch processing");
-                        Clusters clusters = clustering.classify(slice(batch, BATCH_SIZE));
-                        log.debug(String.format("%s", clusters));
+                        clustering.classify(slice(batch, BATCH_SIZE), model);
 
                         // remove first STEP elements from start
                         cleanFromStart(batch, STEP);
-
-                        // update model
-                        model.update(clusters);
                     } else {
                         log.debug(tweet);
                         batch.addLast(tweet);

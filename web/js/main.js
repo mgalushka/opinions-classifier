@@ -68,7 +68,8 @@ $( document ).ready(function() {
 		// iterate over elements and if cluster exists - refresh with updated relative weight
 		// if missed - create new
 		// TODO: all existing clusters which are not in passed object should be removed from screen
-		var elems = [];
+		var added_elems = [];
+		var removed_elems = [];
 		var updated_clusters = data.clusters;
 		var total = data.size;
 		for (var i = 0; i < updated_clusters.length; i++) {
@@ -77,7 +78,18 @@ $( document ).ready(function() {
 			// TODO: cleanup clusters which disappeared!
 			if(existing){
 				// TODO: resize depending on score
-				console.log("Skip existing cluster: " + cluster.label);
+				console.log("Update existing cluster: " + cluster.label);
+				var relative_score = (cluster.score/total).toFixed(2);
+				//var updated_cluster = createClusterElement(cluster.id, cluster.message, relative_score, cluster.url, cluster.image);
+				//$('#' + cluster.id).html("");
+				//$('#' + cluster.id).append(updated_cluster);
+				//added_elems.push(new_cluster);
+				//removed_elems.push($('#' + cluster.id));
+				msnry.remove($('#' + cluster.id));
+				$('#' + cluster.id).remove();
+				var updated_cluster = createClusterElement(cluster.id, cluster.message, relative_score, cluster.url, cluster.image);
+				$('.item').first().before(updated_cluster);
+				added_elems.push(updated_cluster);
 			}
 			else{
 				// create new
@@ -85,12 +97,14 @@ $( document ).ready(function() {
 				var new_cluster = createClusterElement(cluster.id, cluster.message, relative_score, cluster.url, cluster.image);
 				// prepend new cluster element to container
 				$('.item').first().before(new_cluster);
-				elems.push(new_cluster);
+				added_elems.push(new_cluster);
 				clusters[cluster.id] = cluster;
 			}
 		}		
 		// add and lay out newly prepended elements
-		msnry.prepended(elems);
+		msnry.prepended(added_elems);
+		msnry.layout();
+		//msnry.remove(removed_elems);
 		console.log("completed layout processing");
 	}
 	

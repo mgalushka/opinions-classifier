@@ -12,10 +12,14 @@ $( document ).ready(function() {
 	
 	// TODO: open associated link with cluster in a new tab
 	var clickHandler = function() {
-		console.log("click");
-		var w = $(this).width();
-		$(this).width(w + 60);
-		msnry.layout();
+		//var w = $(this).width();
+		//$(this).width(w + 60);
+		//msnry.layout();
+		var url = $(this).data("url");
+		if(url !== ""){
+			console.log("Opening: " + url);		
+			window.open(url);
+		}
 	}
 	
 	$(".item").on("click", clickHandler);
@@ -26,23 +30,36 @@ $( document ).ready(function() {
 		poll();
 	});
 	
-	function createClusterElement(id, text, score) {
+	function createClusterElement(id, text, score, url, image) {
 		var elem = document.createElement('div');
 		elem['id'] = id;
 		
+		//var documentFragment = $(document.createDocumentFragment());
+		
 		// insert text
-		var t = document.createTextNode(text);
-		elem.appendChild(t); 
+		if(image === ""){
+			var t = document.createTextNode(text);
+			$(elem).append(t); 
+		}
 		
 		// TODO: here size should depend on cluster overall score
-		var wRand = Math.random();
-		var hRand = Math.random();
-		var widthClass = wRand > 0.92 ? 'w4' : wRand > 0.84 ? 'w3' : wRand > 0.65 ? 'w2' : '';
-		var heightClass = hRand > 0.85 ? 'h4' : hRand > 0.6 ? 'h3' : hRand > 0.35 ? 'h2' : '';
+		var widthClass = score > 0.01 ? 'w4' : score > 0.005 ? 'w3' : score > 0.001 ? 'w2' : 'w2';
+		//var heightClass = score > 0.01 ? 'h4' : score > 0.005 ? 'h3' : score > 0.001 ? 'h2' : '';
+		
+		if(image !== ""){
+			// insert image
+			$(elem).append($('<div style="display:block;"><div>' + text + '</div><img src="' + image + '" class="img ' + widthClass + '" style="display:block;"/></div>'));
+		};
+		
+		//console.info(documentFragment);
+		//$(elem).append(documentFragment);
 		
 		// assign corresponding class
-		elem.className = 'item ' + widthClass + ' ' + heightClass;
-		$(elem).on("click", clickHandler);
+		elem.className = 'item ' + widthClass;// + ' ' + heightClass;
+		if(url !== ""){
+			$(elem).data("url", url);
+			$(elem).on("click", clickHandler);
+		}
 		return elem;
 	}
 
@@ -53,18 +70,23 @@ $( document ).ready(function() {
 		// TODO: all existing clusters which are not in passed object should be removed from screen
 		var elems = [];
 		var updated_clusters = data.clusters;
+		var total = data.size;
 		for (var i = 0; i < updated_clusters.length; i++) {
 			var cluster = updated_clusters[i];
 			var existing = clusters[cluster.id];
+			// TODO: cleanup clusters which disappeared!
 			if(existing){
 				// TODO: resize depending on score
+				console.log("Skip existing cluster: " + cluster.label);
 			}
 			else{
 				// create new
-				var new_cluster = createClusterElement(cluster.id, cluster.label, 0);
+				var relative_score = (cluster.score/total).toFixed(2);
+				var new_cluster = createClusterElement(cluster.id, cluster.message, relative_score, cluster.url, cluster.image);
 				// prepend new cluster element to container
 				$('.item').first().before(new_cluster);
 				elems.push(new_cluster);
+				clusters[cluster.id] = cluster;
 			}
 		}		
 		// add and lay out newly prepended elements

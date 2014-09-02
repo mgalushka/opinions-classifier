@@ -2,6 +2,7 @@ package com.maximgalushka.classifier.twitter.classify.carrot;
 
 import com.google.common.base.Optional;
 import com.maximgalushka.classifier.twitter.clusters.*;
+import com.maximgalushka.classifier.twitter.model.Entities;
 import com.maximgalushka.classifier.twitter.model.Tweet;
 import org.apache.log4j.Logger;
 import org.carrot2.clustering.lingo.LingoClusteringAlgorithm;
@@ -51,6 +52,9 @@ public class ClusteringTweetsList {
         List<Document> docs = readTweetsToDocs(batch);
         if (docs.isEmpty()) return;
 
+        // helper map to extract any required tween metadata
+        Map<String, Tweet> tweetsIndex = readTweetsToMap(batch);
+
         // Perform clustering by topic using the Lingo algorithm.
         final ProcessingResult byTopicClusters = controller.process(docs, null, LingoClusteringAlgorithm.class);
         final List<Cluster> clustersByTopic = byTopicClusters.getClusters();
@@ -59,34 +63,49 @@ public class ClusteringTweetsList {
 
         if (previousClusters != null) {
             Map<Integer, Optional<Integer>> fromTo = compareWithPrev(previousClusters, clustersByTopic);
-            updateModel(model, clustersByTopic, fromTo);
+            updateModel(model, clustersByTopic, fromTo, tweetsIndex);
         }
         previousClusters = clustersByTopic;
     }
 
-    private void updateModel(final Clusters clusters, List<Cluster> currentClusters, Map<Integer, Optional<Integer>> fromTo) {
+    private void updateModel(final Clusters clusters, List<Cluster> currentClusters,
+                             Map<Integer, Optional<Integer>> fromTo, Map<String, Tweet> tweetsIndex) {
         // if cluster id is no longer in fromTo map - we should remove it
         // if cluster migrated to another - we should change it tracking id
         // if new cluster was created - we should just add it
+        Map<Integer, Cluster> currentClustersIndex = new HashMap<Integer, Cluster>();
+        for (Cluster c : currentClusters) currentClustersIndex.put(c.getId(), c);
+
         List<com.maximgalushka.classifier.twitter.clusters.Cluster> updated = new ArrayList<com.maximgalushka.classifier.twitter.clusters.Cluster>();
         List<com.maximgalushka.classifier.twitter.clusters.Cluster> snapshot = Collections.unmodifiableList(clusters.getClusters());
         for (com.maximgalushka.classifier.twitter.clusters.Cluster old : snapshot) {
             Optional<Integer> to = Optional.fromNullable(fromTo.get(old.getId())).or(Optional.<Integer>absent());
             if (to.isPresent()) {
                 com.maximgalushka.classifier.twitter.clusters.Cluster updatedCluster = old.clone();
+                Cluster newCluster = currentClustersIndex.get(to.get());
                 updatedCluster.setTrackingId(to.get());
+                updatedCluster.setScore(old.getScore() + newCluster.getAllDocuments().size());
                 updated.add(updatedCluster);
             }
         }
         for (Cluster current : currentClusters) {
             com.maximgalushka.classifier.twitter.clusters.Cluster old = clusters.clusterById(current.getId());
             if (old == null) {
+                Tweet representative = findRepresentative(current.getAllDocuments(), tweetsIndex);
+                Entities entities = representative.getEntities();
+                String url = "";
+                String image = "";
+                if (entities != null) {
+                    url = entities.getUrls().isEmpty() ? "" : entities.getUrls().get(0).getUrl();
+                    image = entities.getMedia().isEmpty() ? "" : entities.getMedia().get(0).getUrl();
+                }
                 // create new
                 updated.add(new com.maximgalushka.classifier.twitter.clusters.Cluster(
                         current.getId(),
                         current.getLabel(),
-                        current.getAllDocuments().get(0).getSummary(),
-                        current.getAllDocuments().size()));
+                        representative.getText(),
+                        current.getAllDocuments().size(),
+                        url, image));
             }
         }
         int size = 0;
@@ -98,6 +117,25 @@ public class ClusteringTweetsList {
             clusters.cleanClusters();
             clusters.addClusters(updated);
         }
+    }
+
+    /**
+     * @return finds good representative tweet from list of documents inside a single cluster
+     */
+    private Tweet findRepresentative(List<Document> allDocuments, Map<String, Tweet> tweetsIndex) {
+        if (allDocuments.isEmpty()) return null;
+        int maxScore = -1;
+        Tweet winner = null;
+        for (Document d : allDocuments) {
+            String id = d.getStringId();
+            Tweet t = tweetsIndex.get(id);
+            int currentScore = t.getFavouriteCount() + t.getRetweetCount();
+            if (currentScore > maxScore) {
+                maxScore = currentScore;
+                winner = t;
+            }
+        }
+        return winner;
     }
 
     /**
@@ -181,6 +219,14 @@ public class ClusteringTweetsList {
             docs.add(new Document(null, t.getText(), null, LanguageCode.ENGLISH, Long.toString(t.getId())));
         }
         return docs;
+    }
+
+    private Map<String, Tweet> readTweetsToMap(List<Tweet> tweets) throws IOException {
+        Map<String, Tweet> map = new HashMap<String, Tweet>(2 * tweets.size());
+        for (Tweet t : tweets) {
+            map.put(Long.toString(t.getId()), t);
+        }
+        return map;
     }
 
     private boolean readDocsToDeque(BufferedReader fr, ArrayDeque<Document> docs, int N) throws IOException {

@@ -3,6 +3,7 @@ package com.maximgalushka.classifier.twitter.clusters;
 /**
  * @since 8/29/2014.
  */
+@SuppressWarnings("UnusedDeclaration")
 public class Cluster {
 
     /**
@@ -17,16 +18,20 @@ public class Cluster {
 
     private String label;
     private String message;
+    private String url;
+    private String image;
 
     private int score;
 
-    public Cluster(int id, String label, String message, int score) {
+    public Cluster(int id, String label, String message, int score, String url, String image) {
         this.id = id;
         // at creation both id and trackingId are the same
         this.trackingId = id;
         this.label = label;
         this.message = message;
         this.score = score;
+        this.url = url;
+        this.image = image;
     }
 
     public int getId() {
@@ -69,6 +74,22 @@ public class Cluster {
         this.score = score;
     }
 
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
     public String toString() {
         return String.format("[%d, %s: [%s]", id, label, message);
     }
@@ -76,7 +97,7 @@ public class Cluster {
     @SuppressWarnings({"CloneDoesntDeclareCloneNotSupportedException", "CloneDoesntCallSuperClone"})
     @Override
     public Cluster clone() {
-        Cluster copy = new Cluster(id, label, message, score);
+        Cluster copy = new Cluster(id, label, message, score, url, image);
         copy.setTrackingId(trackingId);
         return copy;
     }

@@ -8,6 +8,7 @@ import java.util.Map;
 /**
  * @since 8/29/2014.
  */
+@SuppressWarnings("UnusedDeclaration")
 public class Clusters {
 
     private int size;

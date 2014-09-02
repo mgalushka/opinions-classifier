@@ -71,7 +71,7 @@ public class ClusteringTweetsList {
         List<com.maximgalushka.classifier.twitter.clusters.Cluster> updated = new ArrayList<com.maximgalushka.classifier.twitter.clusters.Cluster>();
         List<com.maximgalushka.classifier.twitter.clusters.Cluster> snapshot = Collections.unmodifiableList(clusters.getClusters());
         for (com.maximgalushka.classifier.twitter.clusters.Cluster old : snapshot) {
-            Optional<Integer> to = Optional.fromNullable(fromTo.get(old.getId()).orNull());
+            Optional<Integer> to = Optional.fromNullable(fromTo.get(old.getId())).or(Optional.<Integer>absent());
             if (to.isPresent()) {
                 com.maximgalushka.classifier.twitter.clusters.Cluster updatedCluster = old.clone();
                 updatedCluster.setTrackingId(to.get());

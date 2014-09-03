@@ -170,7 +170,7 @@ $( document ).ready(function() {
 	
 	function poll(){
 		setTimeout(function(){
-		  $.ajax({ url: "http://localhost:8090", 
+		  $.ajax({ url: "http://ec2-54-68-39-246.us-west-2.compute.amazonaws.com:8090", 
 			success: function(data){
 				console.log(data.clusters.length);
 				refresh(data);

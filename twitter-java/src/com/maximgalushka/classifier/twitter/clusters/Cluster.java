@@ -94,6 +94,28 @@ public class Cluster {
         return String.format("[%d, %s: [%s]", id, label, message);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Cluster cluster = (Cluster) o;
+
+        if (message != null && cluster.message != null && message.equals(cluster.message)) return true;
+        if (url != null && cluster.url != null && url.equals(cluster.url)) return true;
+        if (image != null && cluster.image != null && image.equals(cluster.image)) return true;
+
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = message != null ? message.hashCode() : 0;
+        result = 31 * result + (url != null ? url.hashCode() : 0);
+        result = 31 * result + (image != null ? image.hashCode() : 0);
+        return result;
+    }
+
     @SuppressWarnings({"CloneDoesntDeclareCloneNotSupportedException", "CloneDoesntCallSuperClone"})
     @Override
     public Cluster clone() {

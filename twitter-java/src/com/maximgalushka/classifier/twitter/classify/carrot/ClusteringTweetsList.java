@@ -115,8 +115,56 @@ public class ClusteringTweetsList {
         clusters.setSize(size);
         synchronized (this) {
             clusters.cleanClusters();
-            clusters.addClusters(updated);
+            List<com.maximgalushka.classifier.twitter.clusters.Cluster> finalList = filterDuplicateRepresentations(updated);
+            log.debug(String.format("Final clusters list: [%s]", finalList));
+            clusters.addClusters(finalList);
         }
+    }
+
+    /**
+     * TODO: kind of messy method to filter out duplicate cluster representations if any.
+     *
+     * @return list of clusters (domain model) without duplicated
+     */
+    private List<com.maximgalushka.classifier.twitter.clusters.Cluster>
+    filterDuplicateRepresentations(List<com.maximgalushka.classifier.twitter.clusters.Cluster> clusters) {
+        List<com.maximgalushka.classifier.twitter.clusters.Cluster> result
+                = new ArrayList<com.maximgalushka.classifier.twitter.clusters.Cluster>();
+
+        HashMap<String, com.maximgalushka.classifier.twitter.clusters.Cluster> messagesIndex =
+                new HashMap<String, com.maximgalushka.classifier.twitter.clusters.Cluster>();
+
+        HashMap<String, com.maximgalushka.classifier.twitter.clusters.Cluster> urlsIndex =
+                new HashMap<String, com.maximgalushka.classifier.twitter.clusters.Cluster>();
+
+        HashMap<String, com.maximgalushka.classifier.twitter.clusters.Cluster> imagesIndex =
+                new HashMap<String, com.maximgalushka.classifier.twitter.clusters.Cluster>();
+
+        List<com.maximgalushka.classifier.twitter.clusters.Cluster> snapshot =
+                Collections.unmodifiableList(clusters);
+
+        for (com.maximgalushka.classifier.twitter.clusters.Cluster c : snapshot) {
+            String message = c.getMessage();
+            String url = c.getUrl();
+            String image = c.getImage();
+            if (messagesIndex.containsKey(message.trim())) mergeClusters(c, messagesIndex.get(message));
+            else if (url != null && urlsIndex.containsKey(url)) mergeClusters(c, urlsIndex.get(url));
+            else if (image != null && imagesIndex.containsKey(image)) mergeClusters(c, imagesIndex.get(image));
+            else {
+                messagesIndex.put(message.trim(), c);
+                if (url != null) urlsIndex.put(url, c);
+                if (image != null) imagesIndex.put(image, c);
+            }
+        }
+        result.addAll(messagesIndex.values());
+        return result;
+    }
+
+    private void mergeClusters(com.maximgalushka.classifier.twitter.clusters.Cluster from,
+                               com.maximgalushka.classifier.twitter.clusters.Cluster to) {
+        log.warn(String.format("Merging cluster [%d] to [%d]", from.getId(), to.getId()));
+        // recalculate sore
+        to.setScore(to.getScore() + from.getScore());
     }
 
     private static class TweetsComparator implements Comparator<Tweet> {

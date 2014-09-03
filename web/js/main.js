@@ -6,7 +6,56 @@ $( document ).ready(function() {
 	});
 	
 	var autorefresh = true;
-	var clusters = {};
+	
+	var clusters = {
+		all: {},
+		add: function(cluster) {
+			var cl = {
+				id: cluster.id, 			
+				label: cluster.label, 			
+				message: cluster.message, 			
+				url: cluster.url, 			
+				image: cluster.image, 		
+				marked: true
+			};
+			clusters.all[cluster.id] = cl;
+		},
+		remove: function(id) {
+			delete clusters.all[id];
+		},
+		get: function(){
+			return all;
+		},
+		getById: function(id){
+			return clusters.all[id];
+		},
+		reset: function(){
+			for (var clusterId in clusters.all) {
+				if (clusters.all.hasOwnProperty(clusterId)) {
+					var cluster = clusters.all[clusterId];
+					cluster.marked = false;
+				}
+			}			
+		},
+		clean: function(){
+			for (var clusterId in clusters.all) {
+				if (clusters.all.hasOwnProperty(clusterId)) {
+					var cluster = clusters.all[clusterId];
+					if(!cluster.marked){
+						console.log("Delete cluster: " + cluster.id);
+						delete clusters.all[clusterId];
+						msnry.remove($('#' + cluster.id));
+						$('#' + cluster.id).remove();
+					}	
+				}
+			}	
+		},
+		print: function(){
+			console.log(clusters.all);
+		}
+	};
+	
+	//var clusters = {};
 	
 	var msnry = $('.masonry').data('masonry');
 	
@@ -27,6 +76,7 @@ $( document ).ready(function() {
 	$("#stopBtn").on("click", function() {
 		console.log("pause/resume");
 		autorefresh = !autorefresh;
+		console.log("refreshing = " + autorefresh);
 		poll();
 	});
 	
@@ -64,6 +114,7 @@ $( document ).ready(function() {
 	}
 
 	function refresh(data){
+		clusters.print();
 		var container = $('.masonry');
 		// iterate over elements and if cluster exists - refresh with updated relative weight
 		// if missed - create new
@@ -72,13 +123,16 @@ $( document ).ready(function() {
 		var removed_elems = [];
 		var updated_clusters = data.clusters;
 		var total = data.size;
+		
+		clusters.reset();
+		
 		for (var i = 0; i < updated_clusters.length; i++) {
 			var cluster = updated_clusters[i];
-			var existing = clusters[cluster.id];
+			var existing = clusters.getById(cluster.id);
 			// TODO: cleanup clusters which disappeared!
 			if(existing){
 				// TODO: resize depending on score
-				console.log("Update existing cluster: " + cluster.label);
+				console.log("Update existing cluster: " + existing.id + " " + existing.label + " to [" + cluster.id + "] " + cluster.label);
 				var relative_score = (cluster.score/total).toFixed(2);
 				//var updated_cluster = createClusterElement(cluster.id, cluster.message, relative_score, cluster.url, cluster.image);
 				//$('#' + cluster.id).html("");
@@ -90,21 +144,27 @@ $( document ).ready(function() {
 				var updated_cluster = createClusterElement(cluster.id, cluster.message, relative_score, cluster.url, cluster.image);
 				$('.item').first().before(updated_cluster);
 				added_elems.push(updated_cluster);
+				existing.marked = true;
 			}
 			else{
 				// create new
+				console.log("Create new cluster: " + cluster.label);
 				var relative_score = (cluster.score/total).toFixed(2);
 				var new_cluster = createClusterElement(cluster.id, cluster.message, relative_score, cluster.url, cluster.image);
 				// prepend new cluster element to container
 				$('.item').first().before(new_cluster);
 				added_elems.push(new_cluster);
-				clusters[cluster.id] = cluster;
+				clusters.add(cluster);
 			}
-		}		
+		}
+		
+		clusters.clean();
+		
 		// add and lay out newly prepended elements
 		msnry.prepended(added_elems);
 		msnry.layout();
 		//msnry.remove(removed_elems);
+		clusters.print();
 		console.log("completed layout processing");
 	}
 	

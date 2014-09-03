@@ -50,7 +50,7 @@ public class TwitterStreamProcessor implements Runnable {
         int BATCH_SIZE = 1000;
 
         // TODO: experiment to find better ratio
-        int STEP = BATCH_SIZE / 10;
+        int STEP = BATCH_SIZE / 20;
 
         ArrayDeque<Tweet> batch = new ArrayDeque<Tweet>();
         while (true) {

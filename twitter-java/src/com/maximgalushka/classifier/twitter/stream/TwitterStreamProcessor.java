@@ -47,10 +47,10 @@ public class TwitterStreamProcessor implements Runnable {
         final Client hosebirdClient = client.stream(q);
         hosebirdClient.connect();
 
-        int BATCH_SIZE = 100;
+        int BATCH_SIZE = 1000;
 
         // TODO: experiment to find better ratio
-        int STEP = BATCH_SIZE / 20;
+        int STEP = BATCH_SIZE / 10;
 
         ArrayDeque<Tweet> batch = new ArrayDeque<Tweet>();
         while (true) {
@@ -58,8 +58,15 @@ public class TwitterStreamProcessor implements Runnable {
                 String json = q.take();
                 Tweet tweet = gson.fromJson(json, Tweet.class);
                 try {
+                    if ((batch.size() % STEP) == 0) {
+                        log.debug("Pre-batch cluster estimation.");
+                        clustering.classify(slice(batch, batch.size() - STEP, batch.size()), model);
+                    }
                     // we need to collect full batch of elements and then classify the whole batch
                     if (batch.size() == (BATCH_SIZE + STEP)) {
+                        log.debug("Clean model. We start full scale clustering.");
+                        model.cleanClusters();
+
                         log.debug("Start batch processing");
                         clustering.classify(slice(batch, BATCH_SIZE), model);
 

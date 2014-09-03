@@ -119,23 +119,43 @@ public class ClusteringTweetsList {
         }
     }
 
+    private static class TweetsComparator implements Comparator<Tweet> {
+        @Override
+        public int compare(Tweet one, Tweet two) {
+            int oneScore = one.getFavouriteCount() + one.getRetweetCount();
+            int twoScore = two.getFavouriteCount() + two.getRetweetCount();
+
+            // higher - with higher mentions/retweets
+            if (oneScore != twoScore) return twoScore - oneScore;
+
+            // if scores are equal - just retrieve one which has media inside
+            Entities e1 = one.getEntities();
+            Entities e2 = two.getEntities();
+            if (!e1.getMedia().isEmpty() && e2.getMedia().isEmpty()) return -1;
+            if (e1.getMedia().isEmpty() && !e2.getMedia().isEmpty()) return 1;
+
+            if (!e1.getUrls().isEmpty() && e2.getUrls().isEmpty()) return -1;
+            if (e1.getUrls().isEmpty() && !e2.getUrls().isEmpty()) return 1;
+
+            return 0;
+        }
+    }
+
+    private static final Comparator<Tweet> TWEETS_COMPARATOR = new TweetsComparator();
+
     /**
+     * Performance: O(n*log(n))
+     *
      * @return finds good representative tweet from list of documents inside a single cluster
      */
     private Tweet findRepresentative(List<Document> allDocuments, Map<String, Tweet> tweetsIndex) {
         if (allDocuments.isEmpty()) return null;
-        int maxScore = -1;
-        Tweet winner = null;
+
+        TreeSet<Tweet> selected = new TreeSet<Tweet>(TWEETS_COMPARATOR);
         for (Document d : allDocuments) {
-            String id = d.getStringId();
-            Tweet t = tweetsIndex.get(id);
-            int currentScore = t.getFavouriteCount() + t.getRetweetCount();
-            if (currentScore > maxScore) {
-                maxScore = currentScore;
-                winner = t;
-            }
+            selected.add(tweetsIndex.get(d.getStringId()));
         }
-        return winner;
+        return selected.first();
     }
 
     /**

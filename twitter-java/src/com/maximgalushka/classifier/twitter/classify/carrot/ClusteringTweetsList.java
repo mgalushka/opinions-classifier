@@ -281,10 +281,21 @@ public class ClusteringTweetsList {
         return fromTo;
     }
 
+    /**
+     * Reads tweets to doument list ready for classification.<br/>
+     * Filters out any duplicate tweets (with dame tweet id).
+     */
     private List<Document> readTweetsToDocs(List<Tweet> tweets) throws IOException {
         List<Document> docs = new ArrayList<Document>(tweets.size());
+        Set<String> set = new HashSet<String>(2 * docs.size());
         for (Tweet t : tweets) {
-            docs.add(new Document(null, t.getText(), null, LanguageCode.ENGLISH, Long.toString(t.getId())));
+            String id = Long.toString(t.getId());
+            if (!set.contains(id)) {
+                docs.add(new Document(null, t.getText(), null, LanguageCode.ENGLISH, id));
+                set.add(id);
+            } else {
+                log.debug(String.format("Skip duplicate document: [%s]", id));
+            }
         }
         return docs;
     }

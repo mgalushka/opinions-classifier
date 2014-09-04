@@ -58,7 +58,7 @@ public class TwitterStreamProcessor implements Runnable {
                 String json = q.take();
                 Tweet tweet = gson.fromJson(json, Tweet.class);
                 try {
-                    if ((batch.size() % STEP) == 0) {
+                    if (batch.size() < (BATCH_SIZE + STEP) && (batch.size() % STEP) == 0) {
                         log.debug("Pre-batch cluster estimation.");
                         clustering.classify(slice(batch, batch.size() - STEP, batch.size()), model);
                     }

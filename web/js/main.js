@@ -168,9 +168,8 @@ $( document ).ready(function() {
 		console.log("completed layout processing");
 	}
 	
-	function poll(){
-		setTimeout(function(){
-		  $.ajax({ url: "http://ec2-54-68-39-246.us-west-2.compute.amazonaws.com:8090", 
+	function remoteCall(){
+		$.ajax({ url: "http://ec2-54-68-39-246.us-west-2.compute.amazonaws.com:8090", 
 			success: function(data){
 				console.log(data.clusters.length);
 				refresh(data);
@@ -186,10 +185,15 @@ $( document ).ready(function() {
 				}
 			}, 
 			dataType: "json"});
-		}, 5000);
+	}
+	
+	function poll(){
+		setTimeout(function(){
+			remoteCall();
+		}, 60000);
 	};
 	
-	poll();
+	remoteCall();
 	
 });
 

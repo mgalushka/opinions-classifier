@@ -53,6 +53,7 @@ public class TwitterStreamProcessor implements Runnable {
         int STEP = BATCH_SIZE / 20;
 
         ArrayDeque<Tweet> batch = new ArrayDeque<Tweet>();
+        long messageCount = 0;
         while (true) {
             try {
                 String json = q.take();
@@ -73,7 +74,7 @@ public class TwitterStreamProcessor implements Runnable {
                         // remove first STEP elements from start
                         cleanFromStart(batch, STEP);
                     } else {
-                        log.debug(tweet);
+                        log.debug(String.format("[%d] %s", messageCount++, tweet));
                         batch.addLast(tweet);
                     }
                 } catch (IOException e) {

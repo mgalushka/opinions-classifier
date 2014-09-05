@@ -202,7 +202,7 @@ $( document ).ready(function() {
 	function poll(){
 		setTimeout(function(){
 			remoteCall();
-		}, 5000);
+		}, 60000);
 	};
 	
 	remoteCall();

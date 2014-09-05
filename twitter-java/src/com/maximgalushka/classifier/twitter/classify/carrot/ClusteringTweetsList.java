@@ -282,7 +282,7 @@ public class ClusteringTweetsList {
     }
 
     /**
-     * Reads tweets to doument list ready for classification.<br/>
+     * Reads tweets to document list ready for classification.<br/>
      * Filters out any duplicate tweets (with dame tweet id).
      */
     private List<Document> readTweetsToDocs(List<Tweet> tweets) throws IOException {

@@ -115,7 +115,7 @@ public class ClusteringTweetsList {
         clusters.setSize(size);
         synchronized (this) {
             clusters.cleanClusters();
-            List<com.maximgalushka.classifier.twitter.clusters.Cluster> finalList = filterDuplicateRepresentations(updated);
+            List<com.maximgalushka.classifier.twitter.clusters.Cluster> finalList = filterAndFormatRepresetnations(updated);
             log.debug(String.format("Final clusters list: [%s]", finalList));
             clusters.addClusters(finalList);
         }
@@ -127,7 +127,7 @@ public class ClusteringTweetsList {
      * @return list of clusters (domain model) without duplicated
      */
     private List<com.maximgalushka.classifier.twitter.clusters.Cluster>
-    filterDuplicateRepresentations(List<com.maximgalushka.classifier.twitter.clusters.Cluster> clusters) {
+    filterAndFormatRepresetnations(List<com.maximgalushka.classifier.twitter.clusters.Cluster> clusters) {
         List<com.maximgalushka.classifier.twitter.clusters.Cluster> result
                 = new ArrayList<com.maximgalushka.classifier.twitter.clusters.Cluster>();
 
@@ -157,7 +157,35 @@ public class ClusteringTweetsList {
             }
         }
         result.addAll(messagesIndex.values());
+
+        for (com.maximgalushka.classifier.twitter.clusters.Cluster cluster : result) {
+            cluster.setMessage(reformatMessage(cluster.getMessage()));
+        }
+
         return result;
+    }
+
+    /**
+     * <ul>
+     * <li>Removes all "RT" asking for retweet.</li>
+     * <li>Removes all the mentions.</li>
+     * <li>Clean-up all the urls</li>
+     * </ul>
+     */
+    public String reformatMessage(String initial) {
+        String formatted = initial.replaceAll("(r|R)(t|T)", "");
+        formatted = formatted.replaceAll("@\\S+", "");
+        formatted = formatted.replaceAll("http[s]?:[/]{1,2}\\S*", "");
+
+        // remove all URLs' remains
+        formatted = formatted.replaceAll("https:", "");
+        formatted = formatted.replaceAll("http:", "");
+        formatted = formatted.replaceAll("https", "");
+        formatted = formatted.replaceAll("http", "");
+
+        // normalize internal spaces
+        formatted = formatted.replaceAll("\\s+", " ");
+        return formatted.trim();
     }
 
     private void mergeClusters(com.maximgalushka.classifier.twitter.clusters.Cluster from,

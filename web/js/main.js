@@ -1,5 +1,7 @@
 $( document ).ready(function() {
 	console.log( "ready!" );
+	var WIDTH = window.innerWidth;
+	var colsWidth = Math.max(WIDTH/4, 240);
 	$('.masonry').masonry({
 		columnWidth: 60,
 		itemSelector: '.item'
@@ -55,15 +57,11 @@ $( document ).ready(function() {
 		}
 	};
 	
-	//var clusters = {};
-	
 	var msnry = $('.masonry').data('masonry');
 	
 	// TODO: open associated link with cluster in a new tab
+	// TODO: open image if clicked on image
 	var clickHandler = function() {
-		//var w = $(this).width();
-		//$(this).width(w + 60);
-		//msnry.layout();
 		var url = $(this).data("url");
 		if(url !== ""){
 			console.log("Opening: " + url);		
@@ -121,8 +119,8 @@ $( document ).ready(function() {
 
 	function refresh(data){
 		// we skip if update is empty - maybe error on server?
-		if(data.clusters && data.clusters.length === 0) {
-			log.warn("Received empty clusters list. Check server side. No refresh.");
+		if(data && data.clusters && data.clusters.length === 0) {
+			console.warn("Received empty clusters list. Check server side. No refresh.");
 			return;
 		}
 		clusters.print();

@@ -33,7 +33,12 @@ body { font-family: sans-serif; }
 .item.w3 { width:  180px; }
 .item.w4 { width:  240px; }
 
-
+.img{
+	display: block;
+    margin-left: auto;
+    margin-right: auto;
+	margin-top: 10px;
+}
 .img.w2 { width:  115px; }
 .img.w3 { width:  175px; }
 .img.w4 { width:  235px; }

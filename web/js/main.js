@@ -84,8 +84,6 @@ $( document ).ready(function() {
 		var elem = document.createElement('div');
 		elem['id'] = id;
 		
-		//var documentFragment = $(document.createDocumentFragment());
-		
 		// insert text
 		if(image === ""){
 			var t = document.createTextNode(text);
@@ -93,17 +91,16 @@ $( document ).ready(function() {
 		}
 		
 		// TODO: here size should depend on cluster overall score
-		var widthClass = score > 0.01 ? 'w4' : score > 0.005 ? 'w3' : score > 0.001 ? 'w2' : 'w2';
+		// TODO: this is bad idea, revertign to default size for big screent
+		//var widthClass = score > 0.01 ? 'w4' : score > 0.005 ? 'w3' : score > 0.001 ? 'w2' : 'w2';
+		var widthClass = 'w4';
 		//var heightClass = score > 0.01 ? 'h4' : score > 0.005 ? 'h3' : score > 0.001 ? 'h2' : '';
 		
 		if(image !== ""){
 			// insert image
 			$(elem).append($('<div style="display:block;"><div>' + text + '</div><img src="' + image + '" class="img ' + widthClass + '" style="display:block;"/></div>'));
 		};
-		
-		//console.info(documentFragment);
-		//$(elem).append(documentFragment);
-		
+
 		// assign corresponding class
 		elem.className = 'item ' + widthClass;// + ' ' + heightClass;
 		if(url !== ""){
@@ -112,11 +109,27 @@ $( document ).ready(function() {
 		}
 		return elem;
 	}
+	
+	function insertIntoContainer(container, clusterObj){
+		if($('.item').length > 0){
+			$('.item').first().before(clusterObj);
+		}
+		else{
+			container.append(clusterObj);
+		}	
+	}
 
 	function refresh(data){
+		// we skip if update is empty - maybe error on server?
+		if(data.clusters && data.clusters.length === 0) {
+			log.warn("Received empty clusters list. Check server side. No refresh.");
+			return;
+		}
 		clusters.print();
 		var container = $('.masonry');
-		// iterate over elements and if cluster exists - refresh with updated relative weight
+		
+		// iterate over elements and if cluster exists - refresh with updated relative weight? TODO: this is not good idea.
+		// TODO: Need to think how we will work on different devices with resizing issues, etc...
 		// if missed - create new
 		// TODO: all existing clusters which are not in passed object should be removed from screen
 		var added_elems = [];
@@ -131,19 +144,19 @@ $( document ).ready(function() {
 			var existing = clusters.getById(cluster.id);
 			// TODO: cleanup clusters which disappeared!
 			if(existing){
-				// TODO: resize depending on score
+				// TODO: resize depending on score???
 				console.log("Update existing cluster: " + existing.id + " " + existing.label + " to [" + cluster.id + "] " + cluster.label);
 				var relative_score = (cluster.score/total).toFixed(2);
-				//var updated_cluster = createClusterElement(cluster.id, cluster.message, relative_score, cluster.url, cluster.image);
-				//$('#' + cluster.id).html("");
-				//$('#' + cluster.id).append(updated_cluster);
-				//added_elems.push(new_cluster);
-				//removed_elems.push($('#' + cluster.id));
-				msnry.remove($('#' + cluster.id));
-				$('#' + cluster.id).remove();
-				var updated_cluster = createClusterElement(cluster.id, cluster.message, relative_score, cluster.url, cluster.image);
-				$('.item').first().before(updated_cluster);
-				added_elems.push(updated_cluster);
+				// we only delete in case if messages are really different
+				if(existing.message !== cluster.message){
+					msnry.remove($('#' + cluster.id));
+					$('#' + cluster.id).remove();
+					var updated_cluster = createClusterElement(cluster.id, cluster.message, relative_score, cluster.url, cluster.image);
+					
+					// insert updated cluster to container
+					insertIntoContainer(container, updated_cluster);
+					added_elems.push(updated_cluster);
+				}
 				existing.marked = true;
 			}
 			else{
@@ -151,8 +164,9 @@ $( document ).ready(function() {
 				console.log("Create new cluster: " + cluster.label);
 				var relative_score = (cluster.score/total).toFixed(2);
 				var new_cluster = createClusterElement(cluster.id, cluster.message, relative_score, cluster.url, cluster.image);
-				// prepend new cluster element to container
-				$('.item').first().before(new_cluster);
+				
+				// insert new cluster to container
+				insertIntoContainer(container, new_cluster);
 				added_elems.push(new_cluster);
 				clusters.add(cluster);
 			}
@@ -190,7 +204,7 @@ $( document ).ready(function() {
 	function poll(){
 		setTimeout(function(){
 			remoteCall();
-		}, 60000);
+		}, 5000);
 	};
 	
 	remoteCall();

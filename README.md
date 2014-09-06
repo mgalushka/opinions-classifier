@@ -5,7 +5,7 @@ This is small attempt to create application which analyzes real-time stream of d
 
 Various clustering algorithms are planned to be tested as part of this app.
 
-The goal of this project is to create miningfull clustering for strwam information and visualize it accordingly.
+The goal of this project is to create meaningful clustering for textual stream of information and visualize it accordingly.
 
 See discussion regarding possible algorithms to use is on stackoverflow here: http://datascience.stackexchange.com/questions/979/algorithms-for-text-clustering
 

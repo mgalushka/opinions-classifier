@@ -1,14 +1,12 @@
-$( document ).ready(function() {
-	console.log( "ready!" );
-	var WIDTH = window.innerWidth;
-	var colsWidth = Math.max(WIDTH/4, 240);
-	$('.masonry').masonry({
-		columnWidth: 60,
-		itemSelector: '.item'
-	});
-	
+var classifier = classifier || {};
+
+classifier.gui = function () {
+
+	var container;
+	var msnry;
 	var autorefresh = true;
 	
+	// internal storage for clusters on a screen
 	var clusters = {
 		all: {},
 		add: function(cluster) {
@@ -56,8 +54,36 @@ $( document ).ready(function() {
 			console.log(clusters.all);
 		}
 	};
-	
-	var msnry = $('.masonry').data('masonry');
+  
+	var init = function(){
+		console.log("initializing");
+		//container = $('.masonry');
+		//msnry = container.data('masonry');
+		
+		var WIDTH = window.innerWidth;
+		var colsWidth = Math.max(WIDTH/4, 240);
+		container = $('.masonry');
+		container.masonry({
+			columnWidth: 60,
+			itemSelector: '.item'
+		});		
+		
+		msnry = container.data('masonry');
+		
+		$(".item").on("click", clickHandler);
+		
+		// assign handler to pause button
+		$("#stopBtn").on("click", function() {
+			console.log("pause/resume");
+			autorefresh = !autorefresh;
+			if(autorefresh){
+				classifier.remote.retrieveClusters(refreshCallback);
+			}
+		});	
+		
+		// init immediate first call to remote function
+		classifier.remote.retrieveClusters(refreshCallback);
+	}	
 	
 	// TODO: open associated link with cluster in a new tab
 	// TODO: open image if clicked on image
@@ -69,16 +95,7 @@ $( document ).ready(function() {
 		}
 	}
 	
-	$(".item").on("click", clickHandler);
-	
-	$("#stopBtn").on("click", function() {
-		console.log("pause/resume");
-		autorefresh = !autorefresh;
-		console.log("refreshing = " + autorefresh);
-		poll();
-	});
-	
-	function createClusterElement(id, text, score, url, image) {
+	var createClusterElement = function(id, text, score, url, image) {
 		var elem = document.createElement('div');
 		elem['id'] = id;
 		
@@ -108,7 +125,7 @@ $( document ).ready(function() {
 		return elem;
 	}
 	
-	function insertIntoContainer(container, clusterObj){
+	var insertIntoContainer = function(clusterObj){
 		if($('.item').length > 0){
 			$('.item').first().before(clusterObj);
 		}
@@ -116,15 +133,17 @@ $( document ).ready(function() {
 			container.append(clusterObj);
 		}	
 	}
-
-	function refresh(data){
+	
+	// this refreshes screen presentation based on data received
+	var refresh = function(data){
 		// we skip if update is empty - maybe error on server?
 		if(data && data.clusters && data.clusters.length === 0) {
 			console.warn("Received empty clusters list. Check server side. No refresh.");
 			return;
 		}
+		console.log("Received = "  + data.clusters.length + " clusters");
 		clusters.print();
-		var container = $('.masonry');
+		//var container = $('.masonry');
 		
 		// iterate over elements and if cluster exists - refresh with updated relative weight? TODO: this is not good idea.
 		// TODO: Need to think how we will work on different devices with resizing issues, etc...
@@ -140,7 +159,8 @@ $( document ).ready(function() {
 		for (var i = 0; i < updated_clusters.length; i++) {
 			var cluster = updated_clusters[i];
 			var existing = clusters.getById(cluster.id);
-			// TODO: cleanup clusters which disappeared!
+			// TODO: we want to keep disappeared clusters for history.
+			// TODO: we need to keep disappeared clusters at the end
 			if(existing){
 				// TODO: resize depending on score???
 				console.log("Update existing cluster: " + existing.id + " " + existing.label + " to [" + cluster.id + "] " + cluster.label);
@@ -152,7 +172,7 @@ $( document ).ready(function() {
 					var updated_cluster = createClusterElement(cluster.id, cluster.message, relative_score, cluster.url, cluster.image);
 					
 					// insert updated cluster to container
-					insertIntoContainer(container, updated_cluster);
+					insertIntoContainer(updated_cluster);
 					added_elems.push(updated_cluster);
 				}
 				existing.marked = true;
@@ -164,7 +184,7 @@ $( document ).ready(function() {
 				var new_cluster = createClusterElement(cluster.id, cluster.message, relative_score, cluster.url, cluster.image);
 				
 				// insert new cluster to container
-				insertIntoContainer(container, new_cluster);
+				insertIntoContainer(new_cluster);
 				added_elems.push(new_cluster);
 				clusters.add(cluster);
 			}
@@ -180,37 +200,19 @@ $( document ).ready(function() {
 		console.log("completed layout processing");
 	}
 	
-	function remoteCall(){
-		$.ajax({ url: "http://ec2-54-68-39-246.us-west-2.compute.amazonaws.com:8090", 
-			success: function(data){
-				console.log(data.clusters.length);
-				refresh(data);
-				if(autorefresh){
-					poll();
-				}
-			}, 
-			error: function(data){
-				console.log(data.clusters.length);
-				refresh(data);
-				if(autorefresh){
-					poll();
-				}
-			}, 
-			dataType: "json"});
+	var refreshCallback = function(data){
+		console.log("refreshCallback");
+		if(data && data.clusters){
+			console.log("Received = "  + data.clusters.length + " clusters");
+			refresh(data);
+			if(autorefresh){
+				classifier.remote.schedulePolling(refreshCallback);
+			}
+		}
 	}
-	
-	function poll(){
-		setTimeout(function(){
-			remoteCall();
-		}, 5000);
-	};
-	
-	remoteCall();
-	
-	classifier.gui.init();
-	
-});
-
-
-
+ 
+	return {
+		init: init
+	}; 
+}();
 

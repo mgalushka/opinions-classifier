@@ -57,11 +57,6 @@ classifier.gui = function () {
   
 	var init = function(){
 		console.log("initializing");
-		//container = $('.masonry');
-		//msnry = container.data('masonry');
-		
-		var WIDTH = window.innerWidth;
-		var colsWidth = Math.max(WIDTH/4, 240);
 		container = $('.masonry');
 		container.masonry({
 			columnWidth: 60,

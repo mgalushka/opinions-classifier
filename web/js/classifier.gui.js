@@ -113,7 +113,7 @@ classifier.gui = function () {
 		
 		if(image !== ""){
 			// insert image
-			$(elem).append($('<div style="display:block;"><div>' + text + '</div><img src="' + image + '" class="img ' + widthClass + '" style="display:block;"/></div>'));
+			$(elem).append($('<div style="display:block;"><div>' + text + '</div><img src="' + image + '" data-src="' + image + '" class="img ' + widthClass + '" style="display:block;"/></div>'));
 		};
 
 		// assign corresponding class
@@ -190,14 +190,19 @@ classifier.gui = function () {
 			}
 		}
 		
-		clusters.clean();
-		
-		// add and lay out newly prepended elements
-		msnry.prepended(added_elems);
-		msnry.layout();
-		//msnry.remove(removed_elems);
-		clusters.print();
-		console.log("completed layout processing");
+		$('.masonry').imageloader({
+			selector: '.img',
+			callback: function (obj) {
+				console.log("all images loaded");
+				clusters.clean();		
+				// add and lay out newly prepended elements
+				msnry.prepended(added_elems);
+				msnry.layout();
+				//msnry.remove(removed_elems);
+				clusters.print();
+				console.log("completed layout processing");
+			}
+		});
 	}
 	
 	var refreshCallback = function(data){

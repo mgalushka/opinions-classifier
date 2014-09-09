@@ -170,14 +170,19 @@ $( document ).ready(function() {
 			}
 		}
 		
-		clusters.clean();
-		
-		// add and lay out newly prepended elements
-		msnry.prepended(added_elems);
-		msnry.layout();
-		//msnry.remove(removed_elems);
-		clusters.print();
-		console.log("completed layout processing");
+		$('.masonry').imageloader({
+			selector: '.img',
+			callback: function (obj) {
+				console.log("all images loaded");
+				clusters.clean();		
+				// add and lay out newly prepended elements
+				msnry.prepended(added_elems);
+				msnry.layout();
+				//msnry.remove(removed_elems);
+				clusters.print();
+				console.log("completed layout processing");
+			}
+		});
 	}
 	
 	function remoteCall(){

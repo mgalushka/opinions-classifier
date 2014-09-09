@@ -1,7 +1,7 @@
 classifier.remote = function () {
 
 	var URL = "http://ec2-54-68-39-246.us-west-2.compute.amazonaws.com:8090";
-	var REFRESH_PERIOD = 5000;
+	var REFRESH_PERIOD = 60000;
   
 	// this function calls remote service to retrieve current state of clusters
 	var retrieveClusters = function(callback){

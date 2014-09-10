@@ -7,7 +7,7 @@
 body { font-family: sans-serif; }
 
 .masonry {
-  background: #EEE;
+  /*background: #EEE;*/
   /*max-width: 1640px;*/
 }
 
@@ -27,6 +27,18 @@ body { font-family: sans-serif; }
   border: 1px solid #333;
   border-color: hsla(0, 0%, 0%, 0.5);
   border-radius: 5px;
+}
+
+.share{
+	/*margin-bottom: 10px;*/
+}
+
+.share {
+	float: right;
+}
+
+.message{
+	padding: 5px;
 }
 
 .item.w2 { width:  120px; }
@@ -52,20 +64,25 @@ body { font-family: sans-serif; }
 	.img.w4 { width:  98%; }
 }
 
-.item:hover {
-  background: #A2C;
+.item .img:hover, .item .message:hover, .share {
+  /*background: #A2C;*/
   border-color: white;
   cursor: pointer;
 }
 
-/*
-.item.h2 { height: 100px; }
-.item.h3 { height: 130px; }
-.item.h4 { height: 180px; }
-
-.item.gigante {
-  width: 180px;
-  height: 180px;
+.badge {
+  display: inline-block;
+  min-width: 10px;
+  padding: 3px 7px;
+  font-size: 12px;
+  font-weight: bold;
+  line-height: 1;
+  color: #fff;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  background-color: #777;
+  border-radius: 10px;
 }
-*/
+
 

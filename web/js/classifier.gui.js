@@ -96,8 +96,7 @@ classifier.gui = function () {
 		
 		// insert text
 		if(image === ""){
-			var t = document.createTextNode(text);
-			$(elem).append(t); 
+			$(elem).append($('<div style="display:block;"><div><a href="https://twitter.com/share?text=' + encodeURIComponent(text) + '" target="_blank"><img class="share" alt="Share on Twitter" title="Share on Twitter" src="images/1410371148_twitter_circle_gray-32.png"/></a></div><div class="message">' + text + '</div></div>')); 
 		}
 		
 		// TODO: here size should depend on cluster overall score
@@ -108,7 +107,7 @@ classifier.gui = function () {
 		
 		if(image !== ""){
 			// insert image
-			$(elem).append($('<div style="display:block;"><div>' + text + '</div><img src="' + image + '" data-src="' + image + '" class="img ' + widthClass + '" style="display:block;"/></div>'));
+			$(elem).append($('<div style="display:block;"><div><a href="https://twitter.com/share?text=' + encodeURIComponent(text) + '" target="_blank"><img class="share" alt="Share on Twitter" title="Share on Twitter" src="images/1410371148_twitter_circle_gray-32.png"/></a></div><div class="message">' + text + '</div><img src="' + image + '" data-src="' + image + '" class="img ' + widthClass + '" style="display:block;"/></div>'));
 		};
 
 		// assign corresponding class

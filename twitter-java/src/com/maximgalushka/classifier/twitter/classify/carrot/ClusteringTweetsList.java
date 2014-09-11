@@ -240,7 +240,7 @@ public class ClusteringTweetsList {
 
         double T = 0.5D;
         // combined tweet representative -> count of such tweets (similar based on Jaccard coefficient)
-        TreeMap<TweetTextWrapper, Integer> similarity = new TreeMap<TweetTextWrapper, Integer>();
+        HashMap<TweetTextWrapper, Integer> similarity = new HashMap<TweetTextWrapper, Integer>();
         for (Document d : allDocuments) {
             Tweet found = tweetsIndex.get(d.getStringId());
             String foundText = found.getText();

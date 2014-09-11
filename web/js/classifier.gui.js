@@ -84,6 +84,9 @@ classifier.gui = function () {
 	// TODO: open image if clicked on image
 	var clickHandler = function() {
 		var url = $(this).data("url");
+		var share = $(this).data("share");
+		console.log("");
+		if(share === "true") return;
 		if(url !== ""){
 			console.log("Opening: " + url);		
 			window.open(url);
@@ -107,7 +110,7 @@ classifier.gui = function () {
 		
 		if(image !== ""){
 			// insert image
-			$(elem).append($('<div style="display:block;"><div><a href="https://twitter.com/share?text=' + encodeURIComponent(text) + '" target="_blank"><img class="share" alt="Share on Twitter" title="Share on Twitter" src="images/1410371148_twitter_circle_gray-32.png"/></a></div><div class="message">' + text + '</div><img src="' + image + '" data-src="' + image + '" class="img ' + widthClass + '" style="display:block;"/></div>'));
+			$(elem).append($('<div style="display:block;"><div><a href="https://twitter.com/share?text=' + encodeURIComponent(text) + '" target="_blank" data-share="true"><img class="share" alt="Share on Twitter" title="Share on Twitter" src="images/1410371148_twitter_circle_gray-32.png"/></a></div><div id="message_' + id + '" class="message">' + text + '</div><img id="image_' + id + '" src="' + image + '" data-src="' + image + '" class="img ' + widthClass + '" style="display:block;"/></div>'));
 		};
 
 		// assign corresponding class

@@ -1,0 +1,30 @@
+<cruisecontrol>
+	<project name="twitter-opinions-classifier">
+		<listeners>
+			<currentbuildstatuslistener file="logs/${project.name}/status.txt"/>
+		</listeners>
+
+		<bootstrappers>
+			<gitbootstrapper localWorkingCopy="/home/ec2-user/projects/opinions-classifier" />			
+		</bootstrappers>
+
+		<modificationset quietperiod="0">
+			<compound>
+				<triggers>
+					<git localWorkingCopy="/home/ec2-user/projects/opinions-classifier"/>
+				</triggers>	
+				<targets>
+					<filesystem folder="/home/ec2-user/projects/opinions-classifier/twitter-java"/>
+				</targets>
+			</compound>	
+		</modificationset>
+		
+		<schedule interval="30">
+			<maven2 mvnhome="/home/ec2-user/apache-maven-3.2.3" pomfile="/home/ec2-user/projects/opinions-classifier/twitter-java/pom.xml" goal="clean install dependency:copy-dependencies" activateprofiles="credentials"/>
+		</schedule>
+
+		<log>
+			<merge dir="projects/${project.name}/target/test-results"/>
+		</log>
+	</project>
+</cruisecontrol>

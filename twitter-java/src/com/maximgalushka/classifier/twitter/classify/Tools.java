@@ -34,4 +34,18 @@ public class Tools {
         }
         return result;
     }
+
+    public static <T> ArrayList<T> slice(ArrayDeque<T> deque, int from, int to) {
+        if (to < from) throw new IllegalArgumentException("From index cannot be greater then to index");
+        ArrayList<T> result = new ArrayList<T>(to - from);
+        Iterator<T> it = deque.iterator();
+        int counter = to - from;
+        while (it.hasNext()) {
+            if (from-- > 0) continue;
+            result.add(it.next());
+            counter--;
+            if (counter <= 0) break;
+        }
+        return result;
+    }
 }

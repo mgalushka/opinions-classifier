@@ -2,9 +2,13 @@ package com.maximgalushka.classifier.twitter.model;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Maxim Galushka
  */
+@SuppressWarnings("UnusedDeclaration")
 public class Tweet {
 
     private long id;
@@ -13,6 +17,14 @@ public class Tweet {
     @SerializedName("user")
     private User author;
     private boolean retweeted;
+
+    private Entities entities;
+
+    @SerializedName("favorite_count")
+    private int favouriteCount;
+
+    @SerializedName("retweet_count")
+    private int retweetCount;
 
     public Tweet() {
     }
@@ -49,8 +61,35 @@ public class Tweet {
         this.retweeted = retweeted;
     }
 
+    public int getFavouriteCount() {
+        return favouriteCount;
+    }
+
+    public void setFavouriteCount(int favouriteCount) {
+        this.favouriteCount = favouriteCount;
+    }
+
+    public int getRetweetCount() {
+        return retweetCount;
+    }
+
+    public void setRetweetCount(int retweetCount) {
+        this.retweetCount = retweetCount;
+    }
+
+    public Entities getEntities() {
+        return entities;
+    }
+
+    public void setEntities(Entities entities) {
+        this.entities = entities;
+    }
+
     @Override
     public String toString() {
-        return String.format("[%d, '%s', %s]", id, text, author);
+        Entities e = this.getEntities();
+        String url = e.getUrls().isEmpty() ? "" : e.getUrls().get(0).getUrl();
+        String image = e.getMedia().isEmpty() ? "" : e.getMedia().get(0).getUrl();
+        return String.format("[%d, '%s', %s, %s, %s]", id, text, author, url, image);
     }
 }

@@ -70,8 +70,7 @@ public class TwitterStreamStandalone {
                     try {
                         // we need to collect full batch of elements and then classify the whole batch
                         if (batch.size() == (BATCH_SIZE + STEP)) {
-                            Clusters clusters = clustering.classify(slice(batch, BATCH_SIZE));
-                            log.debug(String.format("%s", clusters));
+                            clustering.classify(slice(batch, BATCH_SIZE), new Clusters());
 
                             // remove first STEP elements from start
                             cleanFromStart(batch, STEP);

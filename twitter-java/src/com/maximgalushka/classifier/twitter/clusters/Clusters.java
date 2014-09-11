@@ -8,9 +8,10 @@ import java.util.Map;
 /**
  * @since 8/29/2014.
  */
+@SuppressWarnings("UnusedDeclaration")
 public class Clusters {
 
-    private boolean updated = false;
+    private int size;
     private List<Cluster> clusters = new ArrayList<Cluster>();
     private transient Map<Integer, Cluster> reversedIndex;
 
@@ -18,20 +19,11 @@ public class Clusters {
         this.reversedIndex = new HashMap<Integer, Cluster>();
     }
 
-    public Clusters(boolean updated) {
-        this();
-        this.updated = updated;
-    }
-
     private void rebuildIndex() {
         reversedIndex.clear();
         for (Cluster c : clusters) {
             reversedIndex.put(c.getTrackingId(), c);
         }
-    }
-
-    public boolean isUpdated() {
-        return updated;
     }
 
     public List<Cluster> getClusters() {
@@ -48,22 +40,16 @@ public class Clusters {
         rebuildIndex();
     }
 
-    public void updateCluster(int id, int newId, String label, String message) {
-        Cluster update = this.reversedIndex.get(id);
-        if (update != null) {
-            update.setTrackingId(newId);
-            this.reversedIndex.remove(id);
-            this.reversedIndex.put(newId, update);
-        } else {
-            Cluster added = new Cluster(id, label, message);
-            clusters.add(added);
-            this.reversedIndex.put(id, added);
-        }
+    public Cluster clusterById(int id) {
+        return this.reversedIndex.get(id);
     }
 
-    public void removeCluster(int id) {
-        Cluster c = this.reversedIndex.remove(id);
-        this.clusters.remove(c);
+    public int getSize() {
+        return size;
+    }
+
+    public void setSize(int size) {
+        this.size = size;
     }
 
     @Override

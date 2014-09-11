@@ -1,6 +1,8 @@
 package com.maximgalushka.classifier.twitter.classify.carrot;
 
+import com.google.common.base.Optional;
 import com.maximgalushka.classifier.twitter.clusters.*;
+import com.maximgalushka.classifier.twitter.model.Entities;
 import com.maximgalushka.classifier.twitter.model.Tweet;
 import org.apache.log4j.Logger;
 import org.carrot2.clustering.lingo.LingoClusteringAlgorithm;
@@ -40,15 +42,18 @@ public class ClusteringTweetsList {
     /**
      * 1 thread processing because we need to keep previous batch. <br/>
      * <p/>
-     * TODO: result of this method should be map:<br>
-     * from cluster id: to cluster id
+     * TODO: result of this method should be map:<br/>
+     * from cluster id: to cluster id<br/>
+     * <p/>
+     * This method updates underlying model.<br/>
+     * TODO: maybe this is not the best design. To think about it.<br/>
      */
-    public synchronized Clusters classify(List<Tweet> batch) throws IOException {
-        Clusters result = new Clusters();
-
+    public synchronized void classify(List<Tweet> batch, Clusters model) throws IOException {
         List<Document> docs = readTweetsToDocs(batch);
-        if (docs.isEmpty()) return result;
+        if (docs.isEmpty()) return;
 
+        // helper map to extract any required tween metadata
+        Map<String, Tweet> tweetsIndex = readTweetsToMap(batch);
 
         // Perform clustering by topic using the Lingo algorithm.
         final ProcessingResult byTopicClusters = controller.process(docs, null, LingoClusteringAlgorithm.class);
@@ -57,13 +62,184 @@ public class ClusteringTweetsList {
         log.debug(String.format("Found [%d] clusters:\n%s", clustersByTopic.size(), printClusters(clustersByTopic)));
 
         if (previousClusters != null) {
-            compareWithPrev(previousClusters, clustersByTopic, result);
+            Map<Integer, Optional<Integer>> fromTo = compareWithPrev(previousClusters, clustersByTopic);
+            updateModel(model, clustersByTopic, fromTo, tweetsIndex);
         }
         previousClusters = clustersByTopic;
+    }
+
+    private void updateModel(final Clusters clusters, List<Cluster> currentClusters,
+                             Map<Integer, Optional<Integer>> fromTo, Map<String, Tweet> tweetsIndex) {
+        // if cluster id is no longer in fromTo map - we should remove it
+        // if cluster migrated to another - we should change it tracking id
+        // if new cluster was created - we should just add it
+        Map<Integer, Cluster> currentClustersIndex = new HashMap<Integer, Cluster>();
+        for (Cluster c : currentClusters) currentClustersIndex.put(c.getId(), c);
+
+        List<com.maximgalushka.classifier.twitter.clusters.Cluster> updated = new ArrayList<com.maximgalushka.classifier.twitter.clusters.Cluster>();
+        List<com.maximgalushka.classifier.twitter.clusters.Cluster> snapshot = Collections.unmodifiableList(clusters.getClusters());
+        for (com.maximgalushka.classifier.twitter.clusters.Cluster old : snapshot) {
+            Optional<Integer> to = Optional.fromNullable(fromTo.get(old.getId())).or(Optional.<Integer>absent());
+            if (to.isPresent()) {
+                com.maximgalushka.classifier.twitter.clusters.Cluster updatedCluster = old.clone();
+                Cluster newCluster = currentClustersIndex.get(to.get());
+                updatedCluster.setTrackingId(to.get());
+                updatedCluster.setScore(old.getScore() + newCluster.getAllDocuments().size());
+                updated.add(updatedCluster);
+            }
+        }
+        for (Cluster current : currentClusters) {
+            com.maximgalushka.classifier.twitter.clusters.Cluster old = clusters.clusterById(current.getId());
+            if (old == null) {
+                Tweet representative = findRepresentative(current.getAllDocuments(), tweetsIndex);
+                Entities entities = representative.getEntities();
+                String url = "";
+                String image = "";
+                if (entities != null) {
+                    url = entities.getUrls().isEmpty() ? "" : entities.getUrls().get(0).getUrl();
+                    image = entities.getMedia().isEmpty() ? "" : entities.getMedia().get(0).getUrl();
+                }
+                // create new
+                updated.add(new com.maximgalushka.classifier.twitter.clusters.Cluster(
+                        current.getId(),
+                        current.getLabel(),
+                        representative.getText(),
+                        current.getAllDocuments().size(),
+                        url, image));
+            }
+        }
+        int size = 0;
+        for (com.maximgalushka.classifier.twitter.clusters.Cluster c : updated) {
+            size += c.getScore();
+        }
+        clusters.setSize(size);
+        synchronized (this) {
+            clusters.cleanClusters();
+            List<com.maximgalushka.classifier.twitter.clusters.Cluster> finalList = filterAndFormatRepresetnations(updated);
+            log.debug(String.format("Final clusters list: [%s]", finalList));
+            clusters.addClusters(finalList);
+        }
+    }
+
+    /**
+     * TODO: kind of messy method to filter out duplicate cluster representations if any.
+     *
+     * @return list of clusters (domain model) without duplicated
+     */
+    private List<com.maximgalushka.classifier.twitter.clusters.Cluster>
+    filterAndFormatRepresetnations(List<com.maximgalushka.classifier.twitter.clusters.Cluster> clusters) {
+        List<com.maximgalushka.classifier.twitter.clusters.Cluster> result
+                = new ArrayList<com.maximgalushka.classifier.twitter.clusters.Cluster>();
+
+        HashMap<String, com.maximgalushka.classifier.twitter.clusters.Cluster> messagesIndex =
+                new HashMap<String, com.maximgalushka.classifier.twitter.clusters.Cluster>();
+
+        HashMap<String, com.maximgalushka.classifier.twitter.clusters.Cluster> urlsIndex =
+                new HashMap<String, com.maximgalushka.classifier.twitter.clusters.Cluster>();
+
+        HashMap<String, com.maximgalushka.classifier.twitter.clusters.Cluster> imagesIndex =
+                new HashMap<String, com.maximgalushka.classifier.twitter.clusters.Cluster>();
+
+        List<com.maximgalushka.classifier.twitter.clusters.Cluster> snapshot =
+                Collections.unmodifiableList(clusters);
+
+        for (com.maximgalushka.classifier.twitter.clusters.Cluster c : snapshot) {
+            String message = c.getMessage();
+            String url = c.getUrl();
+            String image = c.getImage();
+            if (messagesIndex.containsKey(message.trim())) mergeClusters(c, messagesIndex.get(message));
+            else if (url != null && urlsIndex.containsKey(url)) mergeClusters(c, urlsIndex.get(url));
+            else if (image != null && imagesIndex.containsKey(image)) mergeClusters(c, imagesIndex.get(image));
+            else {
+                messagesIndex.put(message.trim(), c);
+                if (url != null) urlsIndex.put(url, c);
+                if (image != null) imagesIndex.put(image, c);
+            }
+        }
+        result.addAll(messagesIndex.values());
+
+        for (com.maximgalushka.classifier.twitter.clusters.Cluster cluster : result) {
+            cluster.setMessage(reformatMessage(cluster.getMessage()));
+        }
+
         return result;
     }
 
-    private void compareWithPrev(List<Cluster> prev, List<Cluster> current, Clusters model) {
+    /**
+     * <ul>
+     * <li>Removes all "RT" asking for retweet.</li>
+     * <li>Removes all the mentions.</li>
+     * <li>Clean-up all the urls</li>
+     * </ul>
+     */
+    public String reformatMessage(String initial) {
+        String formatted = initial.replaceAll("(r|R)(t|T)", "");
+        formatted = formatted.replaceAll("@\\S+", "");
+        formatted = formatted.replaceAll("http[s]?:[/]{1,2}\\S*", "");
+
+        // remove all URLs' remains
+        formatted = formatted.replaceAll("https:", "");
+        formatted = formatted.replaceAll("http:", "");
+        formatted = formatted.replaceAll("https", "");
+        formatted = formatted.replaceAll("http", "");
+
+        // normalize internal spaces
+        formatted = formatted.replaceAll("\\s+", " ");
+        return formatted.trim();
+    }
+
+    private void mergeClusters(com.maximgalushka.classifier.twitter.clusters.Cluster from,
+                               com.maximgalushka.classifier.twitter.clusters.Cluster to) {
+        log.warn(String.format("Merging cluster [%d] to [%d]", from.getId(), to.getId()));
+        // recalculate sore
+        to.setScore(to.getScore() + from.getScore());
+    }
+
+    private static class TweetsComparator implements Comparator<Tweet> {
+        @Override
+        public int compare(Tweet one, Tweet two) {
+            int oneScore = one.getFavouriteCount() + one.getRetweetCount();
+            int twoScore = two.getFavouriteCount() + two.getRetweetCount();
+
+            // higher - with higher mentions/retweets
+            if (oneScore != twoScore) return twoScore - oneScore;
+
+            // if scores are equal - just retrieve one which has media inside
+            Entities e1 = one.getEntities();
+            Entities e2 = two.getEntities();
+            if (!e1.getMedia().isEmpty() && e2.getMedia().isEmpty()) return -1;
+            if (e1.getMedia().isEmpty() && !e2.getMedia().isEmpty()) return 1;
+
+            if (!e1.getUrls().isEmpty() && e2.getUrls().isEmpty()) return -1;
+            if (e1.getUrls().isEmpty() && !e2.getUrls().isEmpty()) return 1;
+
+            return 0;
+        }
+    }
+
+    private static final Comparator<Tweet> TWEETS_COMPARATOR = new TweetsComparator();
+
+    /**
+     * Performance: O(n*log(n))
+     *
+     * @return finds good representative tweet from list of documents inside a single cluster
+     */
+    private Tweet findRepresentative(List<Document> allDocuments, Map<String, Tweet> tweetsIndex) {
+        if (allDocuments.isEmpty()) return null;
+
+        TreeSet<Tweet> selected = new TreeSet<Tweet>(TWEETS_COMPARATOR);
+        for (Document d : allDocuments) {
+            selected.add(tweetsIndex.get(d.getStringId()));
+        }
+        return selected.first();
+    }
+
+    /**
+     * @return map which contain mapping between old cluster id which was migrated to new cluster id (optional if old cluster splitted)
+     */
+    private Map<Integer, Optional<Integer>> compareWithPrev(List<Cluster> prev, List<Cluster> current) {
+        Map<Integer, Optional<Integer>> fromTo = new HashMap<Integer, Optional<Integer>>(prev.size() * 2);
+
         // documentId -> Current cluster
         HashMap<String, Cluster> currMap = new HashMap<String, Cluster>();
 
@@ -80,8 +256,8 @@ public class ClusteringTweetsList {
         // threshold to determine if cluster stayed the same.
         // if >= this threshold elements stayed in this cluster - it is considered to stay the same
         double SAME = 0.6d;
-        for (Cluster p : prev) {
-            List<Document> docs = p.getAllDocuments();
+        for (Cluster oldCluster : prev) {
+            List<Document> docs = oldCluster.getAllDocuments();
             int totalMoved = 0;
             // next cluster id -> how many documents moved from this cluster to next cluster on next step
             HashMap<Integer, Integer> howManyMovedAndWhere = new HashMap<Integer, Integer>();
@@ -104,27 +280,60 @@ public class ClusteringTweetsList {
                 int count = howManyMovedAndWhere.get(clusterId);
                 double ratio = (double) count / totalMoved;
                 Cluster currentCluster = clusterIdsMap.get(clusterId);
+
                 if (ratio >= SAME) {
-                    String message = currentCluster.getAllDocuments().get(0).getSummary();
-                    model.updateCluster(p.getId(), clusterId, currentCluster.getLabel(), message);
-                    log.debug(String.format("Cluster [%s] moved to [%s]", p.getId(), clusterId));
+                    //String message = currentCluster.getAllDocuments().get(0).getSummary();
+                    //model.updateCluster(p.getId(), clusterId, currentCluster.getLabel(), message);
+                    fromTo.put(oldCluster.getId(), Optional.fromNullable(clusterId));
+                    log.debug(String.format("Cluster [%s] moved to [%s]", oldCluster.getId(), clusterId));
+                    split = false;
+                    break;
+                }
+                String currentLabel = currentCluster.getLabel();
+                String prevLabel = oldCluster.getLabel();
+                if (currentLabel.equals(prevLabel)) {
+                    //String message = currentCluster.getAllDocuments().get(0).getSummary();
+                    //model.updateCluster(oldCluster.getId(), clusterId, currentCluster.getLabel(), message);
+                    fromTo.put(oldCluster.getId(), Optional.fromNullable(clusterId));
+                    log.debug(String.format("Cluster [%s] moved to [%s]", oldCluster.getId(), clusterId));
                     split = false;
                     break;
                 }
             }
             if (split) {
-                model.removeCluster(p.getId());
-                log.debug(String.format("Cluster [%s] splitted", p.getId()));
+                //model.removeCluster(oldCluster.getId());
+                fromTo.put(oldCluster.getId(), Optional.<Integer>absent());
+                log.debug(String.format("Cluster [%s] splitted", oldCluster.getId()));
             }
         }
+        return fromTo;
     }
 
+    /**
+     * Reads tweets to document list ready for classification.<br/>
+     * Filters out any duplicate tweets (with dame tweet id).
+     */
     private List<Document> readTweetsToDocs(List<Tweet> tweets) throws IOException {
         List<Document> docs = new ArrayList<Document>(tweets.size());
+        Set<String> set = new HashSet<String>(2 * docs.size());
         for (Tweet t : tweets) {
-            docs.add(new Document(null, t.getText(), null, LanguageCode.ENGLISH, Long.toString(t.getId())));
+            String id = Long.toString(t.getId());
+            if (!set.contains(id)) {
+                docs.add(new Document(null, t.getText(), null, LanguageCode.ENGLISH, id));
+                set.add(id);
+            } else {
+                log.debug(String.format("Skip duplicate document: [%s]", id));
+            }
         }
         return docs;
+    }
+
+    private Map<String, Tweet> readTweetsToMap(List<Tweet> tweets) throws IOException {
+        Map<String, Tweet> map = new HashMap<String, Tweet>(2 * tweets.size());
+        for (Tweet t : tweets) {
+            map.put(Long.toString(t.getId()), t);
+        }
+        return map;
     }
 
     private boolean readDocsToDeque(BufferedReader fr, ArrayDeque<Document> docs, int N) throws IOException {
@@ -187,7 +396,7 @@ public class ClusteringTweetsList {
                     c.printClusters(clustersByTopic)));
 
             if (prev != null) {
-                c.compareWithPrev(prev, clustersByTopic, new Clusters());
+                c.compareWithPrev(prev, clustersByTopic);
             }
             prev = clustersByTopic;
 

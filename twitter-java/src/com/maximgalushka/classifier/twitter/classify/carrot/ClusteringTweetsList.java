@@ -1,9 +1,11 @@
 package com.maximgalushka.classifier.twitter.classify.carrot;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.Sets;
 import com.maximgalushka.classifier.twitter.clusters.*;
 import com.maximgalushka.classifier.twitter.model.Entities;
 import com.maximgalushka.classifier.twitter.model.Tweet;
+import com.maximgalushka.classifier.twitter.model.TweetTextWrapper;
 import org.apache.log4j.Logger;
 import org.carrot2.clustering.lingo.LingoClusteringAlgorithm;
 import org.carrot2.core.*;
@@ -220,18 +222,71 @@ public class ClusteringTweetsList {
     private static final Comparator<Tweet> TWEETS_COMPARATOR = new TweetsComparator();
 
     /**
-     * Performance: O(n*log(n))
+     * Performance: O(n*log(n))<br/>
+     * O(n^2)!!!<br/>
      *
      * @return finds good representative tweet from list of documents inside a single cluster
      */
     private Tweet findRepresentative(List<Document> allDocuments, Map<String, Tweet> tweetsIndex) {
         if (allDocuments.isEmpty()) return null;
 
+        /*
         TreeSet<Tweet> selected = new TreeSet<Tweet>(TWEETS_COMPARATOR);
         for (Document d : allDocuments) {
             selected.add(tweetsIndex.get(d.getStringId()));
         }
         return selected.first();
+        */
+
+        double T = 0.5D;
+        // combined tweet representative -> count of such tweets (similar based on Jaccard coefficient)
+        TreeMap<TweetTextWrapper, Integer> similarity = new TreeMap<TweetTextWrapper, Integer>();
+        for (Document d : allDocuments) {
+            Tweet found = tweetsIndex.get(d.getStringId());
+            String foundText = found.getText();
+            boolean similar = false;
+            for (TweetTextWrapper w : similarity.keySet()) {
+                if (jaccard(foundText, w.getText()) >= T) {
+                    similarity.put(w, similarity.get(w) + 1);
+                    Tweet underlying = w.getTweet();
+
+                    // fill missing media - to enrich representative
+                    if (underlying.getEntities().getMedia().isEmpty() && !found.getEntities().getMedia().isEmpty()) {
+                        underlying.getEntities().getMedia().addAll(found.getEntities().getMedia());
+                    }
+                    if (underlying.getEntities().getUrls().isEmpty() && !found.getEntities().getUrls().isEmpty()) {
+                        underlying.getEntities().getUrls().addAll(found.getEntities().getUrls());
+                    }
+
+                    similar = true;
+                    break;
+                }
+            }
+            if (!similar) {
+                similarity.put(new TweetTextWrapper(foundText, found), 1);
+            }
+        }
+        // find top tweet with max number of similar to it
+        int max = 0;
+        Tweet representative = null;
+        for (TweetTextWrapper w : similarity.keySet()) {
+            int current = similarity.get(w);
+            if (current > max) {
+                max = current;
+                representative = w.getTweet();
+            }
+        }
+        return representative;
+    }
+
+    public double jaccard(String a, String b) {
+        Set<String> tokens_A = Sets.newHashSet(a.split("\\s+"));
+        Set<String> tokens_B = Sets.newHashSet(b.split("\\s+"));
+
+        int intersection = Sets.intersection(tokens_A, tokens_B).size();
+        int union = Sets.union(tokens_A, tokens_B).size();
+
+        return (double) intersection / union;
     }
 
     /**

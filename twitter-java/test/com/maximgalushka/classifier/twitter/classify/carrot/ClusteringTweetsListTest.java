@@ -31,6 +31,13 @@ public class ClusteringTweetsListTest {
         Assert.assertEquals("Ivan told", cleaner.reformatMessage("      Ivan \n\n\n\t\t\t   told https:/        "));
 
 
-        Assert.assertEquals("Grigoriy told htt:", cleaner.reformatMessage("Grigoriy   told https://google.com ht htt http htt:"));
+        Assert.assertEquals("Grigoriy told ht htt htt:", cleaner.reformatMessage("Grigoriy   told https://google.com ht htt http htt:"));
+    }
+
+    @Test
+    public void testJaccard() throws Exception {
+        Assert.assertEquals(1, cleaner.jaccard("a b c", "a b c"), 0.00001);
+        Assert.assertEquals(0.6666666666, cleaner.jaccard("b c", "a b c"), 0.00001);
+        Assert.assertEquals(0, cleaner.jaccard("d", "a b c"), 0.00001);
     }
 }

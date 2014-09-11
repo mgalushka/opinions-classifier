@@ -20,9 +20,11 @@
 		</modificationset>
 		
 		<schedule interval="30">
-			<exec command="/usr/bin/nc" args="localhost 4000 | echo 0" errorstr="skip this - no errors"/>
-			<maven2 mvnhome="/home/ec2-user/apache-maven-3.2.3" pomfile="/home/ec2-user/projects/opinions-classifier/twitter-java/pom.xml" goal="clean install dependency:copy-dependencies" activateprofiles="credentials"/>
-			<exec command="nohup" args="/home/ec2-user/projects/opinions-classifier/twitter-java/start.bash &amp;" errorstr="skip this - no errors"/>
+			<composite>
+				<exec command="/home/ec2-user/projects/opinions-classifier/twitter-java/stop.bash" />
+				<maven2 mvnhome="/home/ec2-user/apache-maven-3.2.3" pomfile="/home/ec2-user/projects/opinions-classifier/twitter-java/pom.xml" goal="clean install dependency:copy-dependencies" activateprofiles="credentials"/>
+				<exec command="/home/ec2-user/projects/opinions-classifier/twitter-java/start.bash" workingdir="/home/ec2-user/projects/opinions-classifier/twitter-java"/>
+			</composite>
 		</schedule>
 
 		<log>

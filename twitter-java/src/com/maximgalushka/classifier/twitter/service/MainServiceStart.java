@@ -66,6 +66,9 @@ public class MainServiceStart implements Container {
         // TODO: via executors
         new Thread(new TwitterStreamProcessor(model)).start();
         log.debug("Twitter stream processor started");
+
+        new Thread(new StopServiceHandler()).start();
+        log.debug("Started application stop interface");
     }
 
 }

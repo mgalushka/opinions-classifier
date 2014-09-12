@@ -70,6 +70,9 @@ public class ClusteringTweetsList {
         previousClusters = clustersByTopic;
     }
 
+    /**
+     * @param clusters in-memory current clusters snapshot model - this is singleton object stored on app level
+     */
     private void updateModel(final Clusters clusters, List<Cluster> currentClusters,
                              Map<Integer, Optional<Integer>> fromTo, Map<String, Tweet> tweetsIndex) {
         // if cluster id is no longer in fromTo map - we should remove it

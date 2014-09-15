@@ -1,11 +1,14 @@
 package com.maximgalushka.classifier.storage.memcached;
 
 import com.maximgalushka.classifier.twitter.LocalSettings;
+import com.maximgalushka.classifier.twitter.clusters.Cluster;
+import com.maximgalushka.classifier.twitter.clusters.Clusters;
 import net.spy.memcached.MemcachedClient;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.util.Arrays;
 
 /**
  * @author Maxim Galushka
@@ -16,18 +19,12 @@ public class MemClient {
 
     private static final LocalSettings settings = LocalSettings.settings();
 
-    public static void main(String[] args) throws IOException {
-        MemcachedClient c = new MemcachedClient(
-                new InetSocketAddress(settings.value(LocalSettings.MEMCACHED_HOST),
-                        Integer.valueOf(settings.value(LocalSettings.MEMCACHED_PORT))));
-
-        // Store a value (async) for one hour
-        c.set("someKey", 3600, "someObject");
-        // Retrieve a value (synchronously).
-        Object myObject = c.get("someKey");
-
-        log.debug(myObject);
-
-
+    public static void main(String[] args) throws Exception {
+        StorageService ss = StorageService.getService();
+        Clusters add = new Clusters();
+        add.addClusters(Arrays.asList(new Cluster(1, "test", "some message", 70, "http://google.com", "http://imgur.com")));
+        long latest = ss.addNewClustersGroup(add);
+        log.debug(String.format("Added new clusters group for [%d]", latest));
+        log.debug(ss.mergeFromTimestamp(latest, 1));
     }
 }

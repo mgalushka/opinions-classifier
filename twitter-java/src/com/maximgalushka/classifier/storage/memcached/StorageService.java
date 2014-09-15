@@ -7,6 +7,7 @@ import com.maximgalushka.classifier.twitter.clusters.Clusters;
 import net.spy.memcached.CASMutation;
 import net.spy.memcached.CASMutator;
 import net.spy.memcached.MemcachedClient;
+import net.spy.memcached.internal.OperationFuture;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -63,7 +64,6 @@ public class StorageService {
      * @throws Exception if any
      */
     public long addTimestamp() throws Exception {
-
         final long timestamp = new Date().getTime();
         // This is how we modify a list when we find one in the cache.
         CASMutation<ArrayDeque<Long>> mutation = new CASMutation<ArrayDeque<Long>>() {

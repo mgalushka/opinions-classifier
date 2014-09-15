@@ -15,6 +15,9 @@ public class LocalSettings {
 
     public static final String USE_PROXY = "useproxy";
 
+    public static final String MEMCACHED_HOST = "memcached.host";
+    public static final String MEMCACHED_PORT = "memcached.port";
+
     private Properties properties;
     private static final LocalSettings settings = new LocalSettings();
 

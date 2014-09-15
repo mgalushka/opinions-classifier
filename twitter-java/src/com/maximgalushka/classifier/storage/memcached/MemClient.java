@@ -1,5 +1,6 @@
 package com.maximgalushka.classifier.storage.memcached;
 
+import com.maximgalushka.classifier.twitter.LocalSettings;
 import net.spy.memcached.MemcachedClient;
 import org.apache.log4j.Logger;
 
@@ -13,10 +14,12 @@ public class MemClient {
 
     public static final Logger log = Logger.getLogger(MemClient.class);
 
+    private static final LocalSettings settings = LocalSettings.settings();
+
     public static void main(String[] args) throws IOException {
         MemcachedClient c = new MemcachedClient(
-                new InetSocketAddress("ec2-54-68-39-246.us-west-2.compute.amazonaws.com",
-                        11211));
+                new InetSocketAddress(settings.value(LocalSettings.MEMCACHED_HOST),
+                        Integer.valueOf(settings.value(LocalSettings.MEMCACHED_PORT))));
 
         // Store a value (async) for one hour
         c.set("someKey", 3600, "someObject");
@@ -24,5 +27,7 @@ public class MemClient {
         Object myObject = c.get("someKey");
 
         log.debug(myObject);
+
+
     }
 }

@@ -1,12 +1,17 @@
 package com.maximgalushka.classifier.storage.memcached;
 
+import com.google.common.collect.Lists;
+import com.maximgalushka.classifier.twitter.LocalSettings;
 import com.maximgalushka.classifier.twitter.clusters.Cluster;
+import com.maximgalushka.classifier.twitter.clusters.Clusters;
+import net.spy.memcached.CASMutation;
+import net.spy.memcached.CASMutator;
 import net.spy.memcached.MemcachedClient;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.util.List;
-
+import java.util.*;
 
 /**
  * Memcached is designed to store all the latest clusters generated sequentially for latest 24 hours.<br/>
@@ -16,16 +21,24 @@ import java.util.List;
  */
 public class StorageService {
 
+    public static final Logger log = Logger.getLogger(StorageService.class);
+
     private static final StorageService service = new StorageService();
     private static final int HOURS24 = 24 * 60 * 60 * 1000;
+
+    private static final String TIMESTAMPS_KEY = "timestamps.all.key";
+
+    private static final ArrayDequeTranscoder ARRAY_DEQUE_LONG_TRANSCODER = new ArrayDequeTranscoder();
+    private static final ClustersTranscoder CLUSTERS_TRANSCODER = new ClustersTranscoder();
 
     private MemcachedClient memcached;
 
     private StorageService() {
+        LocalSettings settings = LocalSettings.settings();
         try {
-            // TODO: move server URL to config
             this.memcached = new MemcachedClient(
-                    new InetSocketAddress("ec2-54-68-39-246.us-west-2.compute.amazonaws.com", 11211));
+                    new InetSocketAddress(settings.value(LocalSettings.MEMCACHED_HOST),
+                            Integer.valueOf(settings.value(LocalSettings.MEMCACHED_PORT))));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -36,21 +49,95 @@ public class StorageService {
     }
 
     /**
-     * @param cluster cluster to store in memcached
+     * @return list of timestamps which are stored in cache and which we have data for.
      */
-    public void newCluster(Cluster cluster) {
-        memcached.add(Integer.toString(cluster.getId()), HOURS24, cluster);
+    @SuppressWarnings("unchecked")
+    public ArrayDeque<Long> listTimestamps() {
+        return this.memcached.get(TIMESTAMPS_KEY, ARRAY_DEQUE_LONG_TRANSCODER);
     }
 
     /**
-     * @param cluster cluster to touch in memcached
+     * Inserts (at start of queue) latest timestamp.<br/>
+     *
+     * @return inserted timestamp
+     * @throws Exception if any
      */
-    public void touchCluster(Cluster cluster) {
+    public long addTimestamp() throws Exception {
 
+        final long timestamp = new Date().getTime();
+        // This is how we modify a list when we find one in the cache.
+        CASMutation<ArrayDeque<Long>> mutation = new CASMutation<ArrayDeque<Long>>() {
+            // This is only invoked when a value actually exists.
+            @Override
+            public ArrayDeque<Long> getNewValue(ArrayDeque<Long> current) {
+                // Not strictly necessary if you specify the storage as
+                // LinkedList (our initial value isn't), but I like to keep
+                // things functional anyway, so I'm going to copy this list
+                // first.
+                ArrayDeque<Long> copy = new ArrayDeque<Long>(current);
+
+                // Remove from the end of list all which are older then required time span
+                for (Iterator<Long> last = current.descendingIterator(); last.hasNext(); ) {
+                    long millis = last.next();
+                    if ((millis - timestamp) >= HOURS24) {
+                        last.remove();
+                    } else {
+                        break;
+                    }
+                }
+                // Add latest timestamp to the head of the list
+                copy.addFirst(timestamp);
+                return copy;
+            }
+        };
+
+        // The initial value -- only used when there's no list stored under
+        // the key.
+        ArrayDeque<Long> initialValue = new ArrayDeque<Long>();
+        initialValue.addFirst(timestamp);
+
+        // The mutator who'll do all the low-level stuff.
+        CASMutator<ArrayDeque<Long>> mutator = new CASMutator<ArrayDeque<Long>>(this.memcached, ARRAY_DEQUE_LONG_TRANSCODER);
+
+        // This returns whatever value was successfully stored within the
+        // cache -- either the initial list as above, or a mutated existing
+        // one
+        mutator.cas(TIMESTAMPS_KEY, initialValue, 0, mutation);
+
+        // return inserted timestamp
+        return timestamp;
     }
 
-    public List<Cluster> all() {
-        //memcached.get
-        return null;
+    /**
+     * @param group clusters group to be stored in memcached, timestamp - to be generated
+     */
+    public long addNewClustersGroup(Clusters group) throws Exception {
+        long timestamp = addTimestamp();
+        memcached.add(Long.toString(timestamp), HOURS24, group, CLUSTERS_TRANSCODER);
+        return timestamp;
+    }
+
+    /**
+     * @param timestamp timestamp to merge all the clusters up to current date for period
+     */
+    public List<Cluster> mergeFromTimestamp(long timestamp, long delta) {
+        ArrayDeque<Long> timestamps = memcached.get(TIMESTAMPS_KEY, ARRAY_DEQUE_LONG_TRANSCODER);
+        LinkedHashMap<Cluster, Integer> merged = new LinkedHashMap<Cluster, Integer>(64, 0.75f, false);
+        for (Iterator<Long> last = timestamps.descendingIterator(); last.hasNext(); ) {
+            long current = last.next();
+            if ((current - timestamp) < delta) {
+                String key = Long.toString(current);
+                Clusters group = memcached.get(key, CLUSTERS_TRANSCODER);
+                if (group != null) {
+                    List<Cluster> clusters = group.getClusters();
+                    for (Cluster c : clusters) {
+                        merged.put(c, c.getId());
+                    }
+                } else {
+                    log.warn(String.format("Not found clusters for key: [%s]", key));
+                }
+            }
+        }
+        return Lists.newArrayList(merged.keySet());
     }
 }

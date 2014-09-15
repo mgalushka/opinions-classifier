@@ -1,10 +1,14 @@
 package com.maximgalushka.classifier.twitter.clusters;
 
+import java.io.Serializable;
+
 /**
  * @since 8/29/2014.
  */
 @SuppressWarnings("UnusedDeclaration")
-public class Cluster {
+public class Cluster implements Serializable{
+
+    private static final long serialVersionUID = 6830384462382938911L;
 
     /**
      * Original cluster id - how it is displayed on GUI

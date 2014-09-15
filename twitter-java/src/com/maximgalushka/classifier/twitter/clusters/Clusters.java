@@ -1,5 +1,6 @@
 package com.maximgalushka.classifier.twitter.clusters;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,10 +10,13 @@ import java.util.Map;
  * @since 8/29/2014.
  */
 @SuppressWarnings("UnusedDeclaration")
-public class Clusters {
+public class Clusters implements Serializable {
 
-    private int size;
+    private static final long serialVersionUID = -5519589416029255789L;
+
+    private transient int size;
     private List<Cluster> clusters = new ArrayList<Cluster>();
+
     private transient Map<Integer, Cluster> reversedIndex;
 
     public Clusters() {

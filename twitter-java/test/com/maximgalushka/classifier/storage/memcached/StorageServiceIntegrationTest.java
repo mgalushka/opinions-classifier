@@ -7,7 +7,6 @@ import org.junit.Test;
 import org.junit.Assert;
 
 import java.util.Arrays;
-import java.util.Collections;
 
 /**
  * Test is using real data in memcached.

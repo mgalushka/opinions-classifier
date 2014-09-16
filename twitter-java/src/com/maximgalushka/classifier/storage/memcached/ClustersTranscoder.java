@@ -1,15 +1,11 @@
 package com.maximgalushka.classifier.storage.memcached;
 
-import com.google.common.base.Charsets;
-import com.maximgalushka.classifier.twitter.clusters.Cluster;
 import com.maximgalushka.classifier.twitter.clusters.Clusters;
 import net.spy.memcached.CachedData;
 import net.spy.memcached.compat.SpyObject;
 import net.spy.memcached.transcoders.Transcoder;
-import net.spy.memcached.transcoders.TranscoderUtils;
 
 import java.io.*;
-import java.util.ArrayDeque;
 
 /**
  * @since 9/15/2014.

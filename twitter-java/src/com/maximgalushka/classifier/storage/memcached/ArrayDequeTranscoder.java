@@ -18,7 +18,6 @@ public final class ArrayDequeTranscoder extends SpyObject
     public static final Logger log = Logger.getLogger(ArrayDequeTranscoder.class);
 
     private static final int SPECIAL_ARRAY_DEQUE_LONGS = (8 << 9);
-    private final TranscoderUtils tu = new TranscoderUtils(true);
 
     @Override
     public boolean asyncDecode(CachedData d) {

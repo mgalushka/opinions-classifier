@@ -19,11 +19,11 @@ import java.util.*;
  *
  * @since 9/12/2014.
  */
-public class StorageService {
+public class MemcachedService {
 
-    public static final Logger log = Logger.getLogger(StorageService.class);
+    public static final Logger log = Logger.getLogger(MemcachedService.class);
 
-    private static final StorageService service = new StorageService();
+    private static final MemcachedService service = new MemcachedService();
     private static final int HOURS24 = 24 * 60 * 60 * 1000;
 
     private static final String TIMESTAMPS_KEY = "timestamps.all.key";
@@ -33,7 +33,7 @@ public class StorageService {
 
     private MemcachedClient memcached;
 
-    private StorageService() {
+    private MemcachedService() {
         LocalSettings settings = LocalSettings.settings();
         try {
             this.memcached = new MemcachedClient(
@@ -44,7 +44,7 @@ public class StorageService {
         }
     }
 
-    public static StorageService getService() {
+    public static MemcachedService getService() {
         return service;
     }
 

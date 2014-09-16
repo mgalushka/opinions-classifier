@@ -11,33 +11,33 @@ import java.util.Arrays;
 /**
  * Test is using real data in memcached.
  */
-public class StorageServiceIntegrationTest {
+public class MemcachedServiceIntegrationTest {
 
-    public static final Logger log = Logger.getLogger(StorageServiceIntegrationTest.class);
+    public static final Logger log = Logger.getLogger(MemcachedServiceIntegrationTest.class);
     public static final int DELTA = 24 * 60 * 60 * 1000;
 
     @Test
     public void testGetService() throws Exception {
-        StorageService ss = StorageService.getService();
+        MemcachedService ss = MemcachedService.getService();
         Assert.assertNotNull(ss);
     }
 
     @Test
     public void testListTimestamps() throws Exception {
-        StorageService ss = StorageService.getService();
+        MemcachedService ss = MemcachedService.getService();
         Assert.assertFalse(ss.listTimestamps().isEmpty());
     }
 
     @Test
     public void testAddTimestamp() throws Exception {
-        StorageService ss = StorageService.getService();
+        MemcachedService ss = MemcachedService.getService();
         log.debug(String.format("Timestamps queue: [%s]", ss.addTimestamp()));
         Assert.assertFalse(ss.listTimestamps().isEmpty());
     }
 
     @Test
     public void testAddNewClustersGroup() throws Exception {
-        StorageService ss = StorageService.getService();
+        MemcachedService ss = MemcachedService.getService();
         Clusters add = new Clusters();
         add.addClusters(Arrays.asList(new Cluster(1, "test", "some message", 70, "http://google.com", "http://imgur.com")));
         long latest = ss.addNewClustersGroup(add);
@@ -47,7 +47,7 @@ public class StorageServiceIntegrationTest {
 
     @Test
     public void testMergeFromTimestamp() throws Exception {
-        StorageService ss = StorageService.getService();
+        MemcachedService ss = MemcachedService.getService();
         log.debug(String.format("Clusters from timestamp: %s", ss.mergeFromTimestamp(DELTA)));
     }
 }

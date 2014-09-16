@@ -18,6 +18,10 @@ public class LocalSettings {
     public static final String MEMCACHED_HOST = "memcached.host";
     public static final String MEMCACHED_PORT = "memcached.port";
 
+    public static final String MYSQL_URL = "mysql.url";
+    public static final String MYSQL_USERNAME = "mysql.username";
+    public static final String MYSQL_PASSWORD = "mysql.password";
+
     private Properties properties;
     private static final LocalSettings settings = new LocalSettings();
 

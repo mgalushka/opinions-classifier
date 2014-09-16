@@ -4,7 +4,6 @@ import com.google.common.base.Charsets;
 import net.spy.memcached.CachedData;
 import net.spy.memcached.compat.SpyObject;
 import net.spy.memcached.transcoders.Transcoder;
-import net.spy.memcached.transcoders.TranscoderUtils;
 import org.apache.log4j.Logger;
 
 import java.util.ArrayDeque;

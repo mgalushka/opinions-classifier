@@ -2,6 +2,7 @@ package com.maximgalushka.classifier.twitter.classify.carrot;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.Sets;
+import com.maximgalushka.classifier.storage.memcached.MemcachedService;
 import com.maximgalushka.classifier.twitter.clusters.*;
 import com.maximgalushka.classifier.twitter.model.Entities;
 import com.maximgalushka.classifier.twitter.model.Tweet;
@@ -31,10 +32,14 @@ public class ClusteringTweetsList {
 
     private AtomicInteger ai = new AtomicInteger(0);
     private final Controller controller;
+    private final MemcachedService memcached;
 
     private ClusteringTweetsList() {
         // A controller to manage the processing pipeline.
         controller = ControllerFactory.createSimple();
+
+        // memcached service
+        memcached = MemcachedService.getService();
     }
 
     public static ClusteringTweetsList getAlgorithm() {

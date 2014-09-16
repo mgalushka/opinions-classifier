@@ -117,7 +117,6 @@ public class ClusteringTweetsList {
         for (com.maximgalushka.classifier.twitter.clusters.Cluster c : updated) {
             size += c.getScore();
         }
-        clusters.setSize(size);
         synchronized (this) {
             clusters.cleanClusters();
             List<com.maximgalushka.classifier.twitter.clusters.Cluster> finalList = filterAndFormatRepresetnations(updated);

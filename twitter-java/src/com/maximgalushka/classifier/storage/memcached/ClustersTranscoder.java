@@ -18,8 +18,6 @@ public final class ClustersTranscoder extends SpyObject
         implements Transcoder<Clusters> {
 
     private static final int SPECIAL_CLUSTERS = (8 << 10);
-    private static final String FIELDS_SEPARATOR = "|";
-    private final TranscoderUtils tu = new TranscoderUtils(true);
 
     @Override
     public boolean asyncDecode(CachedData d) {

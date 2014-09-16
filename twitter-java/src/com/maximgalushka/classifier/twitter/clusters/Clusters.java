@@ -14,7 +14,6 @@ public class Clusters implements Serializable {
 
     private static final long serialVersionUID = -5519589416029255789L;
 
-    private transient int size;
     private List<Cluster> clusters = new ArrayList<Cluster>();
 
     private transient Map<Integer, Cluster> reversedIndex;
@@ -46,14 +45,6 @@ public class Clusters implements Serializable {
 
     public Cluster clusterById(int id) {
         return this.reversedIndex.get(id);
-    }
-
-    public int getSize() {
-        return size;
-    }
-
-    public void setSize(int size) {
-        this.size = size;
     }
 
     @Override

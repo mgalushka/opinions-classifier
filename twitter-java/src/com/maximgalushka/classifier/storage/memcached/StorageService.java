@@ -7,7 +7,6 @@ import com.maximgalushka.classifier.twitter.clusters.Clusters;
 import net.spy.memcached.CASMutation;
 import net.spy.memcached.CASMutator;
 import net.spy.memcached.MemcachedClient;
-import net.spy.memcached.internal.OperationFuture;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -64,7 +63,9 @@ public class StorageService {
      * @throws Exception if any
      */
     public long addTimestamp() throws Exception {
+        // current timestamp
         final long timestamp = new Date().getTime();
+
         // This is how we modify a list when we find one in the cache.
         CASMutation<ArrayDeque<Long>> mutation = new CASMutation<ArrayDeque<Long>>() {
             // This is only invoked when a value actually exists.
@@ -76,10 +77,10 @@ public class StorageService {
                 // first.
                 ArrayDeque<Long> copy = new ArrayDeque<Long>(current);
 
-                // Remove from the end of list all which are older then required time span
+                // Remove from the end (oldest) of list all which are older then required time span
                 for (Iterator<Long> last = current.descendingIterator(); last.hasNext(); ) {
-                    long millis = last.next();
-                    if ((millis - timestamp) >= HOURS24) {
+                    long oldest = last.next();
+                    if ((timestamp - oldest) >= HOURS24) {
                         last.remove();
                     } else {
                         break;
@@ -113,20 +114,40 @@ public class StorageService {
      */
     public long addNewClustersGroup(Clusters group) throws Exception {
         long timestamp = addTimestamp();
-        memcached.add(Long.toString(timestamp), HOURS24, group, CLUSTERS_TRANSCODER);
+
+        // This is how we modify a list when we find one in the cache.
+        CASMutation<Clusters> mutation = new CASMutation<Clusters>() {
+            // This is only invoked when a value actually exists.
+            @Override
+            public Clusters getNewValue(Clusters current) {
+                return current;
+            }
+        };
+
+        // The mutator who'll do all the low-level stuff.
+        CASMutator<Clusters> mutator = new CASMutator<Clusters>(this.memcached, CLUSTERS_TRANSCODER);
+
+        // This returns whatever value was successfully stored within the
+        // cache -- either the initial list as above, or a mutated existing
+        // one
+        String key = Long.toString(timestamp);
+        mutator.cas(key, group, 0, mutation);
+
+        // return inserted timestamp
         return timestamp;
     }
 
     /**
-     * @param timestamp timestamp to merge all the clusters up to current date for period
+     * @param delta period in millis to merge clusters for (since current timestamp)
      */
-    public List<Cluster> mergeFromTimestamp(long timestamp, long delta) {
+    public List<Cluster> mergeFromTimestamp(long delta) {
         ArrayDeque<Long> timestamps = memcached.get(TIMESTAMPS_KEY, ARRAY_DEQUE_LONG_TRANSCODER);
+        long now = new Date().getTime();
         LinkedHashMap<Cluster, Integer> merged = new LinkedHashMap<Cluster, Integer>(64, 0.75f, false);
         for (Iterator<Long> last = timestamps.descendingIterator(); last.hasNext(); ) {
-            long current = last.next();
-            if ((current - timestamp) < delta) {
-                String key = Long.toString(current);
+            long oldest = last.next();
+            if ((now - oldest) < delta) {
+                String key = Long.toString(oldest);
                 Clusters group = memcached.get(key, CLUSTERS_TRANSCODER);
                 if (group != null) {
                     List<Cluster> clusters = group.getClusters();

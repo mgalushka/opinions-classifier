@@ -46,7 +46,7 @@ public final class ArrayDequeTranscoder extends SpyObject
         ArrayDeque<Long> result = new ArrayDeque<Long>(split.length);
         for (String token : split) {
             try {
-                result.addFirst(Long.valueOf(token));
+                result.addLast(Long.valueOf(token));
             } catch (NumberFormatException e) {
                 log.warn(String.format("Cannot decode, skip: [%s]", token));
             }

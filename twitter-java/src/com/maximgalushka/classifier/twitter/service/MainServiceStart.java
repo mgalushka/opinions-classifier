@@ -56,7 +56,9 @@ public class MainServiceStart implements Container {
         try {
             headers(request, response);
             PrintStream body = response.getPrintStream();
-            body.println(gson.toJson(storage.findClusters(HOURS24)));
+            Clusters clusters = new Clusters();
+            clusters.addClustersNoIndex(storage.findClusters(HOURS24));
+            body.println(gson.toJson(clusters));
             body.close();
             log.debug("Response sent");
         } catch (Exception e) {

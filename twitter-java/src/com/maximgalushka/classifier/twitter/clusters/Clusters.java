@@ -43,6 +43,11 @@ public class Clusters implements Serializable {
         rebuildIndex();
     }
 
+    // TODO: looks like crap
+    public void addClustersNoIndex(List<Cluster> clusters) {
+        this.clusters.addAll(clusters);
+    }
+
     public Cluster clusterById(int id) {
         return this.reversedIndex.get(id);
     }

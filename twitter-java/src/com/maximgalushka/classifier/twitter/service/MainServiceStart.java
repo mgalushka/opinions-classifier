@@ -1,6 +1,7 @@
 package com.maximgalushka.classifier.twitter.service;
 
 import com.google.gson.Gson;
+import com.maximgalushka.classifier.storage.StorageService;
 import com.maximgalushka.classifier.twitter.clusters.Clusters;
 import com.maximgalushka.classifier.twitter.stream.TwitterStreamProcessor;
 import org.apache.log4j.Logger;
@@ -26,14 +27,22 @@ public class MainServiceStart implements Container {
     public static final Logger log = Logger.getLogger(MainServiceStart.class);
 
     //private static final Clusters EMPTY = new Clusters();
+    @Deprecated
     private static final Clusters model = new Clusters();
-    private volatile boolean updated = false;
+
+    private final StorageService storage;
+    private static final long HOURS24 = 24 * 60 * 60 * 1000;
+
     private final Gson gson;
 
     public MainServiceStart() {
         this.gson = new Gson();
+
+        // generic storage service
+        storage = StorageService.getService();
     }
 
+    @SuppressWarnings("UnusedParameters")
     public void headers(Request request, Response response) {
         long time = System.currentTimeMillis();
         response.setValue("Content-Type", "application/json");
@@ -47,7 +56,7 @@ public class MainServiceStart implements Container {
         try {
             headers(request, response);
             PrintStream body = response.getPrintStream();
-            body.println(gson.toJson(model));
+            body.println(gson.toJson(storage.findClusters(HOURS24)));
             body.close();
             log.debug("Response sent");
         } catch (Exception e) {
@@ -63,10 +72,14 @@ public class MainServiceStart implements Container {
         connection.connect(address);
         log.debug("Server started");
 
-        // TODO: via executors
+        // TODO: via executors?
         new Thread(new TwitterStreamProcessor(model)).start();
         log.debug("Twitter stream processor started");
 
+        // TODO: extremely unsafe
+        // TODO: forbid connections to this port from outside
+        // TODO: add credentials to be able to shutdown server
+        // TODO: consider other options for shutdown
         new Thread(new StopServiceHandler()).start();
         log.debug("Started application stop interface");
     }

@@ -112,9 +112,15 @@ public class MemcachedService {
     /**
      * @param group clusters group to be stored in memcached, timestamp - to be generated
      */
-    public long addNewClustersGroup(Clusters group) throws Exception {
+    public long createNewClustersGroup(Clusters group) throws Exception {
+        // create timestamp
         long timestamp = addTimestamp();
 
+        // return inserted timestamp
+        return saveClustersGroup(timestamp, group);
+    }
+
+    public long saveClustersGroup(long timestamp, Clusters group) throws Exception {
         // This is how we modify a list when we find one in the cache.
         CASMutation<Clusters> mutation = new CASMutation<Clusters>() {
             // This is only invoked when a value actually exists.

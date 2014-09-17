@@ -2,7 +2,7 @@ package com.maximgalushka.classifier.twitter.classify.carrot;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.Sets;
-import com.maximgalushka.classifier.storage.memcached.MemcachedService;
+import com.maximgalushka.classifier.storage.StorageService;
 import com.maximgalushka.classifier.twitter.clusters.*;
 import com.maximgalushka.classifier.twitter.model.Entities;
 import com.maximgalushka.classifier.twitter.model.Tweet;
@@ -32,14 +32,14 @@ public class ClusteringTweetsList {
 
     private AtomicInteger ai = new AtomicInteger(0);
     private final Controller controller;
-    private final MemcachedService memcached;
+    private final StorageService storage;
 
     private ClusteringTweetsList() {
         // A controller to manage the processing pipeline.
         controller = ControllerFactory.createSimple();
 
-        // memcached service
-        memcached = MemcachedService.getService();
+        // generic storage service
+        storage = StorageService.getService();
     }
 
     public static ClusteringTweetsList getAlgorithm() {
@@ -78,7 +78,7 @@ public class ClusteringTweetsList {
     /**
      * @param clusters in-memory current clusters snapshot model - this is singleton object stored on app level
      */
-    private void updateModel(final Clusters clusters, List<Cluster> currentClusters,
+    private void updateModel(@Deprecated final Clusters clusters, List<Cluster> currentClusters,
                              Map<Integer, Optional<Integer>> fromTo, Map<String, Tweet> tweetsIndex) {
         // if cluster id is no longer in fromTo map - we should remove it
         // if cluster migrated to another - we should change it tracking id
@@ -118,15 +118,14 @@ public class ClusteringTweetsList {
                         url, image));
             }
         }
-        int size = 0;
-        for (com.maximgalushka.classifier.twitter.clusters.Cluster c : updated) {
-            size += c.getScore();
-        }
         synchronized (this) {
             clusters.cleanClusters();
             List<com.maximgalushka.classifier.twitter.clusters.Cluster> finalList = filterAndFormatRepresetnations(updated);
             log.debug(String.format("Final clusters list: [%s]", finalList));
             clusters.addClusters(finalList);
+
+            // storing
+            storage.saveNewClustersGroup(clusters);
         }
     }
 
@@ -203,30 +202,6 @@ public class ClusteringTweetsList {
         // recalculate sore
         to.setScore(to.getScore() + from.getScore());
     }
-
-    private static class TweetsComparator implements Comparator<Tweet> {
-        @Override
-        public int compare(Tweet one, Tweet two) {
-            int oneScore = one.getFavouriteCount() + one.getRetweetCount();
-            int twoScore = two.getFavouriteCount() + two.getRetweetCount();
-
-            // higher - with higher mentions/retweets
-            if (oneScore != twoScore) return twoScore - oneScore;
-
-            // if scores are equal - just retrieve one which has media inside
-            Entities e1 = one.getEntities();
-            Entities e2 = two.getEntities();
-            if (!e1.getMedia().isEmpty() && e2.getMedia().isEmpty()) return -1;
-            if (e1.getMedia().isEmpty() && !e2.getMedia().isEmpty()) return 1;
-
-            if (!e1.getUrls().isEmpty() && e2.getUrls().isEmpty()) return -1;
-            if (e1.getUrls().isEmpty() && !e2.getUrls().isEmpty()) return 1;
-
-            return 0;
-        }
-    }
-
-    private static final Comparator<Tweet> TWEETS_COMPARATOR = new TweetsComparator();
 
     /**
      * Performance: O(n*log(n))<br/>
@@ -466,5 +441,32 @@ public class ClusteringTweetsList {
             cleanFromStart(documents, delta);
         }
     }
+
+    /*
+    TODO: old code - consider removing
+    private static class TweetsComparator implements Comparator<Tweet> {
+        @Override
+        public int compare(Tweet one, Tweet two) {
+            int oneScore = one.getFavouriteCount() + one.getRetweetCount();
+            int twoScore = two.getFavouriteCount() + two.getRetweetCount();
+
+            // higher - with higher mentions/retweets
+            if (oneScore != twoScore) return twoScore - oneScore;
+
+            // if scores are equal - just retrieve one which has media inside
+            Entities e1 = one.getEntities();
+            Entities e2 = two.getEntities();
+            if (!e1.getMedia().isEmpty() && e2.getMedia().isEmpty()) return -1;
+            if (e1.getMedia().isEmpty() && !e2.getMedia().isEmpty()) return 1;
+
+            if (!e1.getUrls().isEmpty() && e2.getUrls().isEmpty()) return -1;
+            if (e1.getUrls().isEmpty() && !e2.getUrls().isEmpty()) return 1;
+
+            return 0;
+        }
+    }
+
+    private static final Comparator<Tweet> TWEETS_COMPARATOR = new TweetsComparator();
+    */
 }
 

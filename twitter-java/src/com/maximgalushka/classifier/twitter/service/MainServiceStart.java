@@ -32,6 +32,7 @@ public class MainServiceStart implements Container {
 
     private final StorageService storage;
     private static final long HOURS24 = 24 * 60 * 60 * 1000;
+    private static final long HOURS6 = 6 * 60 * 60 * 1000;
 
     private final Gson gson;
 
@@ -57,7 +58,7 @@ public class MainServiceStart implements Container {
             headers(request, response);
             PrintStream body = response.getPrintStream();
             Clusters clusters = new Clusters();
-            clusters.addClustersNoIndex(storage.findClusters(HOURS24));
+            clusters.addClustersNoIndex(storage.findClusters(HOURS6));
             body.println(gson.toJson(clusters));
             body.close();
             log.debug("Response sent");

@@ -4,7 +4,7 @@ classifier.gui = function () {
 
 	var container;
 	var msnry;
-	var autorefresh = true;
+	var autorefresh = false;
 	
 	// internal storage for clusters on a screen
 	var clusters = {
@@ -68,11 +68,17 @@ classifier.gui = function () {
 		$(".item").on("click", clickHandler);
 		
 		// assign handler to pause button
-		$("#stopBtn").on("click", function() {
+		$("#refresh").on("click", function() {
 			console.log("pause/resume");
 			autorefresh = !autorefresh;
 			if(autorefresh){
 				classifier.remote.retrieveClusters(refreshCallback);
+			}
+			if(autorefresh){
+				$(this).attr("src", "images/1411069103_refresh-32.png");
+			}
+			else{
+				$(this).attr("src", "images/1411069103_refresh-32_grey.png");
 			}
 		});	
 		

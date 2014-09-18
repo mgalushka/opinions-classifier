@@ -4,11 +4,34 @@
           box-sizing: border-box;
 }
 
-body { font-family: sans-serif; }
+body { 
+	font-family: sans-serif; 
+	margin:0px;
+    background:#fff;
+}
+
+.title{
+	font-size: 35px;
+	padding-left: 20px;
+}
+
+.header-cont {
+	width:100%;
+	position:fixed;
+	top:0px;
+	height: 50px;
+	background: #99CCFF;
+	z-index: 100;
+}
+
+#content{
+	margin-top: 50px;
+}
 
 .masonry {
   /*background: #EEE;*/
   /*max-width: 1640px;*/
+  margin: 5px;
 }
 
 /* clearfix */
@@ -21,10 +44,12 @@ body { font-family: sans-serif; }
 .masonry .item {
   width:  60px;
   /*height: 60px;*/
-  float: left;
-  /*margin-left: 1px;*/
+  /*float: left;*/
   /*background: #D26;*/
-  border: 1px solid #333;
+  margin-top: 5px;
+  margin-left: 0px;
+  padding: 5px;
+  border: 1px solid #F0F0F0;
   border-color: hsla(0, 0%, 0%, 0.5);
   border-radius: 5px;
 }
@@ -56,12 +81,12 @@ body { font-family: sans-serif; }
 
 @media (min-width: 640px) and (max-width: 1600px){
 	.item.w4 { width:  240px; }
-	.img.w4 { width:  235px; }
+	.img.w4 { width:  225px; }
 }
 
 @media (max-width: 640px) {
     .item.w4 { width:  100%; }
-	.img.w4 { width:  98%; }
+	.img.w4 { width:  95%; }
 }
 
 .item .img:hover, .item .message:hover, .share {

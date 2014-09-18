@@ -1,4 +1,33 @@
 <cruisecontrol>
+	<project name="twitter-opinions-classifier-web">
+		<listeners>
+			<currentbuildstatuslistener file="logs/${project.name}/status.txt"/>
+		</listeners>
+
+		<bootstrappers>
+			<gitbootstrapper localWorkingCopy="/home/ec2-user/projects/opinions-classifier" />			
+		</bootstrappers>
+
+		<modificationset quietperiod="0">
+			<compound>
+				<triggers>
+					<git localWorkingCopy="/var/www/html/opinions-classifier"/>
+				</triggers>	
+				<targets>
+					<filesystem folder="/var/www/html/opinions-classifier/web"/>
+				</targets>
+			</compound>	
+		</modificationset>
+		
+		<schedule interval="30">
+			<exec command="echo" />
+		</schedule>
+
+		<log>
+			<merge dir="projects/${project.name}/target/test-results"/>
+		</log>
+	</project>
+	
 	<project name="twitter-opinions-classifier">
 		<listeners>
 			<currentbuildstatuslistener file="logs/${project.name}/status.txt"/>

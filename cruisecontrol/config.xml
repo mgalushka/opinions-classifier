@@ -5,7 +5,7 @@
 		</listeners>
 
 		<bootstrappers>
-			<gitbootstrapper localWorkingCopy="/home/ec2-user/projects/opinions-classifier" />			
+			<gitbootstrapper localWorkingCopy="/var/www/html/opinions-classifier" />			
 		</bootstrappers>
 
 		<modificationset quietperiod="0">

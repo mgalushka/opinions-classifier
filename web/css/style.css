@@ -11,8 +11,10 @@ body {
 }
 
 .title{
-	font-size: 35px;
-	padding-left: 20px;
+	font-size: 2em;
+	padding-left: 4%;
+	vertical-align: middle;
+	line-height: 50px;
 }
 
 .header-cont {

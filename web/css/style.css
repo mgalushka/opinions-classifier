@@ -19,6 +19,7 @@ body {
 
 #refresh{
 	padding-top: 9px;
+	padding-left: 9px;
 	cursor: pointer;
 }
 

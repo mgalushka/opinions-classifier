@@ -88,8 +88,8 @@ body {
 
 
 @media (min-width: 640px) and (max-width: 1600px){
-	.item.w4 { width:  240px; }
-	.img.w4 { width:  225px; }
+	.item.w4 { width:  15%; /*240px;*/ }
+	.img.w4 { width:  95%; /*225px;*/ }
 }
 
 @media (max-width: 640px) {

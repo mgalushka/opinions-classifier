@@ -98,9 +98,11 @@ public class TwitterStreamProcessor implements Runnable {
                     }
                 } catch (IOException e) {
                     log.error(e);
+                    e.printStackTrace();
                 }
             } catch (InterruptedException e) {
                 log.error(e);
+                e.printStackTrace();
             }
         }
     }

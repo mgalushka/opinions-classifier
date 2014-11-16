@@ -37,12 +37,12 @@ public final class ClustersTranscoder extends SpyObject
                     out.close();
                 }
             } catch (IOException ex) {
-                // ignore close exception
+                ex.printStackTrace();
             }
             try {
                 bos.close();
             } catch (IOException ex) {
-                // ignore close exception
+                ex.printStackTrace();
             }
         }
         return null;
@@ -67,14 +67,14 @@ public final class ClustersTranscoder extends SpyObject
                     in.close();
                 }
             } catch (IOException ex) {
-                // ignore close exception
+                ex.printStackTrace();
             }
             try {
                 if (bis != null) {
                     bis.close();
                 }
             } catch (IOException ex) {
-                // ignore close exception
+                ex.printStackTrace();
             }
         }
         return null;

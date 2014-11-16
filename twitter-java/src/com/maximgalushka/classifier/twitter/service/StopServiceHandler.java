@@ -19,6 +19,7 @@ public class StopServiceHandler implements Runnable {
             new Socket("localhost", 4000).getInputStream().read(); //block until its done
         } catch (Exception e) { //if no one is listening, we're the only instance
             log.error(e);
+            e.printStackTrace();
         }
         //start kill listener for self
         new Thread() {
@@ -33,6 +34,7 @@ public class StopServiceHandler implements Runnable {
                     serverSocket.close();
                 } catch (Exception e) {
                     log.error(e);
+                    e.printStackTrace();
                 }
                 // TODO: make it more gracefull
                 // TODO: create flag here TwitterStreamProcessor:68 to complete last loop

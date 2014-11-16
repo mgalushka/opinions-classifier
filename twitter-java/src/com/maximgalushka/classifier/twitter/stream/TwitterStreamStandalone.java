@@ -86,6 +86,7 @@ public class TwitterStreamStandalone {
                         }
                     } catch (IOException e) {
                         log.error(e);
+                        e.printStackTrace();
                     }
                 } else {
                     String tweetSingleLine = tweet.getText().trim().replaceAll("\r?\n", " ");
@@ -93,6 +94,7 @@ public class TwitterStreamStandalone {
                 }
             } catch (InterruptedException e) {
                 log.error(e);
+                e.printStackTrace();
             }
         }
     }

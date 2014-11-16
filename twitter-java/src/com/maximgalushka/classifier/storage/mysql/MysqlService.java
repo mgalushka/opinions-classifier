@@ -26,17 +26,6 @@ public class MysqlService {
         this.datasource = datasource;
     }
 
-    public static MysqlService getService() {
-        if (service == null) {
-            try {
-                service = new MysqlService();
-            } catch (SQLException e) {
-                log.error(e);
-            }
-        }
-        return service;
-    }
-
     /**
      * @return clusters persisted in database to store them to cache
      */
@@ -61,6 +50,7 @@ public class MysqlService {
                             result.put(null, null);
                         } catch (SQLException e) {
                             log.error(e);
+                            e.printStackTrace();
                         } catch (ClassNotFoundException e) {
                             e.printStackTrace();
                         } catch (IOException e) {
@@ -96,11 +86,13 @@ public class MysqlService {
                 if (stmt != null) stmt.close();
             } catch (Exception e) {
                 log.error(e);
+                e.printStackTrace();
             }
             try {
                 if (conn != null) conn.close();
             } catch (Exception e) {
                 log.error(e);
+                e.printStackTrace();
             }
         }
     }
@@ -122,16 +114,19 @@ public class MysqlService {
                 if (rset != null) rset.close();
             } catch (Exception e) {
                 log.error(e);
+                e.printStackTrace();
             }
             try {
                 if (stmt != null) stmt.close();
             } catch (Exception e) {
                 log.error(e);
+                e.printStackTrace();
             }
             try {
                 if (conn != null) conn.close();
             } catch (Exception e) {
                 log.error(e);
+                e.printStackTrace();
             }
         }
         return null;

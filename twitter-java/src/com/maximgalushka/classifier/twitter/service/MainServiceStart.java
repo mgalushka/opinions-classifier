@@ -59,7 +59,7 @@ public class MainServiceStart implements Container {
         response.setDate("Last-Modified", time);
         // TODO: this is unsafe - allow only from localhost/setup proxy via apache???
         // TODO: make it safe
-        response.setValue("Access-Control-Allow-Origin", "*");
+        // response.setValue("Access-Control-Allow-Origin", "*");
     }
 
     public void handle(Request request, Response response) {

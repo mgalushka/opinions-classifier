@@ -57,8 +57,17 @@ public class MainServiceStart implements Container {
         response.setValue("Server", "Tweets Clustering Classifier");
         response.setDate("Date", time);
         response.setDate("Last-Modified", time);
-        // TODO: this is unsafe - allow only from localhost/setup proxy via apache???
-        // TODO: make it safe
+        /** I leave it commented here as a reference for future
+         This is fixed with proper apache server reverse proxy configuration
+         <VirtualHost *:80>
+             ProxyPreserveHost On
+             ProxyRequests Off
+             ServerName host
+             ServerAlias host
+             ProxyPass /api http://localhost:8090
+             ProxyPassReverse /api http://localhost:8090
+         </VirtualHost>
+         */
         // response.setValue("Access-Control-Allow-Origin", "*");
     }
 
@@ -100,10 +109,7 @@ public class MainServiceStart implements Container {
         pool.execute(processor);
         log.debug("Twitter stream processor started");
 
-        // TODO: extremely unsafe
-        // TODO: forbid connections to this port from outside
         // TODO: add credentials to be able to shutdown server
-        // TODO: consider other options for shutdown
         StopServiceHandler stopHandler = (StopServiceHandler)
                 ac.getBean("stop-service");
         pool.execute(stopHandler);

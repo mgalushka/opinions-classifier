@@ -24,6 +24,7 @@ public class StopServiceHandler implements Runnable {
         try {
             int port = Integer.valueOf(
                     settings.value(LocalSettings.SHUTDOWN_PORT));
+            log.debug(String.format("Started shutdown service on port [%d]", port));
             new Socket("localhost", port).getInputStream().read(); //block until its done
         } catch (Exception e) { //if no one is listening, we're the only instance
             log.error(e);

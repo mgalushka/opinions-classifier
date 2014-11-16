@@ -89,10 +89,10 @@ public class MainServiceStart implements Container {
         Connection connection = new SocketConnection(server);
 
         int port = Integer.valueOf(
-                container.settings.value(LocalSettings.SHUTDOWN_PORT));
+                container.settings.value(LocalSettings.WEB_PORT));
         SocketAddress address = new InetSocketAddress(port);
         connection.connect(address);
-        log.debug("Server started");
+        log.debug(String.format("Server started on port [%d]", port));
 
         TwitterStreamProcessor processor = (TwitterStreamProcessor)
                 ac.getBean("twitter-stream-processor");

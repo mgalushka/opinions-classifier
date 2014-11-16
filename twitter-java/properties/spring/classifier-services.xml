@@ -67,10 +67,12 @@
     </bean>
 
     <bean id="main" class="com.maximgalushka.classifier.twitter.service.MainServiceStart">
+        <property name="settings" ref="settings"/>
         <property name="storage" ref="storage"/>
     </bean>
 
     <bean id="stop-service" class="com.maximgalushka.classifier.twitter.service.StopServiceHandler">
+        <property name="settings" ref="settings"/>
     </bean>
 
     <bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">

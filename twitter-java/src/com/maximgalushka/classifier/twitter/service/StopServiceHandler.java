@@ -1,5 +1,6 @@
 package com.maximgalushka.classifier.twitter.service;
 
+import com.maximgalushka.classifier.twitter.LocalSettings;
 import org.apache.log4j.Logger;
 
 import java.net.ServerSocket;
@@ -11,12 +12,19 @@ import java.net.Socket;
 public class StopServiceHandler implements Runnable {
 
     public static final Logger log = Logger.getLogger(StopServiceHandler.class);
+    private LocalSettings settings;
+
+    public void setSettings(LocalSettings settings) {
+        this.settings = settings;
+    }
 
     @Override
     public void run() {
         //send kill signal to running instance, if any
         try {
-            new Socket("localhost", 4000).getInputStream().read(); //block until its done
+            int port = Integer.valueOf(
+                    settings.value(LocalSettings.SHUTDOWN_PORT));
+            new Socket("localhost", port).getInputStream().read(); //block until its done
         } catch (Exception e) { //if no one is listening, we're the only instance
             log.error(e);
             e.printStackTrace();

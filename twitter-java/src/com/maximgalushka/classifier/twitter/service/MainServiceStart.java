@@ -2,6 +2,7 @@ package com.maximgalushka.classifier.twitter.service;
 
 import com.google.gson.Gson;
 import com.maximgalushka.classifier.storage.StorageService;
+import com.maximgalushka.classifier.twitter.LocalSettings;
 import com.maximgalushka.classifier.twitter.clusters.Clusters;
 import com.maximgalushka.classifier.twitter.stream.TwitterStreamProcessor;
 import org.apache.log4j.Logger;
@@ -29,11 +30,12 @@ public class MainServiceStart implements Container {
 
     public static final Logger log = Logger.getLogger(MainServiceStart.class);
 
-    private StorageService storage;
     private static final long HOURS24 = 24 * 60 * 60 * 1000;
     private static final long HOURS6 = 6 * 60 * 60 * 1000;
     private static final long HOURS1 = 1 * 60 * 60 * 1000;
 
+    private StorageService storage;
+    private LocalSettings settings;
     private final Gson gson;
 
     public MainServiceStart() {
@@ -42,6 +44,10 @@ public class MainServiceStart implements Container {
 
     public void setStorage(StorageService storage) {
         this.storage = storage;
+    }
+
+    public void setSettings(LocalSettings settings) {
+        this.settings = settings;
     }
 
     @SuppressWarnings("UnusedParameters")
@@ -82,8 +88,9 @@ public class MainServiceStart implements Container {
         Server server = new ContainerServer(container);
         Connection connection = new SocketConnection(server);
 
-        // TODO from config?
-        SocketAddress address = new InetSocketAddress(8090);
+        int port = Integer.valueOf(
+                container.settings.value(LocalSettings.SHUTDOWN_PORT));
+        SocketAddress address = new InetSocketAddress(port);
         connection.connect(address);
         log.debug("Server started");
 

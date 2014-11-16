@@ -19,6 +19,9 @@ public class LocalSettings {
     public static final String USE_PROXY = "useproxy";
     public static final String INTEGRATION_TESTING = "integration.testing";
 
+    public static final String WEB_PORT = "service.web.port";
+    public static final String SHUTDOWN_PORT = "service.shutdown.port";
+
     public static final String MEMCACHED_HOST = "memcached.host";
     public static final String MEMCACHED_PORT = "memcached.port";
 
@@ -35,7 +38,8 @@ public class LocalSettings {
     @PostConstruct
     private void init() throws IOException {
         properties = new Properties();
-        properties.load(LocalSettings.class.getResourceAsStream("/details.properties"));
+        properties.load(
+                LocalSettings.class.getResourceAsStream("/details.properties"));
     }
 
     public String value(String key) {

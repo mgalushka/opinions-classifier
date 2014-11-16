@@ -33,7 +33,7 @@ body {
 }
 
 #content{
-	margin-top: 50px;
+	margin-top: 55px;
 }
 
 .masonry {
@@ -54,8 +54,8 @@ body {
   /*height: 60px;*/
   /*float: left;*/
   /*background: #D26;*/
-  margin-top: 5px;
-  margin-left: 0px;
+  margin-bottom: 5px;
+  /*margin-left: 0px;*/
   padding: 5px;
   border: 1px solid #F0F0F0;
   border-color: hsla(0, 0%, 0%, 0.5);
@@ -87,8 +87,9 @@ body {
 .img.w3 { width:  175px; }
 
 
-@media (min-width: 640px) and (max-width: 1600px){
-	.item.w4 { width:  15%; /*240px;*/ }
+@media (min-width: 640px){
+	/*.grid-sizer {width: 15%;} */
+	.item.w4 {  width:  15.0%;  /*240px;*/ }
 	.img.w4 { width:  95%; /*225px;*/ }
 }
 

@@ -60,7 +60,8 @@ classifier.gui = function () {
 		container = $('.masonry');
 		container.masonry({
 			columnWidth: 60,
-			itemSelector: '.item'
+			itemSelector: '.item',
+			gutter: 5
 		});		
 		
 		msnry = container.data('masonry');

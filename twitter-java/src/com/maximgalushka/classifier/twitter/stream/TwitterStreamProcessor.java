@@ -28,6 +28,8 @@ public class TwitterStreamProcessor implements Runnable {
     private ClusteringTweetsListAlgorithm clustering;
     private LocalSettings settings;
 
+    private volatile boolean stopping = false;
+
     public TwitterStreamProcessor() {
     }
 
@@ -45,6 +47,10 @@ public class TwitterStreamProcessor implements Runnable {
 
     public void setTwitterClient(TwitterClient twitterClient) {
         this.twitterClient = twitterClient;
+    }
+
+    public void sendStopSignal() {
+        this.stopping = true;
     }
 
     public void setModel(Clusters model) {
@@ -73,7 +79,7 @@ public class TwitterStreamProcessor implements Runnable {
 
         ArrayDeque<Tweet> batch = new ArrayDeque<Tweet>();
         long messageCount = 0;
-        while (true) {
+        while (!this.stopping) {
             try {
                 String json = q.take();
                 Tweet tweet = gson.fromJson(json, Tweet.class);

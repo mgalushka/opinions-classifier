@@ -52,7 +52,7 @@
     <bean id="lingo-clustering-algorithm"
           class="com.maximgalushka.classifier.twitter.classify.carrot.ClusteringTweetsListAlgorithm">
         <property name="storage" ref="storage"/>
-        <property name="controller" >
+        <property name="controller">
             <bean class="org.carrot2.core.ControllerFactory"
                   factory-method="createSimple"/>
         </property>
@@ -73,12 +73,13 @@
 
     <bean id="stop-service" class="com.maximgalushka.classifier.twitter.service.StopServiceHandler">
         <property name="settings" ref="settings"/>
+        <property name="processor" ref="twitter-stream-processor"/>
     </bean>
 
     <bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
-        <property name="corePoolSize" value="2" />
-        <property name="maxPoolSize" value="10" />
-        <property name="queueCapacity" value="25" />
+        <property name="corePoolSize" value="3"/>
+        <property name="maxPoolSize" value="10"/>
+        <property name="queueCapacity" value="25"/>
     </bean>
 
 </beans>

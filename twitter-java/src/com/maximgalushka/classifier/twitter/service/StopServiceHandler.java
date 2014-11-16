@@ -1,10 +1,11 @@
 package com.maximgalushka.classifier.twitter.service;
 
 import com.maximgalushka.classifier.twitter.LocalSettings;
+import com.maximgalushka.classifier.twitter.stream.TwitterStreamProcessor;
 import org.apache.log4j.Logger;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.net.ServerSocket;
-import java.net.Socket;
 
 /**
  * @since 9/11/2014.
@@ -13,42 +14,41 @@ public class StopServiceHandler implements Runnable {
 
     public static final Logger log = Logger.getLogger(StopServiceHandler.class);
     private LocalSettings settings;
+    private ThreadPoolTaskExecutor pool;
+    private TwitterStreamProcessor processor;
 
     public void setSettings(LocalSettings settings) {
         this.settings = settings;
     }
 
+    public void setPool(ThreadPoolTaskExecutor pool) {
+        this.pool = pool;
+    }
+
     @Override
     public void run() {
-        //send kill signal to running instance, if any
-        try {
-            int port = Integer.valueOf(
-                    settings.value(LocalSettings.SHUTDOWN_PORT));
-            log.debug(String.format("Started shutdown service on port [%d]", port));
-            new Socket("localhost", port).getInputStream().read(); //block until its done
-        } catch (Exception e) { //if no one is listening, we're the only instance
-            log.error(e);
-            e.printStackTrace();
-        }
+        final int port = Integer.valueOf(
+                settings.value(LocalSettings.SHUTDOWN_PORT));
+
         //start kill listener for self
-        new Thread() {
+        pool.execute(new Runnable() {
             @Override
             public void run() {
                 try {
-                    ServerSocket serverSocket = new ServerSocket(4000);
+                    ServerSocket serverSocket = new ServerSocket(port);
+                    log.debug(String.format("Started shutdown service on port [%d]", port));
                     serverSocket.accept();
 
-                    //do cleanup here
+                    processor.sendStopSignal();
+                    Thread.sleep(1000);
 
                     serverSocket.close();
                 } catch (Exception e) {
                     log.error(e);
                     e.printStackTrace();
                 }
-                // TODO: make it more gracefull
-                // TODO: create flag here TwitterStreamProcessor:68 to complete last loop
                 System.exit(0);
             }
-        }.start();
+        });
     }
 }

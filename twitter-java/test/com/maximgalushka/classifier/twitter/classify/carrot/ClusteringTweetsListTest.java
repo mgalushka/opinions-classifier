@@ -5,7 +5,7 @@ import org.junit.Test;
 
 public class ClusteringTweetsListTest {
 
-    private ClusteringTweetsList cleaner = ClusteringTweetsList.getAlgorithm();
+    private ClusteringTweetsListAlgorithm cleaner = ClusteringTweetsListAlgorithm.getAlgorithm();
 
     @Test
     public void testReformatMessage() throws Exception {

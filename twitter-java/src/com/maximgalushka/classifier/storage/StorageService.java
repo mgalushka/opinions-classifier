@@ -6,6 +6,7 @@ import com.maximgalushka.classifier.twitter.clusters.Cluster;
 import com.maximgalushka.classifier.twitter.clusters.Clusters;
 import org.apache.log4j.Logger;
 
+import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -16,20 +17,26 @@ import java.util.concurrent.Executors;
  *
  * @since 9/16/2014.
  */
+@Resource(name = "storage")
 public class StorageService {
 
     public static final Logger log = Logger.getLogger(StorageService.class);
 
-    // TODO: create service which requests memcached - if cache miss - load from database into memcached and then
-    // TODO: return results from memcached again.
-
-    private static MemcachedService memcached = MemcachedService.getService();
-    private static MysqlService mysql = MysqlService.getService();
+    private static MemcachedService memcached;
+    private static MysqlService mysql;
 
     private static final StorageService service = new StorageService();
     private static final ExecutorService executor = Executors.newFixedThreadPool(3);
 
     private StorageService() {
+    }
+
+    public static void setMemcached(MemcachedService memcached) {
+        StorageService.memcached = memcached;
+    }
+
+    public static void setMysql(MysqlService mysql) {
+        StorageService.mysql = mysql;
     }
 
     public static StorageService getService() {

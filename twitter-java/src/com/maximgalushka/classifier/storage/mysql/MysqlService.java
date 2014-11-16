@@ -1,8 +1,6 @@
 package com.maximgalushka.classifier.storage.mysql;
 
-import com.maximgalushka.classifier.twitter.LocalSettings;
 import com.maximgalushka.classifier.twitter.clusters.Clusters;
-import org.apache.commons.dbcp2.*;
 import org.apache.log4j.Logger;
 
 import javax.sql.DataSource;
@@ -22,11 +20,10 @@ public class MysqlService {
     private DataSource datasource;
 
     private MysqlService() throws SQLException {
-        LocalSettings settings = LocalSettings.settings();
-        this.datasource = setupDataSource(settings.value(LocalSettings.MYSQL_URL),
-                settings.value(LocalSettings.MYSQL_USERNAME),
-                settings.value(LocalSettings.MYSQL_PASSWORD)
-        );
+    }
+
+    public void setDatasource(DataSource datasource) {
+        this.datasource = datasource;
     }
 
     public static MysqlService getService() {
@@ -140,12 +137,4 @@ public class MysqlService {
         return null;
     }
 
-    private DataSource setupDataSource(String connectURI, String username, String password) {
-        BasicDataSource ds = new BasicDataSource();
-        ds.setDriverClassName("com.mysql.jdbc.Driver");
-        ds.setUsername(username);
-        ds.setPassword(password);
-        ds.setUrl(connectURI);
-        return ds;
-    }
 }

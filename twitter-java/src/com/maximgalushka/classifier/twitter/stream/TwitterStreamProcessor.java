@@ -3,7 +3,7 @@ package com.maximgalushka.classifier.twitter.stream;
 import com.google.gson.Gson;
 import com.maximgalushka.classifier.twitter.LocalSettings;
 import com.maximgalushka.classifier.twitter.TwitterClient;
-import com.maximgalushka.classifier.twitter.classify.carrot.ClusteringTweetsList;
+import com.maximgalushka.classifier.twitter.classify.carrot.ClusteringTweetsListAlgorithm;
 import com.maximgalushka.classifier.twitter.clusters.Clusters;
 import com.maximgalushka.classifier.twitter.model.Tweet;
 import com.twitter.hbc.core.Client;
@@ -24,9 +24,30 @@ public class TwitterStreamProcessor implements Runnable {
     public static final Logger log = Logger.getLogger(TwitterStreamProcessor.class);
 
     private Clusters model;
-    private LocalSettings settings = LocalSettings.settings();
+    private TwitterClient twitterClient;
+    private ClusteringTweetsListAlgorithm clustering;
+    private LocalSettings settings;
 
-    public TwitterStreamProcessor(Clusters model) {
+    public TwitterStreamProcessor() {
+    }
+
+    public void setClusters(Clusters model) {
+        this.model = model;
+    }
+
+    public void setSettings(LocalSettings settings) {
+        this.settings = settings;
+    }
+
+    public void setClustering(ClusteringTweetsListAlgorithm clustering) {
+        this.clustering = clustering;
+    }
+
+    public void setTwitterClient(TwitterClient twitterClient) {
+        this.twitterClient = twitterClient;
+    }
+
+    public void setModel(Clusters model) {
         this.model = model;
     }
 
@@ -39,12 +60,10 @@ public class TwitterStreamProcessor implements Runnable {
             System.setProperty("http.proxyPort", "4545");
         }
 
-        ClusteringTweetsList clustering = ClusteringTweetsList.getAlgorithm();
         Gson gson = new Gson();
-        TwitterClient client = new TwitterClient();
 
         BlockingQueue<String> q = new ArrayBlockingQueue<String>(100);
-        final Client hosebirdClient = client.stream(q);
+        final Client hosebirdClient = twitterClient.stream(q);
         hosebirdClient.connect();
 
         int BATCH_SIZE = 1000;

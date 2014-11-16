@@ -34,6 +34,8 @@ public class StopServiceHandler implements Runnable {
                 } catch (Exception e) {
                     log.error(e);
                 }
+                // TODO: make it more gracefull
+                // TODO: create flag here TwitterStreamProcessor:68 to complete last loop
                 System.exit(0);
             }
         }.start();

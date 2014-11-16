@@ -12,6 +12,9 @@ import org.simpleframework.http.core.ContainerServer;
 import org.simpleframework.transport.Server;
 import org.simpleframework.transport.connect.Connection;
 import org.simpleframework.transport.connect.SocketConnection;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.io.PrintStream;
 import java.net.InetSocketAddress;
@@ -26,11 +29,7 @@ public class MainServiceStart implements Container {
 
     public static final Logger log = Logger.getLogger(MainServiceStart.class);
 
-    //private static final Clusters EMPTY = new Clusters();
-    @Deprecated
-    private static final Clusters model = new Clusters();
-
-    private final StorageService storage;
+    private StorageService storage;
     private static final long HOURS24 = 24 * 60 * 60 * 1000;
     private static final long HOURS6 = 6 * 60 * 60 * 1000;
     private static final long HOURS1 = 1 * 60 * 60 * 1000;
@@ -39,9 +38,10 @@ public class MainServiceStart implements Container {
 
     public MainServiceStart() {
         this.gson = new Gson();
+    }
 
-        // generic storage service
-        storage = StorageService.getService();
+    public void setStorage(StorageService storage) {
+        this.storage = storage;
     }
 
     @SuppressWarnings("UnusedParameters")
@@ -51,6 +51,8 @@ public class MainServiceStart implements Container {
         response.setValue("Server", "Tweets Clustering Classifier");
         response.setDate("Date", time);
         response.setDate("Last-Modified", time);
+        // TODO: this is unsafe - allow only from localhost/setup proxy via apache???
+        // TODO: make it safe
         response.setValue("Access-Control-Allow-Origin", "*");
     }
 
@@ -69,22 +71,35 @@ public class MainServiceStart implements Container {
     }
 
     public static void main(String[] list) throws Exception {
-        MainServiceStart container = new MainServiceStart();
+        ApplicationContext ac =
+                new ClassPathXmlApplicationContext(
+                        "spring/classifier-services.xml"
+                );
+
+        ThreadPoolTaskExecutor pool = (ThreadPoolTaskExecutor)
+                ac.getBean("taskExecutor");
+        MainServiceStart container = (MainServiceStart) ac.getBean("main");
         Server server = new ContainerServer(container);
         Connection connection = new SocketConnection(server);
+
+        // TODO from config?
         SocketAddress address = new InetSocketAddress(8090);
         connection.connect(address);
         log.debug("Server started");
 
-        // TODO: via executors?
-        new Thread(new TwitterStreamProcessor(model)).start();
+        TwitterStreamProcessor processor = (TwitterStreamProcessor)
+                ac.getBean("twitter-stream-processor");
+
+        pool.execute(processor);
         log.debug("Twitter stream processor started");
 
         // TODO: extremely unsafe
         // TODO: forbid connections to this port from outside
         // TODO: add credentials to be able to shutdown server
         // TODO: consider other options for shutdown
-        new Thread(new StopServiceHandler()).start();
+        StopServiceHandler stopHandler = (StopServiceHandler)
+                ac.getBean("stop-service");
+        pool.execute(stopHandler);
         log.debug("Started application stop interface");
     }
 

@@ -23,26 +23,35 @@ import static com.maximgalushka.classifier.twitter.classify.Tools.*;
 /**
  * Clustering via Lingo algorithm from Carrot2
  */
-public class ClusteringTweetsList {
+public class ClusteringTweetsListAlgorithm {
 
-    public static final Logger log = Logger.getLogger(ClusteringTweetsList.class);
+    public static final Logger log = Logger.getLogger(
+            ClusteringTweetsListAlgorithm.class);
 
     private List<Cluster> previousClusters;
-    private static final ClusteringTweetsList algorithm = new ClusteringTweetsList();
+    private static final ClusteringTweetsListAlgorithm algorithm = new ClusteringTweetsListAlgorithm();
 
     private AtomicInteger ai = new AtomicInteger(0);
-    private final Controller controller;
-    private final StorageService storage;
+    private Controller controller;
+    private StorageService storage;
 
-    private ClusteringTweetsList() {
+    private ClusteringTweetsListAlgorithm() {
         // A controller to manage the processing pipeline.
-        controller = ControllerFactory.createSimple();
+        //controller = ControllerFactory.createSimple();
 
         // generic storage service
-        storage = StorageService.getService();
+        //storage = StorageService.getService();
     }
 
-    public static ClusteringTweetsList getAlgorithm() {
+    public void setController(Controller controller) {
+        this.controller = controller;
+    }
+
+    public void setStorage(StorageService storage) {
+        this.storage = storage;
+    }
+
+    public static ClusteringTweetsListAlgorithm getAlgorithm() {
         return algorithm;
     }
 
@@ -403,7 +412,7 @@ public class ClusteringTweetsList {
     public static void main(String[] args) throws IOException {
         log.debug("Start batch clustering");
         BufferedReader fr = new BufferedReader(new FileReader(args[0]));
-        ClusteringTweetsList c = new ClusteringTweetsList();
+        ClusteringTweetsListAlgorithm c = new ClusteringTweetsListAlgorithm();
 
         int D = 1000;
         int delta = 100;

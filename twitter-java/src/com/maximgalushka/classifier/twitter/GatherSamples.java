@@ -2,6 +2,8 @@ package com.maximgalushka.classifier.twitter;
 
 import com.maximgalushka.classifier.twitter.model.Tweet;
 import org.apache.log4j.Logger;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -18,11 +20,16 @@ public class GatherSamples {
     public static void main(String[] args) throws FileNotFoundException {
         if (args.length == 0) return;
 
+        ApplicationContext ac =
+                new ClassPathXmlApplicationContext(
+                        "spring/classifier-services.xml"
+                );
+        TwitterClient client = (TwitterClient) ac.getBean("twitter-client");
+
         PrintWriter pw = new PrintWriter(args[0]);
-        TwitterClient client = new TwitterClient();
         String token = client.oauth();
 
-        List<Tweet> tweets = client.search(token, "Ukraine");
+        List<Tweet> tweets = client.search(token, "Ukraine", 200);
 
         HashSet<String> texts = new HashSet<String>();
         for (Tweet t : tweets) {

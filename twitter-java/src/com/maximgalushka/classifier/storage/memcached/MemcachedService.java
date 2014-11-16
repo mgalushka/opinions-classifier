@@ -9,6 +9,8 @@ import net.spy.memcached.CASMutator;
 import net.spy.memcached.MemcachedClient;
 import org.apache.log4j.Logger;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.*;
@@ -19,11 +21,11 @@ import java.util.*;
  *
  * @since 9/12/2014.
  */
+@Resource(name = "memcached")
 public class MemcachedService {
 
     public static final Logger log = Logger.getLogger(MemcachedService.class);
 
-    private static final MemcachedService service = new MemcachedService();
     private static final int HOURS24 = 24 * 60 * 60 * 1000;
 
     private static final String TIMESTAMPS_KEY = "timestamps.all.key";
@@ -31,21 +33,24 @@ public class MemcachedService {
     private static final ArrayDequeTranscoder ARRAY_DEQUE_LONG_TRANSCODER = new ArrayDequeTranscoder();
     private static final ClustersTranscoder CLUSTERS_TRANSCODER = new ClustersTranscoder();
 
+    private LocalSettings settings;
+
     private MemcachedClient memcached;
 
-    private MemcachedService() {
-        LocalSettings settings = LocalSettings.settings();
-        try {
-            this.memcached = new MemcachedClient(
-                    new InetSocketAddress(settings.value(LocalSettings.MEMCACHED_HOST),
-                            Integer.valueOf(settings.value(LocalSettings.MEMCACHED_PORT))));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public MemcachedService() {
     }
 
-    public static MemcachedService getService() {
-        return service;
+    public void setSettings(LocalSettings settings) {
+        this.settings = settings;
+    }
+
+    @PostConstruct
+    private void init() throws IOException {
+        this.memcached = new MemcachedClient(
+                new InetSocketAddress(
+                        this.settings.value(LocalSettings.MEMCACHED_HOST),
+                        Integer.valueOf(
+                                this.settings.value(LocalSettings.MEMCACHED_PORT))));
     }
 
     /**

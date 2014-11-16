@@ -27,29 +27,48 @@ import org.glassfish.jersey.apache.connector.ApacheConnectorProvider;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
 
+import javax.annotation.PostConstruct;
 import javax.ws.rs.client.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.*;
 
 /**
  * @author Maxim Galushka
  */
+@SuppressWarnings("ALL")
 public class TwitterClient {
 
     public static final String PROXY_ADDRESS = "http://localhost:4545";
     private Gson gson;
-    private LocalSettings settings = LocalSettings.settings();
+    private LocalSettings settings;
+
+    private boolean underTest = false;
 
     public TwitterClient() {
         this.gson = new Gson();
+    }
+
+    @PostConstruct
+    private void init() {
+        String ut = settings.value(LocalSettings.INTEGRATION_TESTING);
+        if (ut != null) {
+            this.underTest =
+                    Boolean.valueOf(settings.value(LocalSettings.INTEGRATION_TESTING));
+        }
+    }
+
+    public void setSettings(LocalSettings settings) {
+        this.settings = settings;
     }
 
     /**
      * @return access token
      */
     public String oauth() {
+        if (underTest) return testingStub("TESTING_OAUTH_KEY");
         Client client = proxyHttpClient();
 
         WebTarget target = client.target("https://api.twitter.com/oauth2/token");
@@ -70,10 +89,11 @@ public class TwitterClient {
         return gson.fromJson(json, TwitterOAuthToken.class).getAccessToken();
     }
 
-    public List<Tweet> search(String token, String query) {
+    public List<Tweet> search(String token, String query, int count) {
+        if (underTest) return testingStub(Collections.<Tweet>emptyList());
         Client client = proxyHttpClient();
         WebTarget search = client.target("https://api.twitter.com/1.1/search/tweets.json");
-        WebTarget callTarget = search.queryParam("q", query).queryParam("count", 200).queryParam("lang", "en");
+        WebTarget callTarget = search.queryParam("q", query).queryParam("count", count).queryParam("lang", "en");
 
         Invocation.Builder invocationBuilder = callTarget.request();
 
@@ -91,6 +111,7 @@ public class TwitterClient {
      */
     @SuppressWarnings("deprecation")
     public BasicClient stream(BlockingQueue<String> output) {
+        if (underTest) return testingStub(null);
         // Set up your blocking queues: Be sure to size these properly based on expected TPS of your stream
         //BlockingQueue<String> msgQueue = new LinkedBlockingQueue<String>(100000);
         BlockingQueue<Event> eventQueue = new LinkedBlockingQueue<Event>(1000);
@@ -143,5 +164,9 @@ public class TwitterClient {
         cc.property(ClientProperties.PROXY_URI, PROXY_ADDRESS);
         cc.connectorProvider(new ApacheConnectorProvider());
         return ClientBuilder.newClient(cc);
+    }
+
+    private <T> T testingStub(T result) {
+        return result;
     }
 }

@@ -98,4 +98,9 @@
         <property name="threshold" value="0.9"/>
     </bean>
 
+    <bean id="classifier"
+          class="com.maximgalushka.classifier.clustring.realtime.ClusterClassifier">
+        <property name="stats" ref="stats"/>
+    </bean>
+
 </beans>

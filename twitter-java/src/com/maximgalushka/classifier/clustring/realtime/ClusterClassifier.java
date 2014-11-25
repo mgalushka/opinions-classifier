@@ -53,4 +53,11 @@ public class ClusterClassifier {
         return Math.sqrt(totalSquare) / (Math.sqrt(docSquare) * Math.sqrt(clusterSquare));
     }
 
+    public StatsHolder getStats() {
+        return stats;
+    }
+
+    public void setStats(StatsHolder stats) {
+        this.stats = stats;
+    }
 }

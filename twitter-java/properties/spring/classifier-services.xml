@@ -82,4 +82,20 @@
         <property name="queueCapacity" value="25"/>
     </bean>
 
+    <bean id="statsJmx"
+          class="org.springframework.jmx.export.MBeanExporter"
+          lazy-init="false">
+        <property name="beans">
+            <map>
+                <entry key="bean:name=stats" value-ref="stats"/>
+            </map>
+        </property>
+    </bean>
+    <bean id="stats"
+          class="com.maximgalushka.classifier.clustring.realtime.StatsHolder">
+        <property name="clustersCount" value="50"/>
+        <property name="documentsCount" value="0"/>
+        <property name="threshold" value="0.9"/>
+    </bean>
+
 </beans>

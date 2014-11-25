@@ -51,4 +51,20 @@ public class StopServiceHandler implements Runnable {
             }
         });
     }
+
+    public LocalSettings getSettings() {
+        return settings;
+    }
+
+    public ThreadPoolTaskExecutor getPool() {
+        return pool;
+    }
+
+    public TwitterStreamProcessor getProcessor() {
+        return processor;
+    }
+
+    public void setProcessor(TwitterStreamProcessor processor) {
+        this.processor = processor;
+    }
 }

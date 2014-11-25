@@ -46,6 +46,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.apache.opennlp</groupId>
+            <artifactId>opennlp-tools</artifactId>
+            <version>1.5.3</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.carrot2</groupId>
             <artifactId>carrot2-core</artifactId>
             <version>3.9.3</version>

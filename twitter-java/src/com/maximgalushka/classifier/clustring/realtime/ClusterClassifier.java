@@ -32,6 +32,7 @@ public class ClusterClassifier {
         realtimeClusters.add(new Cluster(doc));
     }
 
+    // TODO: use real TD-IDF instead of counts as it is now
     private double cosine(IdfSparseVector global, long D, IdfSparseVector doc,
                           IdfSparseVector cluster) {
         Map<Integer, Long> docTerms = doc.getVector();

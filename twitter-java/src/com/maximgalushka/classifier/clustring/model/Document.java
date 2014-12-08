@@ -91,6 +91,6 @@ public class Document implements Comparable, Serializable {
 
     @Override
     public String toString() {
-        return String.format("[%s]",  text);
+        return String.format("[%s]\n",  text);
     }
 }

@@ -25,7 +25,7 @@ public class ClusterClassifier {
             if (similarity >= stats.getThreshold()) {
                 // document is classified
                 cluster.addDocument(doc);
-                break;
+                return;
             }
             if (t++ >= stats.getClustersToScan()) break;
         }

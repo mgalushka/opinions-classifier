@@ -26,3 +26,5 @@ while ((line = IN.readLine()) != null) {
     println ss.stats.clustersCount
 }
 IN.close()
+println ss.realtimeClusters
+System.exit(0);

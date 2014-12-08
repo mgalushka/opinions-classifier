@@ -88,4 +88,9 @@ public class Document implements Comparable, Serializable {
         Document that = (Document) what;
         return Long.valueOf(that.timestamp).compareTo(this.timestamp);
     }
+
+    @Override
+    public String toString() {
+        return String.format("[%s]",  text);
+    }
 }

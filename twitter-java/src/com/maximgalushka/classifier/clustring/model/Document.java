@@ -1,13 +1,13 @@
 package com.maximgalushka.classifier.clustring.model;
 
-import org.tartarus.snowball.ext.EnglishStemmer;
-
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 import java.io.Serializable;
 
 /**
  * @author Maxim Galushka
  */
+@SuppressWarnings("UnusedDeclaration")
 @Immutable
 public class Document implements Comparable, Serializable {
 
@@ -18,11 +18,7 @@ public class Document implements Comparable, Serializable {
     private String image;
     private long timestamp;
 
-    private transient IdfSparseVector center;
-
-    protected Document() {
-
-    }
+    private transient WordCountSparseVector center;
 
     public Document(long id,
                     String text,
@@ -36,15 +32,9 @@ public class Document implements Comparable, Serializable {
         this.url = url;
         this.image = image;
         this.timestamp = timestamp;
-
-        EnglishStemmer stemmer = new EnglishStemmer();
-        stemmer.setCurrent(text);
-        if (stemmer.stem()) {
-            this.center = new IdfSparseVector(stemmer.getCurrent());
-        } else {
-            throw new RuntimeException("Cannot stem input text");
-        }
+        this.center = new WordCountSparseVector(this.text);
     }
+
 
     public long getId() {
         return id;
@@ -70,12 +60,24 @@ public class Document implements Comparable, Serializable {
         return timestamp;
     }
 
-    public IdfSparseVector getCenter() {
+    public WordCountSparseVector getCenter() {
         return center;
     }
 
+    /**
+     * @param term term to calculate TF(term, document) for
+     * @return TF(term, document) = number of occurrences of term in current document
+     */
+    public Long tf(String term) {
+        return tf(term.hashCode());
+    }
+
+    public Long tf(Integer hash) {
+        return this.center.getVector().get(hash);
+    }
+
     @Override
-    public int compareTo(Object what) {
+    public int compareTo(@Nullable Object what) {
         if (what == null) return 1;
         if (!(what instanceof Document)) {
             throw new IllegalArgumentException(

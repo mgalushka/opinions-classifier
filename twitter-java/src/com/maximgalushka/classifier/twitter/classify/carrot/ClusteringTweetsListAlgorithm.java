@@ -3,6 +3,7 @@ package com.maximgalushka.classifier.twitter.classify.carrot;
 import com.google.common.base.Optional;
 import com.google.common.collect.Sets;
 import com.maximgalushka.classifier.storage.StorageService;
+import com.maximgalushka.classifier.twitter.classify.TextCleanup;
 import com.maximgalushka.classifier.twitter.clusters.*;
 import com.maximgalushka.classifier.twitter.model.Entities;
 import com.maximgalushka.classifier.twitter.model.Tweet;
@@ -23,6 +24,7 @@ import static com.maximgalushka.classifier.twitter.classify.Tools.*;
 /**
  * Clustering via Lingo algorithm from Carrot2
  */
+@SuppressWarnings("UnusedDeclaration")
 public class ClusteringTweetsListAlgorithm {
 
     public static final Logger log = Logger.getLogger(
@@ -36,11 +38,6 @@ public class ClusteringTweetsListAlgorithm {
     private StorageService storage;
 
     private ClusteringTweetsListAlgorithm() {
-        // A controller to manage the processing pipeline.
-        //controller = ControllerFactory.createSimple();
-
-        // generic storage service
-        //storage = StorageService.getService();
     }
 
     public void setController(Controller controller) {
@@ -176,33 +173,10 @@ public class ClusteringTweetsListAlgorithm {
         result.addAll(messagesIndex.values());
 
         for (com.maximgalushka.classifier.twitter.clusters.Cluster cluster : result) {
-            cluster.setMessage(reformatMessage(cluster.getMessage()));
+            cluster.setMessage(TextCleanup.reformatMessage(cluster.getMessage()));
         }
 
         return result;
-    }
-
-    /**
-     * <ul>
-     * <li>Removes all "RT" asking for retweet.</li>
-     * <li>Removes all the mentions.</li>
-     * <li>Clean-up all the urls</li>
-     * </ul>
-     */
-    public String reformatMessage(String initial) {
-        String formatted = initial.replaceAll("(r|R)(t|T)", "");
-        formatted = formatted.replaceAll("@\\S+", "");
-        formatted = formatted.replaceAll("http[s]?:[/]{1,2}\\S*", "");
-
-        // remove all URLs' remains
-        formatted = formatted.replaceAll("https:", "");
-        formatted = formatted.replaceAll("http:", "");
-        formatted = formatted.replaceAll("https", "");
-        formatted = formatted.replaceAll("http", "");
-
-        // normalize internal spaces
-        formatted = formatted.replaceAll("\\s+", " ");
-        return formatted.trim();
     }
 
     private void mergeClusters(com.maximgalushka.classifier.twitter.clusters.Cluster from,

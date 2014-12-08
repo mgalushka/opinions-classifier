@@ -1,20 +1,24 @@
 package com.maximgalushka.classifier.clustring.realtime;
 
 import com.maximgalushka.classifier.clustring.model.Document;
-import com.maximgalushka.classifier.clustring.model.IdfSparseVector;
+import com.maximgalushka.classifier.clustring.model.WordCountSparseVector;
 
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author Maxim Galushka
  */
+@SuppressWarnings("UnusedDeclaration")
 public class StatsHolder {
 
     private volatile AtomicLong documentsCount = new AtomicLong(0);
-    private IdfSparseVector globalIdf = new IdfSparseVector();
+    private volatile AtomicLong clustersCount = new AtomicLong(0);
+
+    // stores for each word - number of documents containing it
+    private WordCountSparseVector globalIdf = new WordCountSparseVector();
 
     private int clustersToScan = 30;
-    private int clustersCount = 30;
+    //private int clustersCount = 30;
     private float threshold;
 
     public StatsHolder() {
@@ -25,11 +29,13 @@ public class StatsHolder {
         return documentsCount.incrementAndGet();
     }
 
-    public int getClustersCount() {
-        return clustersCount;
+    public long getClustersCount() {
+        return clustersCount.longValue();
     }
 
-    public void setClustersCount(int clustersCount) {}
+    public long bumpClustersCount() {
+        return clustersCount.incrementAndGet();
+    }
 
     public long getDocumentsCount() {
         return documentsCount.get();
@@ -37,7 +43,7 @@ public class StatsHolder {
 
     public void setDocumentsCount(long count){}
 
-    public IdfSparseVector getGlobalVector(){
+    public WordCountSparseVector getGlobalVector(){
         return this.globalIdf;
     }
 

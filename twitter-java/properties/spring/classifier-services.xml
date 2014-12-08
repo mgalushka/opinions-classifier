@@ -93,7 +93,7 @@
     </bean>
     <bean id="stats"
           class="com.maximgalushka.classifier.clustring.realtime.StatsHolder">
-        <property name="clustersCount" value="50"/>
+        <property name="clustersToScan" value="50"/>
         <property name="documentsCount" value="0"/>
         <property name="threshold" value="0.9"/>
     </bean>

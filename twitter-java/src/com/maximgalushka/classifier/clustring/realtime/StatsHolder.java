@@ -24,13 +24,17 @@ public class StatsHolder {
     public StatsHolder() {
     }
 
-    public long addDocument(Document document){
+    public long addDocument(Document document) {
         globalIdf.addText(document.getText());
         return documentsCount.incrementAndGet();
     }
 
-    public long getClustersCount() {
-        return clustersCount.longValue();
+    public AtomicLong getClustersCount() {
+        return clustersCount;
+    }
+
+    public void setClustersCount(AtomicLong clustersCount) {
+        // take no action
     }
 
     public long bumpClustersCount() {
@@ -41,9 +45,10 @@ public class StatsHolder {
         return documentsCount.get();
     }
 
-    public void setDocumentsCount(long count){}
+    public void setDocumentsCount(long count) {
+    }
 
-    public WordCountSparseVector getGlobalVector(){
+    public WordCountSparseVector getGlobalVector() {
         return this.globalIdf;
     }
 

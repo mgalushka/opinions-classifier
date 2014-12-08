@@ -104,6 +104,9 @@ public class ClusterClassifier {
      */
     private double idf(SparseVector<Long> global, long D, Integer hash) {
         Long containingTerm = global.getVector().get(hash);
+        if(containingTerm == null){
+            containingTerm = 0L;
+        }
         return Math.log((double) D / (1 + containingTerm));
     }
 

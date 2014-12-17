@@ -6,7 +6,7 @@ import java.io.Serializable;
  * @since 8/29/2014.
  */
 @SuppressWarnings("UnusedDeclaration")
-public class Cluster implements Serializable{
+public class TweetsCluster implements Serializable{
 
     private static final long serialVersionUID = 6830384462382938911L;
 
@@ -27,7 +27,7 @@ public class Cluster implements Serializable{
 
     private int score;
 
-    public Cluster(int id, String label, String message, int score, String url, String image) {
+    public TweetsCluster(int id, String label, String message, int score, String url, String image) {
         this.id = id;
         // at creation both id and trackingId are the same
         this.trackingId = id;
@@ -98,12 +98,13 @@ public class Cluster implements Serializable{
         return String.format("[%d, %s: [%s]", id, label, message);
     }
 
+    @SuppressWarnings("RedundantIfStatement")
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Cluster cluster = (Cluster) o;
+        TweetsCluster cluster = (TweetsCluster) o;
 
         if (message != null && cluster.message != null && message.equals(cluster.message)) return true;
         if (url != null && cluster.url != null && url.equals(cluster.url)) return true;
@@ -122,8 +123,8 @@ public class Cluster implements Serializable{
 
     @SuppressWarnings({"CloneDoesntDeclareCloneNotSupportedException", "CloneDoesntCallSuperClone"})
     @Override
-    public Cluster clone() {
-        Cluster copy = new Cluster(id, label, message, score, url, image);
+    public TweetsCluster clone() {
+        TweetsCluster copy = new TweetsCluster(id, label, message, score, url, image);
         copy.setTrackingId(trackingId);
         return copy;
     }

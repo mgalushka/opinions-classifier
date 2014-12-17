@@ -2,7 +2,7 @@ package com.maximgalushka.classifier.storage;
 
 import com.maximgalushka.classifier.storage.memcached.MemcachedService;
 import com.maximgalushka.classifier.storage.mysql.MysqlService;
-import com.maximgalushka.classifier.twitter.clusters.Cluster;
+import com.maximgalushka.classifier.twitter.clusters.TweetsCluster;
 import com.maximgalushka.classifier.twitter.clusters.Clusters;
 import org.apache.log4j.Logger;
 
@@ -43,9 +43,9 @@ public class StorageService {
         return service;
     }
 
-    public List<Cluster> findClusters(long delta) {
+    public List<TweetsCluster> findClusters(long delta) {
         // from memory by default
-        List<Cluster> results = memcached.mergeFromTimestamp(delta);
+        List<TweetsCluster> results = memcached.mergeFromTimestamp(delta);
         if (results.isEmpty()) {
             log.warn("Memcached is empty - loading clusters from database");
             HashMap<Long, Clusters> fromdb = mysql.loadClusters(delta);

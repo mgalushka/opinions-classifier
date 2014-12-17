@@ -92,12 +92,12 @@ public class ClusteringTweetsListAlgorithm {
         Map<Integer, Cluster> currentClustersIndex = new HashMap<Integer, Cluster>();
         for (Cluster c : currentClusters) currentClustersIndex.put(c.getId(), c);
 
-        List<com.maximgalushka.classifier.twitter.clusters.Cluster> updated = new ArrayList<com.maximgalushka.classifier.twitter.clusters.Cluster>();
-        List<com.maximgalushka.classifier.twitter.clusters.Cluster> snapshot = Collections.unmodifiableList(clusters.getClusters());
-        for (com.maximgalushka.classifier.twitter.clusters.Cluster old : snapshot) {
+        List<TweetsCluster> updated = new ArrayList<TweetsCluster>();
+        List<TweetsCluster> snapshot = Collections.unmodifiableList(clusters.getClusters());
+        for (TweetsCluster old : snapshot) {
             Optional<Integer> to = Optional.fromNullable(fromTo.get(old.getId())).or(Optional.<Integer>absent());
             if (to.isPresent()) {
-                com.maximgalushka.classifier.twitter.clusters.Cluster updatedCluster = old.clone();
+                TweetsCluster updatedCluster = old.clone();
                 Cluster newCluster = currentClustersIndex.get(to.get());
                 updatedCluster.setTrackingId(to.get());
                 updatedCluster.setScore(old.getScore() + newCluster.getAllDocuments().size());
@@ -105,7 +105,7 @@ public class ClusteringTweetsListAlgorithm {
             }
         }
         for (Cluster current : currentClusters) {
-            com.maximgalushka.classifier.twitter.clusters.Cluster old = clusters.clusterById(current.getId());
+            TweetsCluster old = clusters.clusterById(current.getId());
             if (old == null) {
                 Tweet representative = findRepresentative(current.getAllDocuments(), tweetsIndex);
                 Entities entities = representative.getEntities();
@@ -116,7 +116,7 @@ public class ClusteringTweetsListAlgorithm {
                     image = entities.getMedia().isEmpty() ? "" : entities.getMedia().get(0).getUrl();
                 }
                 // create new
-                updated.add(new com.maximgalushka.classifier.twitter.clusters.Cluster(
+                updated.add(new TweetsCluster(
                         current.getId(),
                         current.getLabel(),
                         representative.getText(),
@@ -126,7 +126,7 @@ public class ClusteringTweetsListAlgorithm {
         }
         synchronized (this) {
             clusters.cleanClusters();
-            List<com.maximgalushka.classifier.twitter.clusters.Cluster> finalList = filterAndFormatRepresetnations(updated);
+            List<TweetsCluster> finalList = filterAndFormatRepresetnations(updated);
             log.debug(String.format("Final clusters list: [%s]", finalList));
             clusters.addClusters(finalList);
 
@@ -140,47 +140,81 @@ public class ClusteringTweetsListAlgorithm {
      *
      * @return list of clusters (domain model) without duplicated
      */
-    private List<com.maximgalushka.classifier.twitter.clusters.Cluster>
-    filterAndFormatRepresetnations(List<com.maximgalushka.classifier.twitter.clusters.Cluster> clusters) {
-        List<com.maximgalushka.classifier.twitter.clusters.Cluster> result
-                = new ArrayList<com.maximgalushka.classifier.twitter.clusters.Cluster>();
+    private List<TweetsCluster>
+    filterAndFormatRepresetnations(List<TweetsCluster> clusters) {
+        List<TweetsCluster> result
+                = new ArrayList<TweetsCluster>();
 
-        HashMap<String, com.maximgalushka.classifier.twitter.clusters.Cluster> messagesIndex =
-                new HashMap<String, com.maximgalushka.classifier.twitter.clusters.Cluster>();
+        HashMap<String, TweetsCluster> messagesIndex =
+                new HashMap<String, TweetsCluster>();
 
-        HashMap<String, com.maximgalushka.classifier.twitter.clusters.Cluster> urlsIndex =
-                new HashMap<String, com.maximgalushka.classifier.twitter.clusters.Cluster>();
+        HashMap<String, TweetsCluster> urlsIndex =
+                new HashMap<String, TweetsCluster>();
 
-        HashMap<String, com.maximgalushka.classifier.twitter.clusters.Cluster> imagesIndex =
-                new HashMap<String, com.maximgalushka.classifier.twitter.clusters.Cluster>();
+        HashMap<String, TweetsCluster> imagesIndex =
+                new HashMap<String, TweetsCluster>();
 
-        List<com.maximgalushka.classifier.twitter.clusters.Cluster> snapshot =
+        List<TweetsCluster> snapshot =
                 Collections.unmodifiableList(clusters);
 
-        for (com.maximgalushka.classifier.twitter.clusters.Cluster c : snapshot) {
+        for (TweetsCluster c : snapshot) {
             String message = c.getMessage();
             String url = c.getUrl();
             String image = c.getImage();
-            if (messagesIndex.containsKey(message.trim())) mergeClusters(c, messagesIndex.get(message));
-            else if (url != null && urlsIndex.containsKey(url)) mergeClusters(c, urlsIndex.get(url));
-            else if (image != null && imagesIndex.containsKey(image)) mergeClusters(c, imagesIndex.get(image));
-            else {
-                messagesIndex.put(message.trim(), c);
+            String trimmedMessage = message.trim();
+            TweetsCluster similar = similarExisted(messagesIndex, trimmedMessage);
+            if (similar != null) {
+                mergeClusters(c, similar);
+            } else if (url != null && urlsIndex.containsKey(url)) {
+                mergeClusters(c, urlsIndex.get(url));
+            } else if (image != null && imagesIndex.containsKey(image)) {
+                mergeClusters(c, imagesIndex.get(image));
+            } else {
+                messagesIndex.put(trimmedMessage, c);
                 if (url != null) urlsIndex.put(url, c);
                 if (image != null) imagesIndex.put(image, c);
             }
         }
         result.addAll(messagesIndex.values());
 
-        for (com.maximgalushka.classifier.twitter.clusters.Cluster cluster : result) {
+        for (TweetsCluster cluster : result) {
             cluster.setMessage(TextCleanup.reformatMessage(cluster.getMessage()));
         }
 
         return result;
     }
 
-    private void mergeClusters(com.maximgalushka.classifier.twitter.clusters.Cluster from,
-                               com.maximgalushka.classifier.twitter.clusters.Cluster to) {
+    /**
+     * O(50*n)
+     *
+     * @return true if similar message existed
+     */
+    private TweetsCluster similarExisted(
+            Map<String, TweetsCluster> messagesIndex,
+            String trimmedMessage) {
+        if (trimmedMessage == null) return null;
+
+        TweetsCluster ifExisted = messagesIndex.get(trimmedMessage);
+        if (ifExisted != null) {
+            return ifExisted;
+        }
+
+        int CAP = 50; // heuristics = number of clusters to avoid O(n^2) complexity
+        double THRESHOLD = 0.75;
+        int count = 0;
+        List<String> messages = new ArrayList<String>(messagesIndex.keySet());
+        Collections.shuffle(messages);
+        for (String existing : messages) {
+            if (count++ > CAP) break;
+            if (jaccard(existing, trimmedMessage) >= THRESHOLD) {
+                return messagesIndex.get(existing);
+            }
+        }
+        return null;
+    }
+
+    private void mergeClusters(TweetsCluster from,
+                               TweetsCluster to) {
         log.warn(String.format("Merging cluster [%d] to [%d]", from.getId(), to.getId()));
         // recalculate sore
         to.setScore(to.getScore() + from.getScore());

@@ -14,22 +14,22 @@ public class Clusters implements Serializable {
 
     private static final long serialVersionUID = -5519589416029255789L;
 
-    private List<Cluster> clusters = new ArrayList<Cluster>();
+    private List<TweetsCluster> clusters = new ArrayList<TweetsCluster>();
 
-    private transient Map<Integer, Cluster> reversedIndex;
+    private transient Map<Integer, TweetsCluster> reversedIndex;
 
     public Clusters() {
-        this.reversedIndex = new HashMap<Integer, Cluster>();
+        this.reversedIndex = new HashMap<Integer, TweetsCluster>();
     }
 
     private void rebuildIndex() {
         reversedIndex.clear();
-        for (Cluster c : clusters) {
+        for (TweetsCluster c : clusters) {
             reversedIndex.put(c.getTrackingId(), c);
         }
     }
 
-    public List<Cluster> getClusters() {
+    public List<TweetsCluster> getClusters() {
         return clusters;
     }
 
@@ -38,17 +38,17 @@ public class Clusters implements Serializable {
         rebuildIndex();
     }
 
-    public void addClusters(List<Cluster> clusters) {
+    public void addClusters(List<TweetsCluster> clusters) {
         this.clusters.addAll(clusters);
         rebuildIndex();
     }
 
     // TODO: looks like crap
-    public void addClustersNoIndex(List<Cluster> clusters) {
+    public void addClustersNoIndex(List<TweetsCluster> clusters) {
         this.clusters.addAll(clusters);
     }
 
-    public Cluster clusterById(int id) {
+    public TweetsCluster clusterById(int id) {
         return this.reversedIndex.get(id);
     }
 

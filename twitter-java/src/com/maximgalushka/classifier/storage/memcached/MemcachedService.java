@@ -2,7 +2,7 @@ package com.maximgalushka.classifier.storage.memcached;
 
 import com.google.common.collect.Lists;
 import com.maximgalushka.classifier.twitter.LocalSettings;
-import com.maximgalushka.classifier.twitter.clusters.Cluster;
+import com.maximgalushka.classifier.twitter.clusters.TweetsCluster;
 import com.maximgalushka.classifier.twitter.clusters.Clusters;
 import net.spy.memcached.CASMutation;
 import net.spy.memcached.CASMutator;
@@ -151,18 +151,18 @@ public class MemcachedService {
     /**
      * @param delta period in millis to merge clusters for (since current timestamp)
      */
-    public List<Cluster> mergeFromTimestamp(long delta) {
+    public List<TweetsCluster> mergeFromTimestamp(long delta) {
         ArrayDeque<Long> timestamps = memcached.get(TIMESTAMPS_KEY, ARRAY_DEQUE_LONG_TRANSCODER);
         long now = new Date().getTime();
-        LinkedHashMap<Cluster, Integer> merged = new LinkedHashMap<Cluster, Integer>(64, 0.75f, false);
+        LinkedHashMap<TweetsCluster, Integer> merged = new LinkedHashMap<TweetsCluster, Integer>(64, 0.75f, false);
         for (Iterator<Long> last = timestamps.descendingIterator(); last.hasNext(); ) {
             long oldest = last.next();
             if ((now - oldest) < delta) {
                 String key = Long.toString(oldest);
                 Clusters group = memcached.get(key, CLUSTERS_TRANSCODER);
                 if (group != null) {
-                    List<Cluster> clusters = group.getClusters();
-                    for (Cluster c : clusters) {
+                    List<TweetsCluster> clusters = group.getClusters();
+                    for (TweetsCluster c : clusters) {
                         merged.put(c, c.getId());
                     }
                 } else {

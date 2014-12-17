@@ -1,6 +1,6 @@
 package com.maximgalushka.classifier.storage.memcached;
 
-import com.maximgalushka.classifier.twitter.clusters.Cluster;
+import com.maximgalushka.classifier.twitter.clusters.TweetsCluster;
 import com.maximgalushka.classifier.twitter.clusters.Clusters;
 import org.apache.log4j.Logger;
 import org.junit.Test;
@@ -39,7 +39,7 @@ public class MemcachedServiceIntegrationTest {
     public void testAddNewClustersGroup() throws Exception {
         MemcachedService ss = MemcachedService.getService();
         Clusters add = new Clusters();
-        add.addClusters(Arrays.asList(new Cluster(1, "test", "some message", 70, "http://google.com", "http://imgur.com")));
+        add.addClusters(Arrays.asList(new TweetsCluster(1, "test", "some message", 70, "http://google.com", "http://imgur.com")));
         long latest = ss.createNewClustersGroup(add);
         log.debug(String.format("Added new clusters group for [%d]", latest));
         Assert.assertFalse(ss.mergeFromTimestamp(DELTA).isEmpty());

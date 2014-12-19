@@ -1,6 +1,3 @@
-# public URL
-# http://ec2-54-68-39-246.us-west-2.compute.amazonaws.com/opinions-classifier/web/
-
 export JAVA_HOME=/opt/jdk/jdk1.7.0_67
 export M2_HOME=~/apache-maven-3.2.3
 export PATH=${JAVA_HOME}/bin:${PATH}:${M2_HOME}/bin
@@ -11,3 +8,5 @@ export PATH=${JAVA_HOME}/bin:${PATH}:${M2_HOME}/bin
 
 
 sudo /etc/init.d/mysqld restart
+
+sudo /etc/init.d/memcached restart

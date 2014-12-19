@@ -28,92 +28,98 @@ import java.net.SocketAddress;
  */
 public class MainServiceStart implements Container {
 
-    public static final Logger log = Logger.getLogger(MainServiceStart.class);
+  public static final Logger log = Logger.getLogger(MainServiceStart.class);
 
-    private static final long HOURS24 = 24 * 60 * 60 * 1000;
-    private static final long HOURS6 = 6 * 60 * 60 * 1000;
-    private static final long HOURS1 = 1 * 60 * 60 * 1000;
+  @SuppressWarnings("UnusedDeclaration")
+  private static final long HOURS24 = 24 * 60 * 60 * 1000;
 
-    private StorageService storage;
-    private LocalSettings settings;
-    private final Gson gson;
+  @SuppressWarnings("UnusedDeclaration")
+  private static final long HOURS6 = 6 * 60 * 60 * 1000;
 
-    public MainServiceStart() {
-        this.gson = new Gson();
+  @SuppressWarnings("UnusedDeclaration")
+  private static final long HOURS1 = 60 * 60 * 1000;
+
+  private StorageService storage;
+  private LocalSettings settings;
+  private final Gson gson;
+
+  public MainServiceStart() {
+    this.gson = new Gson();
+  }
+
+  public void setStorage(StorageService storage) {
+    this.storage = storage;
+  }
+
+  @SuppressWarnings("UnusedDeclaration")
+  public void setSettings(LocalSettings settings) {
+    this.settings = settings;
+  }
+
+  public void headers(Response response) {
+    long time = System.currentTimeMillis();
+    response.setValue("Content-Type", "application/json");
+    response.setValue("Server", "Tweets Clustering Classifier");
+    response.setDate("Date", time);
+    response.setDate("Last-Modified", time);
+    /** I leave it commented here as a reference for future
+     This is fixed with proper apache server reverse proxy configuration
+     <VirtualHost *:80>
+     ProxyPreserveHost On
+     ProxyRequests Off
+     ServerName host
+     ServerAlias host
+     ProxyPass /api http://localhost:8090
+     ProxyPassReverse /api http://localhost:8090
+     </VirtualHost>
+     */
+    // response.setValue("Access-Control-Allow-Origin", "*");
+  }
+
+  public void handle(Request request, Response response) {
+    try {
+      headers(response);
+      PrintStream body = response.getPrintStream();
+      Clusters clusters = new Clusters();
+      clusters.addClustersNoIndex(storage.findClusters(HOURS1));
+      body.println(gson.toJson(clusters));
+      body.close();
+      log.debug("Response sent");
+    } catch (Exception e) {
+      e.printStackTrace();
     }
+  }
 
-    public void setStorage(StorageService storage) {
-        this.storage = storage;
-    }
+  public static void main(String[] list) throws Exception {
+    ApplicationContext ac =
+      new ClassPathXmlApplicationContext(
+        "spring/classifier-services.xml"
+      );
 
-    public void setSettings(LocalSettings settings) {
-        this.settings = settings;
-    }
+    ThreadPoolTaskExecutor pool = (ThreadPoolTaskExecutor)
+      ac.getBean("taskExecutor");
+    MainServiceStart container = (MainServiceStart) ac.getBean("main");
+    Server server = new ContainerServer(container);
+    Connection connection = new SocketConnection(server);
 
-    @SuppressWarnings("UnusedParameters")
-    public void headers(Request request, Response response) {
-        long time = System.currentTimeMillis();
-        response.setValue("Content-Type", "application/json");
-        response.setValue("Server", "Tweets Clustering Classifier");
-        response.setDate("Date", time);
-        response.setDate("Last-Modified", time);
-        /** I leave it commented here as a reference for future
-         This is fixed with proper apache server reverse proxy configuration
-         <VirtualHost *:80>
-             ProxyPreserveHost On
-             ProxyRequests Off
-             ServerName host
-             ServerAlias host
-             ProxyPass /api http://localhost:8090
-             ProxyPassReverse /api http://localhost:8090
-         </VirtualHost>
-         */
-        // response.setValue("Access-Control-Allow-Origin", "*");
-    }
+    int port = Integer.valueOf(
+      container.settings.value(LocalSettings.WEB_PORT)
+    );
+    SocketAddress address = new InetSocketAddress(port);
+    connection.connect(address);
+    log.debug(String.format("Server started on port [%d]", port));
 
-    public void handle(Request request, Response response) {
-        try {
-            headers(request, response);
-            PrintStream body = response.getPrintStream();
-            Clusters clusters = new Clusters();
-            clusters.addClustersNoIndex(storage.findClusters(HOURS1));
-            body.println(gson.toJson(clusters));
-            body.close();
-            log.debug("Response sent");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+    TwitterStreamProcessor processor = (TwitterStreamProcessor)
+      ac.getBean("twitter-stream-processor");
 
-    public static void main(String[] list) throws Exception {
-        ApplicationContext ac =
-                new ClassPathXmlApplicationContext(
-                        "spring/classifier-services.xml"
-                );
+    pool.execute(processor);
+    log.debug("Twitter stream processor started");
 
-        ThreadPoolTaskExecutor pool = (ThreadPoolTaskExecutor)
-                ac.getBean("taskExecutor");
-        MainServiceStart container = (MainServiceStart) ac.getBean("main");
-        Server server = new ContainerServer(container);
-        Connection connection = new SocketConnection(server);
-
-        int port = Integer.valueOf(
-                container.settings.value(LocalSettings.WEB_PORT));
-        SocketAddress address = new InetSocketAddress(port);
-        connection.connect(address);
-        log.debug(String.format("Server started on port [%d]", port));
-
-        TwitterStreamProcessor processor = (TwitterStreamProcessor)
-                ac.getBean("twitter-stream-processor");
-
-        pool.execute(processor);
-        log.debug("Twitter stream processor started");
-
-        // TODO: add credentials to be able to shutdown server
-        StopServiceHandler stopHandler = (StopServiceHandler)
-                ac.getBean("stop-service");
-        pool.execute(stopHandler);
-        log.debug("Started application stop interface");
-    }
+    // TODO: add credentials to be able to shutdown server
+    StopServiceHandler stopHandler = (StopServiceHandler)
+      ac.getBean("stop-service");
+    pool.execute(stopHandler);
+    log.debug("Started application stop interface");
+  }
 
 }

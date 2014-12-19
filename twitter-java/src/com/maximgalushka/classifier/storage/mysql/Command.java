@@ -7,5 +7,5 @@ import java.sql.ResultSet;
  */
 public interface Command<T> {
 
-    public T process(ResultSet set);
+  public T process(ResultSet set);
 }

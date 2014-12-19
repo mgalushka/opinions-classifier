@@ -10,19 +10,19 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  */
 public class MySQLTestClient {
 
-    public static final Logger log = Logger.getLogger(MySQLTestClient.class);
+  public static final Logger log = Logger.getLogger(MySQLTestClient.class);
 
-    public static void main(String[] args) throws Exception {
-        ApplicationContext ac =
-                new ClassPathXmlApplicationContext(
-                        "spring/classifier-services.xml"
-                );
-        MysqlService ss = (MysqlService) ac.getBean("mysql");
-        log.debug(ss.loadClusters(30 * 60 * 1000));
+  public static void main(String[] args) throws Exception {
+    ApplicationContext ac =
+      new ClassPathXmlApplicationContext(
+        "spring/classifier-services.xml"
+      );
+    MysqlService ss = (MysqlService) ac.getBean("mysql");
+    log.debug(ss.loadClusters(30 * 60 * 1000));
 
-        ConfigurableApplicationContext configurable =
-                (ConfigurableApplicationContext) ac;
-        configurable.close();
-        System.exit(0);
-    }
+    ConfigurableApplicationContext configurable =
+      (ConfigurableApplicationContext) ac;
+    configurable.close();
+    System.exit(0);
+  }
 }

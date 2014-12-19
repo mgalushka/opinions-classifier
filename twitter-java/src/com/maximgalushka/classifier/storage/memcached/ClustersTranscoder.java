@@ -11,77 +11,75 @@ import java.io.*;
  * @since 9/15/2014.
  */
 public final class ClustersTranscoder extends SpyObject
-        implements Transcoder<Clusters> {
+  implements Transcoder<Clusters> {
 
-    private static final int SPECIAL_CLUSTERS = (8 << 10);
+  private static final int SPECIAL_CLUSTERS = (8 << 10);
 
-    @Override
-    public boolean asyncDecode(CachedData d) {
-        return false;
-    }
+  @Override
+  public boolean asyncDecode(CachedData d) {
+    return false;
+  }
 
-    @Override
-    public CachedData encode(Clusters obj) {
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        ObjectOutput out = null;
-        try {
-            out = new ObjectOutputStream(bos);
-            out.writeObject(obj);
-            byte[] encoded = bos.toByteArray();
-            return new CachedData(SPECIAL_CLUSTERS, encoded, encoded.length);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (out != null) {
-                    out.close();
-                }
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-            try {
-                bos.close();
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
+  @Override
+  public CachedData encode(Clusters obj) {
+    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+    ObjectOutput out = null;
+    try {
+      out = new ObjectOutputStream(bos);
+      out.writeObject(obj);
+      byte[] encoded = bos.toByteArray();
+      return new CachedData(SPECIAL_CLUSTERS, encoded, encoded.length);
+    } catch (IOException e) {
+      e.printStackTrace();
+    } finally {
+      try {
+        if (out != null) {
+          out.close();
         }
-        return null;
+      } catch (IOException ex) {
+        ex.printStackTrace();
+      }
+      try {
+        bos.close();
+      } catch (IOException ex) {
+        ex.printStackTrace();
+      }
     }
+    return null;
+  }
 
-    @Override
-    public Clusters decode(CachedData cachedData) {
-        byte[] encoded = cachedData.getData();
-        ByteArrayInputStream bis = null;
-        ObjectInput in = null;
-        try {
-            bis = new ByteArrayInputStream(encoded);
-            in = new ObjectInputStream(bis);
-            return (Clusters) in.readObject();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (in != null) {
-                    in.close();
-                }
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-            try {
-                if (bis != null) {
-                    bis.close();
-                }
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
+  @Override
+  public Clusters decode(CachedData cachedData) {
+    byte[] encoded = cachedData.getData();
+    ByteArrayInputStream bis = null;
+    ObjectInput in = null;
+    try {
+      bis = new ByteArrayInputStream(encoded);
+      in = new ObjectInputStream(bis);
+      return (Clusters) in.readObject();
+    } catch (IOException | ClassNotFoundException e) {
+      e.printStackTrace();
+    } finally {
+      try {
+        if (in != null) {
+          in.close();
         }
-        return null;
+      } catch (IOException ex) {
+        ex.printStackTrace();
+      }
+      try {
+        if (bis != null) {
+          bis.close();
+        }
+      } catch (IOException ex) {
+        ex.printStackTrace();
+      }
     }
+    return null;
+  }
 
-    @Override
-    public int getMaxSize() {
-        return CachedData.MAX_SIZE;
-    }
+  @Override
+  public int getMaxSize() {
+    return CachedData.MAX_SIZE;
+  }
 }

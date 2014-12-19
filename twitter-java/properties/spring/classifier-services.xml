@@ -73,6 +73,7 @@
 
     <bean id="stop-service" class="com.maximgalushka.classifier.twitter.service.StopServiceHandler">
         <property name="settings" ref="settings"/>
+        <property name="pool" ref="taskExecutor"/>
         <property name="processor" ref="twitter-stream-processor"/>
     </bean>
 

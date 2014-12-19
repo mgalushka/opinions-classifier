@@ -3,68 +3,74 @@ package com.maximgalushka.classifier.twitter.service;
 import com.maximgalushka.classifier.twitter.LocalSettings;
 import com.maximgalushka.classifier.twitter.stream.TwitterStreamProcessor;
 import org.apache.log4j.Logger;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.net.ServerSocket;
+import java.util.concurrent.ExecutorService;
 
 /**
  * @since 9/11/2014.
  */
+@SuppressWarnings("UnusedDeclaration")
 public class StopServiceHandler implements Runnable {
 
-    public static final Logger log = Logger.getLogger(StopServiceHandler.class);
-    private LocalSettings settings;
-    private ThreadPoolTaskExecutor pool;
-    private TwitterStreamProcessor processor;
+  public static final Logger log = Logger.getLogger(StopServiceHandler.class);
+  private LocalSettings settings;
+  private ExecutorService pool;
+  private TwitterStreamProcessor processor;
 
-    public void setSettings(LocalSettings settings) {
-        this.settings = settings;
-    }
+  @Override
+  public void run() {
+    final int port = Integer.valueOf(
+      settings.value(LocalSettings.SHUTDOWN_PORT)
+    );
 
-    public void setPool(ThreadPoolTaskExecutor pool) {
-        this.pool = pool;
-    }
+    //start kill listener for self
+    pool.execute(
+      () -> {
+        try {
+          ServerSocket serverSocket = new ServerSocket(port);
+          log.debug(
+            String.format(
+              "Started shutdown service on port [%d]",
+              port
+            )
+          );
+          serverSocket.accept();
 
-    @Override
-    public void run() {
-        final int port = Integer.valueOf(
-                settings.value(LocalSettings.SHUTDOWN_PORT));
+          processor.sendStopSignal();
+          Thread.sleep(1000);
 
-        //start kill listener for self
-        pool.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    ServerSocket serverSocket = new ServerSocket(port);
-                    log.debug(String.format("Started shutdown service on port [%d]", port));
-                    serverSocket.accept();
+          serverSocket.close();
+        } catch (Exception e) {
+          log.error(e);
+          e.printStackTrace();
+        }
+        System.exit(0);
+      }
+    );
+  }
 
-                    processor.sendStopSignal();
-                    Thread.sleep(1000);
+  public LocalSettings getSettings() {
+    return settings;
+  }
 
-                    serverSocket.close();
-                } catch (Exception e) {
-                    log.error(e);
-                    e.printStackTrace();
-                }
-                System.exit(0);
-            }
-        });
-    }
+  public void setSettings(LocalSettings settings) {
+    this.settings = settings;
+  }
 
-    public LocalSettings getSettings() {
-        return settings;
-    }
+  public void setPool(ExecutorService pool) {
+    this.pool = pool;
+  }
 
-    public ThreadPoolTaskExecutor getPool() {
-        return pool;
-    }
+  public ExecutorService getPool() {
+    return pool;
+  }
 
-    public TwitterStreamProcessor getProcessor() {
-        return processor;
-    }
+  public TwitterStreamProcessor getProcessor() {
+    return processor;
+  }
 
-    public void setProcessor(TwitterStreamProcessor processor) {
-        this.processor = processor;
-    }
+  public void setProcessor(TwitterStreamProcessor processor) {
+    this.processor = processor;
+  }
 }

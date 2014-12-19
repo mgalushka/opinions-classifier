@@ -3,9 +3,9 @@ package com.maximgalushka.classifier.twitter.service;
 import com.maximgalushka.classifier.twitter.LocalSettings;
 import com.maximgalushka.classifier.twitter.stream.TwitterStreamProcessor;
 import org.apache.log4j.Logger;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.net.ServerSocket;
-import java.util.concurrent.ExecutorService;
 
 /**
  * @since 9/11/2014.
@@ -15,7 +15,7 @@ public class StopServiceHandler implements Runnable {
 
   public static final Logger log = Logger.getLogger(StopServiceHandler.class);
   private LocalSettings settings;
-  private ExecutorService pool;
+  private ThreadPoolTaskExecutor pool;
   private TwitterStreamProcessor processor;
 
   @Override
@@ -58,11 +58,11 @@ public class StopServiceHandler implements Runnable {
     this.settings = settings;
   }
 
-  public void setPool(ExecutorService pool) {
+  public void setPool(ThreadPoolTaskExecutor pool) {
     this.pool = pool;
   }
 
-  public ExecutorService getPool() {
+  public ThreadPoolTaskExecutor getPool() {
     return pool;
   }
 

@@ -52,11 +52,17 @@ public class StorageService {
     return service;
   }
 
-  public List<TweetsCluster> findClusters(long delta) {
+  public List<TweetsCluster> findClusters(long delta) throws Exception {
+    checkConsistency();
     // from memory by default
     List<TweetsCluster> results = memcached.mergeFromTimestamp(delta);
     if (results.isEmpty()) {
-      log.warn("Memcached is empty - loading clusters from database");
+      log.warn(
+        String.format(
+          "Memcached is empty - loading clusters from database for [%d]",
+          delta
+        )
+      );
       HashMap<Long, Clusters> fromdb = mysql.loadClusters(delta);
       for (long timestamp : fromdb.keySet()) {
         Clusters cls = fromdb.get(timestamp);
@@ -78,7 +84,8 @@ public class StorageService {
     return results;
   }
 
-  public void saveNewClustersGroup(final Clusters group) {
+  public void saveNewClustersGroup(final Clusters group) throws Exception {
+    checkConsistency();
     long timestamp = 0L;
     try {
       // save in memcached in sync way
@@ -103,5 +110,18 @@ public class StorageService {
         }
       }
     );
+  }
+
+  private void checkConsistency() throws Exception {
+    if (memcached == null) {
+      throw new Exception(
+        "Memcached instance is null. Check spring configuration!"
+      );
+    }
+    if (mysql == null) {
+      throw new Exception(
+        "Mysql instance is null. Check spring configuration!"
+      );
+    }
   }
 }

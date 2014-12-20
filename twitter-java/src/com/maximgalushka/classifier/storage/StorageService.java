@@ -52,7 +52,7 @@ public class StorageService {
     return service;
   }
 
-  public List<TweetsCluster> findClusters(long delta) throws Exception {
+  public List<TweetsCluster> findClusters(long delta) {
     checkConsistency();
     // from memory by default
     List<TweetsCluster> results = memcached.mergeFromTimestamp(delta);
@@ -84,7 +84,7 @@ public class StorageService {
     return results;
   }
 
-  public void saveNewClustersGroup(final Clusters group) throws Exception {
+  public void saveNewClustersGroup(final Clusters group) {
     checkConsistency();
     long timestamp = 0L;
     try {
@@ -112,14 +112,14 @@ public class StorageService {
     );
   }
 
-  private void checkConsistency() throws Exception {
+  private void checkConsistency() {
     if (memcached == null) {
-      throw new Exception(
+      log.error(
         "Memcached instance is null. Check spring configuration!"
       );
     }
     if (mysql == null) {
-      throw new Exception(
+      log.error(
         "Mysql instance is null. Check spring configuration!"
       );
     }

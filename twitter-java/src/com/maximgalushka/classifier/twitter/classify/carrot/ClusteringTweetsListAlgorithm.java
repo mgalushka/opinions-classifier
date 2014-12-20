@@ -246,8 +246,9 @@ public class ClusteringTweetsListAlgorithm {
     Map<String, TweetsCluster> messagesIndex,
     String trimmedMessage
   ) {
+    final Tuple<TweetsCluster, Double> EMPTY = new Tuple<>(null, 0D);
     if (trimmedMessage == null) {
-      return null;
+      return EMPTY;
     }
 
     TweetsCluster ifExisted = messagesIndex.get(trimmedMessage);
@@ -272,7 +273,7 @@ public class ClusteringTweetsListAlgorithm {
         );
       }
     }
-    return null;
+    return EMPTY;
   }
 
   private void mergeClusters(

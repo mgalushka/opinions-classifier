@@ -44,9 +44,7 @@ public class MysqlService {
             long timestamp = set.getLong(1);
             Blob data = set.getBlob(2);
             ObjectInputStream in = new ObjectInputStream(
-              data
-                .getBinaryStream
-                  ()
+              data.getBinaryStream()
             );
             Clusters clusters = (Clusters) in.readObject();
             result.put(timestamp, clusters);

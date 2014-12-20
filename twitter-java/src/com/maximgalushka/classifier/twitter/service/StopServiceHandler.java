@@ -36,9 +36,16 @@ public class StopServiceHandler implements Runnable {
             )
           );
           serverSocket.accept();
-
+          long TIMEOUT = 1000;
+          log.warn(
+            String.format(
+              "Received shutdown signal, " +
+                "stopping server with timeout [%d] millis",
+              TIMEOUT
+            )
+          );
           processor.sendStopSignal();
-          Thread.sleep(1000);
+          Thread.sleep(TIMEOUT);
 
           serverSocket.close();
         } catch (Exception e) {

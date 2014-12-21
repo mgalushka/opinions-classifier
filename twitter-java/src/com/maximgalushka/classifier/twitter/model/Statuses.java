@@ -13,6 +13,9 @@ public class Statuses {
     @SerializedName("statuses")
     private List<Tweet> tweets = new ArrayList<Tweet>();
 
+    @SerializedName("search_metadata")
+    private SearchMetadata metadata;
+
     public Statuses() {
     }
 
@@ -22,5 +25,13 @@ public class Statuses {
 
     public void setTweets(List<Tweet> tweets) {
         this.tweets = tweets;
+    }
+
+    public SearchMetadata getMetadata() {
+        return metadata;
+    }
+
+    public void setMetadata(SearchMetadata metadata) {
+        this.metadata = metadata;
     }
 }

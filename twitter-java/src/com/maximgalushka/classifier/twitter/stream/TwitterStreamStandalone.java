@@ -1,12 +1,9 @@
 package com.maximgalushka.classifier.twitter.stream;
 
-import com.google.gson.Gson;
-import com.maximgalushka.classifier.twitter.TwitterClient;
 import com.maximgalushka.classifier.twitter.classify.carrot
   .ClusteringTweetsListAlgorithm;
 import com.maximgalushka.classifier.twitter.clusters.Clusters;
 import com.maximgalushka.classifier.twitter.model.Tweet;
-import com.twitter.hbc.core.Client;
 import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -22,8 +19,10 @@ import static com.maximgalushka.classifier.twitter.classify.Tools.*;
  */
 public class TwitterStreamStandalone {
 
-  public static final Logger log = Logger.getLogger(TwitterStreamStandalone
-                                                      .class);
+  public static final Logger log = Logger.getLogger(
+    TwitterStreamStandalone
+      .class
+  );
   private static boolean NO_CLASSIFICATION = false;
 
   @SuppressWarnings("InfiniteLoopStatement")
@@ -42,8 +41,8 @@ public class TwitterStreamStandalone {
       }
     }
 
-    System.setProperty("http.proxyHost", "localhost");
-    System.setProperty("http.proxyPort", "4545");
+    //System.setProperty("http.proxyHost", "localhost");
+    //System.setProperty("http.proxyPort", "4545");
 
     ApplicationContext ac =
       new ClassPathXmlApplicationContext(
@@ -52,14 +51,20 @@ public class TwitterStreamStandalone {
 
     ClusteringTweetsListAlgorithm clustering =
       (ClusteringTweetsListAlgorithm) ac.getBean("lingo-clustering-algorithm");
-    TwitterClient client = (TwitterClient) ac.getBean("twitter-client");
+    StreamTwitterSearchWrapper client = (StreamTwitterSearchWrapper) ac.getBean(
+      "twitter-stream-client"
+    );
 
-    Gson gson = new Gson();
     final PrintWriter pw = new PrintWriter(args[0]);
 
+    /*
     BlockingQueue<String> q = new ArrayBlockingQueue<>(100);
     final Client hosebirdClient = client.stream(q);
     hosebirdClient.connect();
+    */
+
+    BlockingQueue<Tweet> q = new ArrayBlockingQueue<>(100);
+    client.stream("Ukraine", q);
 
     Runtime.getRuntime().addShutdownHook(
       new Thread() {
@@ -67,7 +72,6 @@ public class TwitterStreamStandalone {
         public void run() {
           System.out.println("Shutdown");
           pw.close();
-          hosebirdClient.stop();
         }
       }
     );
@@ -78,8 +82,8 @@ public class TwitterStreamStandalone {
     ArrayDeque<Tweet> batch = new ArrayDeque<>();
     while (true) {
       try {
-        String json = q.take();
-        Tweet tweet = gson.fromJson(json, Tweet.class);
+        Tweet tweet = q.take();
+        //Tweet tweet = gson.fromJson(json, Tweet.class);
         if (!NO_CLASSIFICATION) {
           try {
             // we need to collect full batch of elements and then classify
@@ -101,7 +105,7 @@ public class TwitterStreamStandalone {
             "\r?\n",
             " "
           );
-          log.debug(String.format("%s", tweetSingleLine));
+          log.debug(String.format("[%d] %s", tweet.getId(), tweetSingleLine));
         }
       } catch (InterruptedException e) {
         log.error(e);

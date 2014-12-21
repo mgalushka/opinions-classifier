@@ -3,7 +3,6 @@ package com.maximgalushka.classifier.twitter;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.maximgalushka.classifier.twitter.model.Statuses;
-import com.maximgalushka.classifier.twitter.model.Tweet;
 import com.maximgalushka.classifier.twitter.model.TwitterOAuthToken;
 import com.twitter.hbc.BasicRateTracker;
 import com.twitter.hbc.BasicReconnectionManager;
@@ -31,7 +30,6 @@ import javax.annotation.PostConstruct;
 import javax.ws.rs.client.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.*;
 
@@ -39,15 +37,16 @@ import java.util.concurrent.*;
  * @author Maxim Galushka
  */
 @SuppressWarnings("ALL")
-public class TwitterClient {
+public class TwitterStandardClient {
 
   public static final String PROXY_ADDRESS = "http://localhost:4545";
   private Gson gson;
   private LocalSettings settings;
 
   private boolean underTest = false;
+  private boolean useProxy = false;
 
-  public TwitterClient() {
+  public TwitterStandardClient() {
     this.gson = new Gson();
   }
 
@@ -57,6 +56,8 @@ public class TwitterClient {
     if (ut != null) {
       this.underTest =
         Boolean.valueOf(settings.value(LocalSettings.INTEGRATION_TESTING));
+      this.useProxy =
+        Boolean.parseBoolean(settings.value(LocalSettings.USE_PROXY));
     }
   }
 
@@ -110,18 +111,29 @@ public class TwitterClient {
     return gson.fromJson(json, TwitterOAuthToken.class).getAccessToken();
   }
 
-  public List<Tweet> search(String token, String query, int count) {
+  /**
+   * Searches updates on twitter sinse sinceId tweet id.
+   *
+   * @param token   twitter oauth token
+   * @param query   query streang to search for updates
+   * @param sinceId latest id we already have results from
+   * @return list of tweets which were sent on the query since sinceId
+   */
+  public Statuses search(String token, String query, long sinceId) {
     if (underTest) {
-      return testingStub(Collections.<Tweet>emptyList());
+      return testingStub(new Statuses());
     }
     Client client = proxyHttpClient();
     WebTarget search = client.target(
       "https://api.twitter.com/1.1/search/tweets.json"
     );
-    WebTarget callTarget = search.queryParam("q", query).queryParam(
-      "count",
-      count
-    ).queryParam("lang", "en");
+    WebTarget callTarget = search
+      .queryParam("q", query)               // maximum length = 500
+      .queryParam("count", 100)             // maximum = 100
+      .queryParam("since_id", sinceId)
+      .queryParam("result_type", "recent")
+      .queryParam("include_entities", 1)
+      .queryParam("lang", "en");
 
     Invocation.Builder invocationBuilder = callTarget.request();
 
@@ -140,7 +152,7 @@ public class TwitterClient {
     Response response = invocationBuilder.get();
     String json = response.readEntity(String.class);
 
-    return gson.fromJson(json, Statuses.class).getTweets();
+    return gson.fromJson(json, Statuses.class);
   }
 
   /**
@@ -178,18 +190,17 @@ public class TwitterClient {
 
     com.twitter.hbc.ClientBuilder builder = new com.twitter.hbc.ClientBuilder()
       .name("Hosebird-Client-01")                              // optional:
-      // mainly for the logs
+        // mainly for the logs
       .hosts(hosebirdHosts)
 
       .authentication(hosebirdAuth)
       .endpoint(hosebirdEndpoint)
       .processor(new StringDelimitedProcessor(output))
       .eventMessageQueue(eventQueue);                          // optional:
-      // use this if you want to process client events
+    // use this if you want to process client events
 
     HttpParams params = new BasicHttpParams();
-    boolean useProxy = Boolean.parseBoolean(settings.value(LocalSettings
-                                                             .USE_PROXY));
+
     if (useProxy) {
       HttpHost proxy = new HttpHost("localhost", 4545);
       params.setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
@@ -224,8 +235,10 @@ public class TwitterClient {
 
   private Client proxyHttpClient() {
     ClientConfig cc = new ClientConfig();
-    cc.property(ClientProperties.PROXY_URI, PROXY_ADDRESS);
-    cc.connectorProvider(new ApacheConnectorProvider());
+    if (this.useProxy) {
+      cc.property(ClientProperties.PROXY_URI, PROXY_ADDRESS);
+      cc.connectorProvider(new ApacheConnectorProvider());
+    }
     return ClientBuilder.newClient(cc);
   }
 

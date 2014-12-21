@@ -9,13 +9,16 @@
            http://www.springframework.org/schema/context/spring-context-3.1.xsd">
 
     <context:annotation-config/>
-    <bean id="settings" class="com.maximgalushka.classifier.twitter.LocalSettings"/>
+    <bean id="settings"
+          class="com.maximgalushka.classifier.twitter.LocalSettings"/>
 
-    <bean id="memcached" class="com.maximgalushka.classifier.storage.memcached.MemcachedService">
+    <bean id="memcached"
+          class="com.maximgalushka.classifier.storage.memcached.MemcachedService">
         <property name="settings" ref="settings"/>
     </bean>
 
-    <bean id="mysql-datasource" class="org.apache.commons.dbcp2.BasicDataSource">
+    <bean id="mysql-datasource"
+          class="org.apache.commons.dbcp2.BasicDataSource">
         <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
         <property name="username">
             <bean factory-bean="settings" factory-method="value">
@@ -34,20 +37,29 @@
         </property>
     </bean>
 
-    <bean id="mysql" class="com.maximgalushka.classifier.storage.mysql.MysqlService">
+    <bean id="mysql"
+          class="com.maximgalushka.classifier.storage.mysql.MysqlService">
         <property name="datasource" ref="mysql-datasource"/>
     </bean>
 
-    <bean id="storage" class="com.maximgalushka.classifier.storage.StorageService">
+    <bean id="storage"
+          class="com.maximgalushka.classifier.storage.StorageService">
         <property name="memcached" ref="memcached"/>
         <property name="mysql" ref="mysql"/>
     </bean>
 
-    <bean id="twitter-client" class="com.maximgalushka.classifier.twitter.TwitterClient">
+    <bean id="twitter-client"
+          class="com.maximgalushka.classifier.twitter.TwitterStandardClient">
         <property name="settings" ref="settings"/>
     </bean>
 
-    <bean id="clusters" class="com.maximgalushka.classifier.twitter.clusters.Clusters"/>
+    <bean id="twitter-stream-client"
+          class="com.maximgalushka.classifier.twitter.stream.StreamTwitterSearchWrapper">
+        <property name="twitterClient" ref="twitter-client"/>
+    </bean>
+
+    <bean id="clusters"
+          class="com.maximgalushka.classifier.twitter.clusters.Clusters"/>
 
     <bean id="lingo-clustering-algorithm"
           class="com.maximgalushka.classifier.twitter.classify.carrot.ClusteringTweetsListAlgorithm">
@@ -63,21 +75,24 @@
         <property name="settings" ref="settings"/>
         <property name="clustering" ref="lingo-clustering-algorithm"/>
         <property name="clusters" ref="clusters"/>
-        <property name="twitterClient" ref="twitter-client"/>
+        <property name="twitterClient" ref="twitter-stream-client"/>
     </bean>
 
-    <bean id="main" class="com.maximgalushka.classifier.twitter.service.MainServiceStart">
+    <bean id="main"
+          class="com.maximgalushka.classifier.twitter.service.MainServiceStart">
         <property name="settings" ref="settings"/>
         <property name="storage" ref="storage"/>
     </bean>
 
-    <bean id="stop-service" class="com.maximgalushka.classifier.twitter.service.StopServiceHandler">
+    <bean id="stop-service"
+          class="com.maximgalushka.classifier.twitter.service.StopServiceHandler">
         <property name="settings" ref="settings"/>
         <property name="pool" ref="taskExecutor"/>
         <property name="processor" ref="twitter-stream-processor"/>
     </bean>
 
-    <bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+    <bean id="taskExecutor"
+          class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
         <property name="corePoolSize" value="3"/>
         <property name="maxPoolSize" value="10"/>
         <property name="queueCapacity" value="25"/>

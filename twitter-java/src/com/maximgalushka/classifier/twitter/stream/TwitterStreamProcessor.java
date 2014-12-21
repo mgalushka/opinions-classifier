@@ -1,11 +1,9 @@
 package com.maximgalushka.classifier.twitter.stream;
 
-import com.google.gson.Gson;
 import com.maximgalushka.classifier.twitter.*;
 import com.maximgalushka.classifier.twitter.classify.carrot.*;
 import com.maximgalushka.classifier.twitter.clusters.Clusters;
 import com.maximgalushka.classifier.twitter.model.Tweet;
-import com.twitter.hbc.core.Client;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -24,7 +22,7 @@ public class TwitterStreamProcessor implements Runnable {
   );
 
   private Clusters model;
-  private TwitterClient twitterClient;
+  private StreamTwitterSearchWrapper twitterClient;
   private ClusteringTweetsListAlgorithm clustering;
   private LocalSettings settings;
 
@@ -48,7 +46,7 @@ public class TwitterStreamProcessor implements Runnable {
   }
 
   @SuppressWarnings("UnusedDeclaration")
-  public void setTwitterClient(TwitterClient twitterClient) {
+  public void setTwitterClient(StreamTwitterSearchWrapper twitterClient) {
     this.twitterClient = twitterClient;
   }
 
@@ -73,11 +71,10 @@ public class TwitterStreamProcessor implements Runnable {
       System.setProperty("http.proxyPort", "4545");
     }
 
-    Gson gson = new Gson();
-
-    BlockingQueue<String> q = new ArrayBlockingQueue<>(100);
-    final Client hosebirdClient = twitterClient.stream(q);
-    hosebirdClient.connect();
+    BlockingQueue<Tweet> q = new ArrayBlockingQueue<>(1000);
+    // twitter steam client is infinitely sends messages to this queue
+    // in separate thread and we will read from it and process
+    twitterClient.stream("Ukraine", q);
 
     int BATCH_SIZE = 1000;
 
@@ -88,8 +85,7 @@ public class TwitterStreamProcessor implements Runnable {
     long messageCount = 0;
     while (!this.stopping) {
       try {
-        String json = q.take();
-        Tweet tweet = gson.fromJson(json, Tweet.class);
+        Tweet tweet = q.take();
         try {
           if (batch.size() < (BATCH_SIZE + STEP) &&
             (batch.size() % STEP) == 0) {

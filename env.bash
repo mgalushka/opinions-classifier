@@ -12,3 +12,5 @@ http://download.oracle.com/otn-pub/java/jdk/8u25-b17/jdk-8u25-linux-x64.tar.gz
 sudo /etc/init.d/mysqld restart
 
 sudo /etc/init.d/memcached restart
+
+sudo /etc/init.d/memcached -p 11212 restart

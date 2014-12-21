@@ -1,6 +1,6 @@
 classifier.remote = function () {
 
-	var URL = "http://ec2-54-148-78-168.us-west-2.compute.amazonaws.com/api";
+	var URL = "http://warua.org/api";
 	var REFRESH_PERIOD = 60000;
   
 	// this function calls remote service to retrieve current state of clusters

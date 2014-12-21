@@ -64,7 +64,7 @@ public class TwitterStreamStandalone {
     */
 
     BlockingQueue<Tweet> q = new ArrayBlockingQueue<>(100);
-    client.stream("Ukraine", q);
+    client.stream("rembrandt", q);
 
     Runtime.getRuntime().addShutdownHook(
       new Thread() {

@@ -73,7 +73,7 @@ public class MainServiceStart implements Container {
      ProxyPassReverse /api http://localhost:8090
      </VirtualHost>
      */
-    // response.setValue("Access-Control-Allow-Origin", "*");
+    response.setValue("Access-Control-Allow-Origin", "*");
   }
 
   public void handle(Request request, Response response) {

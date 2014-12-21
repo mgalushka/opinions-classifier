@@ -109,7 +109,7 @@ classifier.gui = function () {
         return false;
     }
 	
-    var ORIGIN_DOMAIN = "";
+    var ORIGIN_DOMAIN = "@waruaorg";
 	var createClusterElement = function(id, text, score, url, image) {
 		var elem = document.createElement('div');
 		elem['id'] = id;

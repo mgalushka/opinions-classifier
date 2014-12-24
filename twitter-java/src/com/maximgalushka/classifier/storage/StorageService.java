@@ -67,7 +67,7 @@ public class StorageService {
       int MAX_RETRIES = 50;
       HashMap<Long, Clusters> fromdb = null;
       int retry = 1;
-      while (fromdb == null && retry++ <= MAX_RETRIES) {
+      while ((fromdb == null || fromdb.isEmpty()) && retry++ <= MAX_RETRIES) {
         long increased = retry * delta;
         log.debug(
           String.format(
@@ -77,7 +77,7 @@ public class StorageService {
         );
         fromdb = mysql.loadClusters(increased);
       }
-      if (fromdb == null) {
+      if (fromdb == null || fromdb.isEmpty()) {
         log.fatal(
           String.format(
             "Cannot find anything in mysql for latest [%d] millis",

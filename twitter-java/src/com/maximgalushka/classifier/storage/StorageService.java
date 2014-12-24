@@ -7,6 +7,7 @@ import com.maximgalushka.classifier.twitter.clusters.Clusters;
 import org.apache.log4j.Logger;
 
 import javax.annotation.Resource;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -63,7 +64,28 @@ public class StorageService {
           delta
         )
       );
-      HashMap<Long, Clusters> fromdb = mysql.loadClusters(delta);
+      int MAX_RETRIES = 50;
+      HashMap<Long, Clusters> fromdb = null;
+      int retry = 1;
+      while (fromdb == null && retry++ <= MAX_RETRIES) {
+        long increased = retry * delta;
+        log.debug(
+          String.format(
+            "Trying to reload from mysql for latest [%d] millis",
+            increased
+          )
+        );
+        fromdb = mysql.loadClusters(increased);
+      }
+      if (fromdb == null) {
+        log.fatal(
+          String.format(
+            "Cannot find anything in mysql for latest [%d] millis",
+            MAX_RETRIES * delta
+          )
+        );
+        return Collections.emptyList();
+      }
       for (long timestamp : fromdb.keySet()) {
         Clusters cls = fromdb.get(timestamp);
         try {

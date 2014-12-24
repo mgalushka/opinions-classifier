@@ -49,7 +49,6 @@ public class MysqlService {
             Clusters clusters = (Clusters) in.readObject();
             result.put(timestamp, clusters);
           }
-          result.put(null, null);
         } catch (SQLException e) {
           log.error(e);
           e.printStackTrace();

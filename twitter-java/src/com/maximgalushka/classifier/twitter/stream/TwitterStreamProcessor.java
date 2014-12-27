@@ -47,7 +47,7 @@ public class TwitterStreamProcessor implements Runnable {
   }
 
   @SuppressWarnings("UnusedDeclaration")
-  public void setTwitterClient(StreamClient streamClient) {
+  public void setStreamClient(StreamClient streamClient) {
     this.streamClient = streamClient;
   }
 

@@ -55,7 +55,7 @@
 
     <bean id="twitter-polling-client"
           class="com.maximgalushka.classifier.twitter.client.PollingTwitterSearchClient">
-        <property name="twitterClient" ref="twitter-client"/>
+        <property name="twitterClient" ref="twitter-stream-client"/>
     </bean>
 
     <bean id="clusters"

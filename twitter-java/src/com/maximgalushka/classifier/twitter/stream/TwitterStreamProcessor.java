@@ -2,6 +2,7 @@ package com.maximgalushka.classifier.twitter.stream;
 
 import com.maximgalushka.classifier.twitter.*;
 import com.maximgalushka.classifier.twitter.classify.carrot.*;
+import com.maximgalushka.classifier.twitter.client.StreamClient;
 import com.maximgalushka.classifier.twitter.clusters.Clusters;
 import com.maximgalushka.classifier.twitter.model.Tweet;
 import org.apache.log4j.Logger;
@@ -22,7 +23,7 @@ public class TwitterStreamProcessor implements Runnable {
   );
 
   private Clusters model;
-  private StreamTwitterSearchWrapper twitterClient;
+  private StreamClient streamClient;
   private ClusteringTweetsListAlgorithm clustering;
   private LocalSettings settings;
 
@@ -46,8 +47,8 @@ public class TwitterStreamProcessor implements Runnable {
   }
 
   @SuppressWarnings("UnusedDeclaration")
-  public void setTwitterClient(StreamTwitterSearchWrapper twitterClient) {
-    this.twitterClient = twitterClient;
+  public void setTwitterClient(StreamClient streamClient) {
+    this.streamClient = streamClient;
   }
 
   public void sendStopSignal() {
@@ -74,7 +75,7 @@ public class TwitterStreamProcessor implements Runnable {
     BlockingQueue<Tweet> q = new ArrayBlockingQueue<>(1000);
     // twitter steam client is infinitely sends messages to this queue
     // in separate thread and we will read from it and process
-    twitterClient.stream("Ukraine", q);
+    streamClient.stream("Ukraine", q);
 
     int BATCH_SIZE = 1000;
 

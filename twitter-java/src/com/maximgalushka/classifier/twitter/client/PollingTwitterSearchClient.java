@@ -1,6 +1,5 @@
-package com.maximgalushka.classifier.twitter.stream;
+package com.maximgalushka.classifier.twitter.client;
 
-import com.maximgalushka.classifier.twitter.TwitterStandardClient;
 import com.maximgalushka.classifier.twitter.model.Statuses;
 import com.maximgalushka.classifier.twitter.model.Tweet;
 import org.apache.log4j.Logger;
@@ -29,9 +28,9 @@ import java.util.concurrent.*;
  * Twitter search query API limits</a>
  */
 @SuppressWarnings("UnusedDeclaration")
-public class StreamTwitterSearchWrapper {
+public class PollingTwitterSearchClient implements StreamClient {
   public static final Logger log = Logger.getLogger
-    (StreamTwitterSearchWrapper.class);
+    (PollingTwitterSearchClient.class);
 
   private final ScheduledExecutorService executor;
 
@@ -51,7 +50,7 @@ public class StreamTwitterSearchWrapper {
 
   private TwitterStandardClient twitterClient;
 
-  public StreamTwitterSearchWrapper() {
+  public PollingTwitterSearchClient() {
     this.executor = Executors.newSingleThreadScheduledExecutor();
     this.pendingQueries = new LinkedBlockingDeque<>();
     this.sinceTweetIds = new ConcurrentHashMap<>();
@@ -68,6 +67,7 @@ public class StreamTwitterSearchWrapper {
    * @param term   search term to poll twitter for updates
    * @param output blocking queue where service will send tweets
    */
+  @Override
   public void stream(String term, BlockingQueue<Tweet> output) {
     results.put(term, output);
     pendingQueries.add(term);

@@ -1,8 +1,10 @@
-package com.maximgalushka.classifier.twitter;
+package com.maximgalushka.classifier.twitter.client;
 
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
+import com.maximgalushka.classifier.twitter.LocalSettings;
 import com.maximgalushka.classifier.twitter.model.Statuses;
+import com.maximgalushka.classifier.twitter.model.Tweet;
 import com.maximgalushka.classifier.twitter.model.TwitterOAuthToken;
 import com.twitter.hbc.BasicRateTracker;
 import com.twitter.hbc.BasicReconnectionManager;
@@ -11,7 +13,6 @@ import com.twitter.hbc.core.Hosts;
 import com.twitter.hbc.core.HttpHosts;
 import com.twitter.hbc.core.endpoint.StatusesFilterEndpoint;
 import com.twitter.hbc.core.event.Event;
-import com.twitter.hbc.core.processor.StringDelimitedProcessor;
 import com.twitter.hbc.httpclient.BasicClient;
 import com.twitter.hbc.httpclient.auth.Authentication;
 import com.twitter.hbc.httpclient.auth.OAuth1;
@@ -37,7 +38,7 @@ import java.util.concurrent.*;
  * @author Maxim Galushka
  */
 @SuppressWarnings("ALL")
-public class TwitterStandardClient {
+public class TwitterStandardClient implements StreamClient {
 
   public static final String PROXY_ADDRESS = "http://localhost:4545";
   private Gson gson;
@@ -156,12 +157,13 @@ public class TwitterStandardClient {
   }
 
   /**
-   * Taken from https://github.com/twitter/hbc project
+   * Reads messages from twitter streaming API and publishes to queue
+   * Based on https://github.com/twitter/hbc project
    */
-  @SuppressWarnings("deprecation")
-  public BasicClient stream(BlockingQueue<String> output) {
+  @Override
+  public void stream(String term, BlockingQueue<Tweet> output) {
     if (underTest) {
-      return testingStub(null);
+      return;
     }
     // Set up your blocking queues: Be sure to size these properly based on
     // expected TPS of your stream
@@ -195,7 +197,7 @@ public class TwitterStandardClient {
 
       .authentication(hosebirdAuth)
       .endpoint(hosebirdEndpoint)
-      .processor(new StringDelimitedProcessor(output))
+      .processor(new TweetStringDelimeterProcessor(output))
       .eventMessageQueue(eventQueue);                          // optional:
     // use this if you want to process client events
 
@@ -217,13 +219,13 @@ public class TwitterStandardClient {
       true,
       scheduled
     );
-    return new BasicClient(
+    BasicClient client = new BasicClient(
       "TwitterStreamClient",
       hosebirdHosts,
       hosebirdEndpoint,
       hosebirdAuth,
       true,
-      new StringDelimitedProcessor(output),
+      new TweetStringDelimeterProcessor(output),
       reconnectionManager,
       rateTracker,
       executorService,
@@ -231,6 +233,9 @@ public class TwitterStandardClient {
       params,
       schemeRegistry
     );
+
+    // start streaming
+    client.connect();
   }
 
   private Client proxyHttpClient() {

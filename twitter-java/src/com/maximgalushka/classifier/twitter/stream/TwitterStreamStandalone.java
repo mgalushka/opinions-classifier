@@ -1,5 +1,6 @@
 package com.maximgalushka.classifier.twitter.stream;
 
+import com.maximgalushka.classifier.twitter.client.PollingTwitterSearchClient;
 import com.maximgalushka.classifier.twitter.classify.carrot
   .ClusteringTweetsListAlgorithm;
 import com.maximgalushka.classifier.twitter.clusters.Clusters;
@@ -51,7 +52,7 @@ public class TwitterStreamStandalone {
 
     ClusteringTweetsListAlgorithm clustering =
       (ClusteringTweetsListAlgorithm) ac.getBean("lingo-clustering-algorithm");
-    StreamTwitterSearchWrapper client = (StreamTwitterSearchWrapper) ac.getBean(
+    PollingTwitterSearchClient client = (PollingTwitterSearchClient) ac.getBean(
       "twitter-stream-client"
     );
 

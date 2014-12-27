@@ -48,13 +48,13 @@
         <property name="mysql" ref="mysql"/>
     </bean>
 
-    <bean id="twitter-client"
-          class="com.maximgalushka.classifier.twitter.TwitterStandardClient">
+    <bean id="twitter-stream-client"
+          class="com.maximgalushka.classifier.twitter.client.TwitterStandardClient">
         <property name="settings" ref="settings"/>
     </bean>
 
-    <bean id="twitter-stream-client"
-          class="com.maximgalushka.classifier.twitter.stream.StreamTwitterSearchWrapper">
+    <bean id="twitter-polling-client"
+          class="com.maximgalushka.classifier.twitter.client.PollingTwitterSearchClient">
         <property name="twitterClient" ref="twitter-client"/>
     </bean>
 
@@ -75,7 +75,7 @@
         <property name="settings" ref="settings"/>
         <property name="clustering" ref="lingo-clustering-algorithm"/>
         <property name="clusters" ref="clusters"/>
-        <property name="twitterClient" ref="twitter-stream-client"/>
+        <property name="streamClient" ref="twitter-stream-client"/>
     </bean>
 
     <bean id="main"

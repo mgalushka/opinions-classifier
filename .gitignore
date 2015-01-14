@@ -4,3 +4,6 @@
 /twitter-java/.idea
 /twitter-java/twitter-java.iml
 /classifier-py/.idea
+/classifier-py/clustering/*.pyc
+/twitter-java/filters
+/twitter-java/*.iml

@@ -87,15 +87,22 @@ classifier.gui = function () {
 		classifier.remote.retrieveClusters(refreshCallback);
 	}	
 	
-	// TODO: open associated link with cluster in a new tab
 	// TODO: open image if clicked on image
 	var clickHandler = function(event) {
 		var url = $(this).data("url");
 		var share = $(this).data("share");
+        var media = $(this).data("media");
 		if(share === "true"){
-            console.log("Share on twitter window: " + url);	
-            window.open(url, "Share on Twitter", "width=550, height=420");            
-            return;
+            if(media === "twitter"){
+                console.log("Share on twitter window: " + url);	
+                twitterShareWindow(url);            
+                return;
+            }
+            if(media === "facebook"){
+                console.log("Share on facebook window: " + url);	
+                facebookShareWindow(url);           
+                return;
+            }
         }
 		if(url !== ""){
 			console.log("Opening: " + url);		
@@ -104,8 +111,26 @@ classifier.gui = function () {
 	}
     
     var twitterShareWindow = function(url) {
-        twitter=window.open(url, 'Share on Twitter', 'height=420,width=550');
+        twitter = window.open(
+            url, 
+            "Share on Twitter", 
+            "width=550, height=420"
+        );
         if (window.focus) {twitter.focus()}
+        return false;
+    }
+    
+    var facebookShareWindow = function(url) {
+        var winWidth = 520;
+        var winHeight = 350;
+        var winTop = (screen.height / 2) - (winHeight / 2);
+        var winLeft = (screen.width / 2) - (winWidth / 2);
+        var facebook = window.open(
+            url, 
+            'sharer', 
+            'top=' + winTop + ',left=' + winLeft + ',toolbar=0,status=0,width=' + winWidth + ',height=' + winHeight
+        );
+        if (window.focus) {facebook.focus()}
         return false;
     }
 	
@@ -114,52 +139,43 @@ classifier.gui = function () {
 		var elem = document.createElement('div');
 		elem['id'] = id;
 		
-		// insert text
-		if(image === ""){
-            var share = document.createElement('div');
-            $(share).append($('<img class="share" alt="Share on Twitter" title="Share on Twitter" src="images/1410371148_twitter_circle_gray-32.png"/>'));
-            $(share).data("share", "true");
-            $(share).data("url", 'https://twitter.com/share?text=' + encodeURIComponent(text + " via " + ORIGIN_DOMAIN));
-            $(share).on("click", clickHandler);
-            $(elem).append(share);
-            
-            var textDiv = document.createElement('div');
-            textDiv.className = 'message';
-            textDiv.innerHTML = text;
-            $(textDiv).data("url", url);
-            $(textDiv).on("click", clickHandler);
-            
-            $(elem).append(textDiv);
-		}
-		
 		// TODO: here size should depend on cluster overall score
 		// TODO: this is bad idea, reverting to default size for big screen
 		//var widthClass = score > 0.01 ? 'w4' : score > 0.005 ? 'w3' : score > 0.001 ? 'w2' : 'w2';
 		var widthClass = 'w4';
 		//var heightClass = score > 0.01 ? 'h4' : score > 0.005 ? 'h3' : score > 0.001 ? 'h2' : '';
-		
-		if(image !== ""){
-			// insert image
-            var share = document.createElement('div');
-            $(share).append($('<img class="share" alt="Share on Twitter" title="Share on Twitter" src="images/1410371148_twitter_circle_gray-32.png"/>'));
-            $(share).data("share", "true");
-            $(share).data("url", 'https://twitter.com/share?text=' + encodeURIComponent(text + " via " + ORIGIN_DOMAIN));
-            $(share).on("click", clickHandler);
-            $(elem).append(share);
+
+        var share = document.createElement('div');
+        $(share).append($('<img class="share" alt="Share on Twitter" title="Share on Twitter" src="images/1410371148_twitter_circle_gray-32.png"/>'));
+        $(share).data("share", "true");
+        $(share).data("url", 'https://twitter.com/share?text=' + encodeURIComponent(text + " via " + ORIGIN_DOMAIN));
+        $(share).data("media", "twitter");
+        $(share).on("click", clickHandler);
+        $(elem).append(share);
+        
+        var facebook = document.createElement('div');
+        $(facebook).append($('<img class="share" alt="Share on Facebook" title="Share on Facebook" src="images/1421214507_46-facebook-32_grey4.png"/>'));
+        $(facebook).data("share", "true");
+        $(facebook).data("media", "facebook");
+        $(facebook).data("url", 'http://www.facebook.com/sharer.php?s=100&p[title]=' + encodeURIComponent(text + " via " + ORIGIN_DOMAIN) + '&p[summary]=' + encodeURIComponent(text + " via " + ORIGIN_DOMAIN) + '&p[url]=' + encodeURIComponent(url) + '&p[images][0]=' + encodeURIComponent(image));
+        $(facebook).on("click", clickHandler);
+        $(elem).append(facebook);
+
+        var textDiv = document.createElement('div');
+        textDiv.className = 'message';
+        textDiv.innerHTML = text;
+        $(textDiv).data("url", url);
+        $(textDiv).on("click", clickHandler);
+        $(elem).append(textDiv);
             
-            var textDiv = document.createElement('div');
-            textDiv.className = 'message';
-            textDiv.innerHTML = text;
-            $(textDiv).data("url", url);
-            $(textDiv).on("click", clickHandler);
-            $(elem).append(textDiv);
-            
+        if(image !== ""){
+            // insert image
             var imageDiv = document.createElement('div');
             $(imageDiv).append($('<img id="image_' + id + '" src="' + image + '" data-src="' + image + '" class="img ' + widthClass + '" style="display:block;"/>'));
             $(imageDiv).data("url", url);
             $(imageDiv).on("click", clickHandler);
             $(elem).append(imageDiv);
-		};
+		}
 
 		// assign corresponding class
 		elem.className = 'item ' + widthClass;// + ' ' + heightClass;

@@ -1,6 +1,0 @@
-@relation tweet_text
-
-@attribute classification {neutral,ukraine,russia}
-@attribute text String
-
-@data

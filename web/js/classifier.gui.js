@@ -157,7 +157,7 @@ classifier.gui = function () {
         $(facebook).append($('<img class="share" alt="Share on Facebook" title="Share on Facebook" src="images/1421214507_46-facebook-32_grey4.png"/>'));
         $(facebook).data("share", "true");
         $(facebook).data("media", "facebook");
-        $(facebook).data("url", 'http://www.facebook.com/sharer.php?s=100&p[title]=' + encodeURIComponent(text + " via " + ORIGIN_DOMAIN) + '&p[summary]=' + encodeURIComponent(text + " via " + ORIGIN_DOMAIN) + '&p[url]=' + encodeURIComponent(url) + '&p[images][0]=' + encodeURIComponent(image));
+        $(facebook).data("url", 'http://www.facebook.com/sharer.php?m2w&s=100&p[title]=' + encodeURIComponent(text + " via " + ORIGIN_DOMAIN) + '&p[summary]=' + encodeURIComponent(text + " via " + ORIGIN_DOMAIN) + '&p[url]=' + encodeURIComponent(url) + '&p[images][0]=' + encodeURIComponent(image));
         $(facebook).on("click", clickHandler);
         $(elem).append(facebook);
 

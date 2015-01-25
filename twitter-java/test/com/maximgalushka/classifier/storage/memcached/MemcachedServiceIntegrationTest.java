@@ -18,26 +18,26 @@ public class MemcachedServiceIntegrationTest {
 
     @Test
     public void testGetService() throws Exception {
-        MemcachedService ss = MemcachedService.getService();
+        MemcachedService ss = new MemcachedService();
         Assert.assertNotNull(ss);
     }
 
     @Test
     public void testListTimestamps() throws Exception {
-        MemcachedService ss = MemcachedService.getService();
+        MemcachedService ss = new MemcachedService();
         Assert.assertFalse(ss.listTimestamps().isEmpty());
     }
 
     @Test
     public void testAddTimestamp() throws Exception {
-        MemcachedService ss = MemcachedService.getService();
+        MemcachedService ss = new MemcachedService();
         log.debug(String.format("Timestamps queue: [%s]", ss.addTimestamp()));
         Assert.assertFalse(ss.listTimestamps().isEmpty());
     }
 
     @Test
     public void testAddNewClustersGroup() throws Exception {
-        MemcachedService ss = MemcachedService.getService();
+        MemcachedService ss = new MemcachedService();
         Clusters add = new Clusters();
         add.addClusters(Arrays.asList(new TweetsCluster(1, "test", "some message", 70, "http://google.com", "http://imgur.com")));
         long latest = ss.createNewClustersGroup(add);
@@ -47,7 +47,7 @@ public class MemcachedServiceIntegrationTest {
 
     @Test
     public void testMergeFromTimestamp() throws Exception {
-        MemcachedService ss = MemcachedService.getService();
+        MemcachedService ss = new MemcachedService();
         log.debug(String.format("Clusters from timestamp: %s", ss.mergeFromTimestamp(DELTA)));
     }
 }

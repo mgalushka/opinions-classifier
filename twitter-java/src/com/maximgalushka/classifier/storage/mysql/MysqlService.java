@@ -19,7 +19,7 @@ public class MysqlService {
 
   private DataSource datasource;
 
-  private MysqlService() throws SQLException {
+  public MysqlService() throws SQLException {
   }
 
   public void setDatasource(DataSource datasource) {

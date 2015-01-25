@@ -1,5 +1,7 @@
 package com.maximgalushka.classifier.twitter.classify;
 
+import com.google.common.collect.Sets;
+
 import java.util.*;
 
 /**
@@ -47,5 +49,15 @@ public class Tools {
             if (counter <= 0) break;
         }
         return result;
+    }
+
+    public static double jaccard(String a, String b) {
+        Set<String> tokens_A = Sets.newHashSet(a.split("\\s+"));
+        Set<String> tokens_B = Sets.newHashSet(b.split("\\s+"));
+
+        int intersection = Sets.intersection(tokens_A, tokens_B).size();
+        int union = Sets.union(tokens_A, tokens_B).size();
+
+        return (double) intersection / union;
     }
 }

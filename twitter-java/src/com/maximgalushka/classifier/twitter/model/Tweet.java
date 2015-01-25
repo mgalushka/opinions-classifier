@@ -2,9 +2,6 @@ package com.maximgalushka.classifier.twitter.model;
 
 import com.google.gson.annotations.SerializedName;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * @author Maxim Galushka
  */
@@ -27,6 +24,10 @@ public class Tweet {
     private int retweetCount;
 
     public Tweet() {
+    }
+
+    public Tweet(String text) {
+        this.text = text;
     }
 
     public long getId() {

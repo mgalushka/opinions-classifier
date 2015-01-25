@@ -12,13 +12,13 @@ public class MysqlIntegrationServiceTest {
 
     @Test
     public void testLoadClusters() throws Exception {
-        MysqlService ms = MysqlService.getService();
+        MysqlService ms = new MysqlService();
         Assert.assertFalse(ms.loadClusters(20000).isEmpty());
     }
 
     @Test
     public void testSaveNewClustersGroup() throws Exception {
-        MysqlService ms = MysqlService.getService();
+        MysqlService ms = new MysqlService();
         long timestamp = new Date().getTime();
         Clusters add = new Clusters();
         add.addClusters(Arrays.asList(new TweetsCluster(1, "test00001", "test", 70, "http://google222.com", "http://imgur333.com")));

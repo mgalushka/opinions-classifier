@@ -110,7 +110,6 @@ public class ClusterRepresentativeFinder {
    * @return best tween in cluster
    */
   public Tweet findRepresentativeScoreBased(
-    /*List<Document> allDocuments,*/
     Map<String, Tweet> tweetsIndex
   ) {
     if (tweetsIndex.isEmpty()) {
@@ -125,8 +124,19 @@ public class ClusterRepresentativeFinder {
       int score = getTweetScore(t);
       sorted.put(new TweetTextWrapper(t.getText(), t), score);
     }
-
+    logRepresentative(sorted);
     return sorted.firstEntry().getKey().getTweet();
+  }
+
+  private void logRepresentative(TreeMap<TweetTextWrapper, Integer> sorted) {
+    StringBuilder sb = new StringBuilder("\n");
+    for (TweetTextWrapper tw : sorted.keySet()) {
+      sb.append(tw.getText()).append(",\n");
+    }
+    sb.append("Chosen:\t")
+      .append(sorted.firstEntry().getKey().getText())
+      .append("\n");
+    System.out.println(sb.toString());
   }
 
   private class TweetTextWrapperComparable

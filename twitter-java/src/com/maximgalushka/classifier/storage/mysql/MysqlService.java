@@ -60,6 +60,38 @@ public class MysqlService {
     );
   }
 
+  /**
+   * @return clusters persisted in database to store them to cache
+   */
+  public HashMap<Long, Clusters> loadLastClusters(long count) {
+    final HashMap<Long, Clusters> result = new HashMap<>();
+    return query(
+      String.format(
+        "select timestamp, clusters_serialized from clusters " +
+          "order by timestamp desc limit %d", count
+      ),
+      set -> {
+        try {
+          while (set.next()) {
+            long timestamp = set.getLong(1);
+            Blob data = set.getBlob(2);
+            ObjectInputStream in = new ObjectInputStream(
+              data.getBinaryStream()
+            );
+            Clusters clusters = (Clusters) in.readObject();
+            result.put(timestamp, clusters);
+          }
+        } catch (SQLException e) {
+          log.error(e);
+          e.printStackTrace();
+        } catch (ClassNotFoundException | IOException e) {
+          e.printStackTrace();
+        }
+        return result;
+      }
+    );
+  }
+
   public void saveNewClustersGroup(long timestamp, Clusters group) {
     Connection conn = null;
     PreparedStatement stmt = null;

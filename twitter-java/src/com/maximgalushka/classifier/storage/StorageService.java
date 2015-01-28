@@ -2,12 +2,11 @@ package com.maximgalushka.classifier.storage;
 
 import com.maximgalushka.classifier.storage.memcached.MemcachedService;
 import com.maximgalushka.classifier.storage.mysql.MysqlService;
-import com.maximgalushka.classifier.twitter.clusters.TweetsCluster;
 import com.maximgalushka.classifier.twitter.clusters.Clusters;
+import com.maximgalushka.classifier.twitter.clusters.TweetsCluster;
 import org.apache.log4j.Logger;
 
 import javax.annotation.Resource;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -78,13 +77,14 @@ public class StorageService {
         fromdb = mysql.loadClusters(increased);
       }
       if (fromdb == null || fromdb.isEmpty()) {
-        log.fatal(
+        log.error(
           String.format(
-            "Cannot find anything in mysql for latest [%d] millis",
+            "Cannot find anything in mysql for latest [%d] millis." +
+              "Just loading top 20 clusters from database.",
             MAX_RETRIES * delta
           )
         );
-        return Collections.emptyList();
+        fromdb = mysql.loadLastClusters(20L);
       }
       for (long timestamp : fromdb.keySet()) {
         Clusters cls = fromdb.get(timestamp);

@@ -470,7 +470,11 @@ public class ClusteringTweetsListAlgorithm {
     for (Cluster c : clusters) {
       sb.append(c.getId()).append(": ").append(c.getLabel()).append("\n");
       for (Document d : c.getAllDocuments()) {
-        sb.append("\t").append(d.getStringId()).append("\n");
+        sb.append("\t")
+          .append(d.getStringId())
+          .append("\t[")
+          .append(d.getSummary())
+          .append("]\n");
       }
     }
     return sb.toString();

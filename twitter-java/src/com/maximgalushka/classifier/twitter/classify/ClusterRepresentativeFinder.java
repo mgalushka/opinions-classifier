@@ -2,7 +2,6 @@ package com.maximgalushka.classifier.twitter.classify;
 
 import com.maximgalushka.classifier.twitter.model.Tweet;
 import com.maximgalushka.classifier.twitter.model.TweetTextWrapper;
-import org.carrot2.core.Document;
 import org.languagetool.JLanguageTool;
 import org.languagetool.MultiThreadedJLanguageTool;
 import org.languagetool.language.BritishEnglish;
@@ -10,7 +9,10 @@ import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
-import java.util.*;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * @author Maxim Galushka
@@ -33,16 +35,17 @@ public class ClusterRepresentativeFinder {
    * Performance: O(n*log(n))<br/>
    * O(n^2)!!!<br/>
    *
+   * Does not use any language tools
+   *
    * @return finds good representative tweet from list of documents inside a
    * single cluster
    */
   @SuppressWarnings("UnusedDeclaration")
   @Deprecated
-  public Tweet findRepresentative(
-    List<Document> allDocuments,
+  public Tweet findRepresentativeLegacy(
     Map<String, Tweet> tweetsIndex
   ) {
-    if (allDocuments.isEmpty()) {
+    if (tweetsIndex.isEmpty()) {
       return null;
     }
 
@@ -50,8 +53,7 @@ public class ClusterRepresentativeFinder {
     // combined tweet representative -> count of such tweets (similar based
     // on Jaccard coefficient)
     HashMap<TweetTextWrapper, Integer> similarity = new HashMap<>();
-    for (Document d : allDocuments) {
-      Tweet found = tweetsIndex.get(d.getStringId());
+    for (Tweet found : tweetsIndex.values()) {
       String foundText = found.getText();
       boolean similar = false;
       for (TweetTextWrapper w : similarity.keySet()) {

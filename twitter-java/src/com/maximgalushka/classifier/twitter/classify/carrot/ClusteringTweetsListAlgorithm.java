@@ -95,7 +95,7 @@ public class ClusteringTweetsListAlgorithm {
 
     log.debug(
       String.format(
-        "Found [%d] clusters:\n%s",
+        "Found [%d] clusters BEFORE merge:\n%s",
         clustersByTopic.size(),
         printClusters(clustersByTopic)
       )
@@ -107,6 +107,14 @@ public class ClusteringTweetsListAlgorithm {
         clustersByTopic
       );
       updateModel(model, clustersByTopic, fromTo, tweetsIndex);
+
+      log.debug(
+        String.format(
+          "New [%d] clusters AFTER merge:\n%s",
+          clustersByTopic.size(),
+          printClusters(clustersByTopic)
+        )
+      );
     }
     previousClusters = clustersByTopic;
   }
@@ -518,7 +526,7 @@ public class ClusteringTweetsListAlgorithm {
       final List<Cluster> clustersByTopic = byTopicClusters.getClusters();
       log.debug(
         String.format(
-          "Found [%d] clusters:\n%s", clustersByTopic.size(),
+          "Found [%d] clusters BEFORE merge:\n%s", clustersByTopic.size(),
           c.printClusters(clustersByTopic)
         )
       );

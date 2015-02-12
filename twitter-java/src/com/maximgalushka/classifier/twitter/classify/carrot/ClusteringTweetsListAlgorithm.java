@@ -157,7 +157,7 @@ public class ClusteringTweetsListAlgorithm {
       TweetsCluster old = clusters.clusterById(current.getId());
       if (old == null) {
         Tweet representative = representativeFinder
-          .findRepresentativeLegacy(tweetsIndex);
+          .findRepresentativeScoreBased(current.getAllDocuments(), tweetsIndex);
         Entities entities = representative.getEntities();
         String url = "";
         String image = "";

@@ -2,6 +2,7 @@ package com.maximgalushka.classifier.twitter.classify;
 
 import com.maximgalushka.classifier.twitter.model.Tweet;
 import com.maximgalushka.classifier.twitter.model.TweetTextWrapper;
+import org.carrot2.core.Document;
 import org.languagetool.JLanguageTool;
 import org.languagetool.MultiThreadedJLanguageTool;
 import org.languagetool.language.BritishEnglish;
@@ -9,10 +10,7 @@ import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * @author Maxim Galushka
@@ -34,7 +32,7 @@ public class ClusterRepresentativeFinder {
   /**
    * Performance: O(n*log(n))<br/>
    * O(n^2)!!!<br/>
-   *
+   * <p>
    * Does not use any language tools
    *
    * @return finds good representative tweet from list of documents inside a
@@ -43,6 +41,7 @@ public class ClusterRepresentativeFinder {
   @SuppressWarnings("UnusedDeclaration")
   @Deprecated
   public Tweet findRepresentativeLegacy(
+    List<Document> documents,
     Map<String, Tweet> tweetsIndex
   ) {
     if (tweetsIndex.isEmpty()) {
@@ -53,7 +52,8 @@ public class ClusterRepresentativeFinder {
     // combined tweet representative -> count of such tweets (similar based
     // on Jaccard coefficient)
     HashMap<TweetTextWrapper, Integer> similarity = new HashMap<>();
-    for (Tweet found : tweetsIndex.values()) {
+    for (Document document : documents) {
+      Tweet found = tweetsIndex.get(document.getStringId());
       String foundText = found.getText();
       boolean similar = false;
       for (TweetTextWrapper w : similarity.keySet()) {
@@ -112,6 +112,7 @@ public class ClusterRepresentativeFinder {
    * @return best tween in cluster
    */
   public Tweet findRepresentativeScoreBased(
+    List<Document> documents,
     Map<String, Tweet> tweetsIndex
   ) {
     if (tweetsIndex.isEmpty()) {
@@ -121,8 +122,8 @@ public class ClusterRepresentativeFinder {
     TreeMap<TweetTextWrapper, Integer> sorted = new TreeMap<>(
       new TweetTextWrapperComparable()
     );
-
-    for (Tweet t : tweetsIndex.values()) {
+    for (Document document : documents) {
+      Tweet t = tweetsIndex.get(document.getStringId());
       int score = getTweetScore(t);
       sorted.put(new TweetTextWrapper(t.getText(), t), score);
     }
@@ -146,7 +147,8 @@ public class ClusterRepresentativeFinder {
     Tweet chosen = sorted.firstEntry().getKey().getTweet();
     sb.append(
       String.format(
-        "Chosen tweet: [%s]", chosen.getText().replaceAll("\\s+", " "
+        "Chosen tweet: [%s]", chosen.getText().replaceAll(
+          "\\s+", " "
         )
       )
     )

@@ -1,6 +1,7 @@
 package com.maximgalushka.classifier.twitter.model;
 
 import com.google.gson.annotations.SerializedName;
+import org.springframework.util.CollectionUtils;
 
 /**
  * @author Maxim Galushka
@@ -89,8 +90,11 @@ public class Tweet {
     @Override
     public String toString() {
         Entities e = this.getEntities();
-        String url = e.getUrls().isEmpty() ? "" : e.getUrls().get(0).getUrl();
-        String image = e.getMedia().isEmpty() ? "" : e.getMedia().get(0).getUrl();
-        return String.format("[%d, '%s', %s, %s, %s]", id, text, author, url, image);
+        if (e != null) {
+            String url = !CollectionUtils.isEmpty(e.getUrls()) ? "" : e.getUrls().get(0).getUrl();
+            String image = !CollectionUtils.isEmpty(e.getMedia()) ? "" : e.getMedia().get(0).getUrl();
+            return String.format("[%d, '%s', %s, %s, %s]", id, text, author, url, image);
+        }
+        return String.format("[%d, '%s', %s]", id, text, author);
     }
 }

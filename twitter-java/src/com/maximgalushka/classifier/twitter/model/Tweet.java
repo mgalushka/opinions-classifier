@@ -9,92 +9,103 @@ import org.springframework.util.CollectionUtils;
 @SuppressWarnings("UnusedDeclaration")
 public class Tweet {
 
-    private long id;
-    private String text;
+  private long id;
+  private String text;
 
-    @SerializedName("user")
-    private User author;
-    private boolean retweeted;
+  @SerializedName("user")
+  private User author;
+  private boolean retweeted;
 
-    private Entities entities;
+  private Entities entities;
 
-    @SerializedName("favorite_count")
-    private int favouriteCount;
+  @SerializedName("favorite_count")
+  private int favouriteCount;
 
-    @SerializedName("retweet_count")
-    private int retweetCount;
+  @SerializedName("retweet_count")
+  private int retweetCount;
 
-    public Tweet() {
+  public Tweet() {
+  }
+
+  public Tweet(String text) {
+    this.text = text;
+  }
+
+  public long getId() {
+    return id;
+  }
+
+  public void setId(long id) {
+    this.id = id;
+  }
+
+  public String getText() {
+    return text;
+  }
+
+  public void setText(String text) {
+    this.text = text;
+  }
+
+  public User getAuthor() {
+    return author;
+  }
+
+  public void setAuthor(User author) {
+    this.author = author;
+  }
+
+  public boolean isRetweeted() {
+    return retweeted;
+  }
+
+  public void setRetweeted(boolean retweeted) {
+    this.retweeted = retweeted;
+  }
+
+  public int getFavouriteCount() {
+    return favouriteCount;
+  }
+
+  public void setFavouriteCount(int favouriteCount) {
+    this.favouriteCount = favouriteCount;
+  }
+
+  public int getRetweetCount() {
+    return retweetCount;
+  }
+
+  public void setRetweetCount(int retweetCount) {
+    this.retweetCount = retweetCount;
+  }
+
+  public Entities getEntities() {
+    return entities;
+  }
+
+  public void setEntities(Entities entities) {
+    this.entities = entities;
+  }
+
+  @Override
+  public String toString() {
+    Entities e = this.getEntities();
+    if (e != null) {
+      String url = CollectionUtils.isEmpty(e.getUrls()) ? "" : e.getUrls()
+                                                                .get(0)
+                                                                .getUrl();
+      String image = CollectionUtils.isEmpty(e.getMedia()) ? "" : e.getMedia()
+                                                                   .get(0)
+                                                                   .getUrl();
+      return String.format(
+        "[%d, '%s', %s, %s, %s]",
+        id,
+        text,
+        author,
+        url,
+        image
+      );
     }
-
-    public Tweet(String text) {
-        this.text = text;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public String getText() {
-        return text;
-    }
-
-    public void setText(String text) {
-        this.text = text;
-    }
-
-    public User getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(User author) {
-        this.author = author;
-    }
-
-    public boolean isRetweeted() {
-        return retweeted;
-    }
-
-    public void setRetweeted(boolean retweeted) {
-        this.retweeted = retweeted;
-    }
-
-    public int getFavouriteCount() {
-        return favouriteCount;
-    }
-
-    public void setFavouriteCount(int favouriteCount) {
-        this.favouriteCount = favouriteCount;
-    }
-
-    public int getRetweetCount() {
-        return retweetCount;
-    }
-
-    public void setRetweetCount(int retweetCount) {
-        this.retweetCount = retweetCount;
-    }
-
-    public Entities getEntities() {
-        return entities;
-    }
-
-    public void setEntities(Entities entities) {
-        this.entities = entities;
-    }
-
-    @Override
-    public String toString() {
-        Entities e = this.getEntities();
-        if (e != null) {
-            String url = CollectionUtils.isEmpty(e.getUrls()) ? "" : e.getUrls().get(0).getUrl();
-            String image = CollectionUtils.isEmpty(e.getMedia()) ? "" : e.getMedia().get(0).getUrl();
-            return String.format("[%d, '%s', %s, %s, %s]", id, text, author, url, image);
-        }
-        return String.format("[%d, '%s', %s]", id, text, author);
-    }
+    return String.format("[%d, '%s', %s]", id, text, author);
+  }
 }

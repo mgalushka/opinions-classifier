@@ -91,8 +91,8 @@ public class Tweet {
     public String toString() {
         Entities e = this.getEntities();
         if (e != null) {
-            String url = !CollectionUtils.isEmpty(e.getUrls()) ? "" : e.getUrls().get(0).getUrl();
-            String image = !CollectionUtils.isEmpty(e.getMedia()) ? "" : e.getMedia().get(0).getUrl();
+            String url = CollectionUtils.isEmpty(e.getUrls()) ? "" : e.getUrls().get(0).getUrl();
+            String image = CollectionUtils.isEmpty(e.getMedia()) ? "" : e.getMedia().get(0).getUrl();
             return String.format("[%d, '%s', %s, %s, %s]", id, text, author, url, image);
         }
         return String.format("[%d, '%s', %s]", id, text, author);

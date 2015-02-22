@@ -131,7 +131,7 @@ public class ClusterRepresentativeFinder {
     return sorted.firstEntry().getKey().getTweet();
   }
 
-  private void logRepresentative(TreeMap<TweetTextWrapper, Integer> sorted) {
+  private void logRepresentative(final TreeMap<TweetTextWrapper, Integer> sorted) {
     StringBuilder sb = new StringBuilder("\n");
     for (TweetTextWrapper tw : sorted.keySet()) {
       sb.append(

@@ -1,5 +1,6 @@
 package com.maximgalushka.classifier.twitter.stream;
 
+import com.maximgalushka.classifier.storage.mysql.MysqlService;
 import com.maximgalushka.classifier.twitter.*;
 import com.maximgalushka.classifier.twitter.classify.carrot.*;
 import com.maximgalushka.classifier.twitter.client.StreamClient;
@@ -8,6 +9,7 @@ import com.maximgalushka.classifier.twitter.model.Tweet;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayDeque;
 import java.util.concurrent.*;
 
@@ -26,10 +28,21 @@ public class TwitterStreamProcessor implements Runnable {
   private StreamClient streamClient;
   private ClusteringTweetsListAlgorithm clustering;
   private LocalSettings settings;
+  private MysqlService mysql;
 
   private volatile boolean stopping = false;
 
   public TwitterStreamProcessor() {
+    try {
+      mysql = new MysqlService();
+    } catch (SQLException e) {
+      log.error(
+        String.format(
+          "Cannot initialize MySQL client: [%s]",
+          e.getMessage()
+        )
+      );
+    }
   }
 
   public void setClusters(Clusters model) {
@@ -99,6 +112,10 @@ public class TwitterStreamProcessor implements Runnable {
           // we need to collect full batch of elements and then classify the
           // whole batch
           if (batch.size() == (BATCH_SIZE + STEP)) {
+            // saving current batch in database
+            log.debug("Saving current tweets batch in database");
+            mysql.saveTweetsBatch(batch);
+
             log.debug("Clean model. We start full scale clustering.");
             model.cleanClusters();
 

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # start apache
-sudo arachectl restart
+sudo apachectl restart
 
 # start mysql
 sudo /etc/init.d/mysqld restart

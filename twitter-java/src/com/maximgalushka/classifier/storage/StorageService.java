@@ -4,9 +4,11 @@ import com.maximgalushka.classifier.storage.memcached.MemcachedService;
 import com.maximgalushka.classifier.storage.mysql.MysqlService;
 import com.maximgalushka.classifier.twitter.clusters.Clusters;
 import com.maximgalushka.classifier.twitter.clusters.TweetsCluster;
+import com.maximgalushka.classifier.twitter.model.Tweet;
 import org.apache.log4j.Logger;
 
 import javax.annotation.Resource;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -132,6 +134,14 @@ public class StorageService {
         }
       }
     );
+  }
+
+  public List<Tweet> getLatestTweets(long hours) {
+    return mysql.getLatestTweets(hours);
+  }
+
+  public void saveTweetsBatch(Collection<Tweet> tweets) {
+    mysql.saveTweetsBatch(tweets);
   }
 
   private void checkConsistency() {

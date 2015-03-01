@@ -1,19 +1,20 @@
 package com.maximgalushka.classifier.twitter.stream;
 
-import com.maximgalushka.classifier.storage.mysql.MysqlService;
-import com.maximgalushka.classifier.twitter.*;
-import com.maximgalushka.classifier.twitter.classify.carrot.*;
+import com.maximgalushka.classifier.storage.StorageService;
+import com.maximgalushka.classifier.twitter.LocalSettings;
+import com.maximgalushka.classifier.twitter.classify.carrot.ClusteringTweetsListAlgorithm;
 import com.maximgalushka.classifier.twitter.client.StreamClient;
 import com.maximgalushka.classifier.twitter.clusters.Clusters;
 import com.maximgalushka.classifier.twitter.model.Tweet;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayDeque;
-import java.util.concurrent.*;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
-import static com.maximgalushka.classifier.twitter.classify.Tools.*;
+import static com.maximgalushka.classifier.twitter.classify.Tools.cleanFromStart;
+import static com.maximgalushka.classifier.twitter.classify.Tools.slice;
 
 /**
  * @since 8/11/2014.
@@ -28,21 +29,11 @@ public class TwitterStreamProcessor implements Runnable {
   private StreamClient streamClient;
   private ClusteringTweetsListAlgorithm clustering;
   private LocalSettings settings;
-  private MysqlService mysql;
+  private StorageService storage;
 
   private volatile boolean stopping = false;
 
   public TwitterStreamProcessor() {
-    try {
-      mysql = new MysqlService();
-    } catch (SQLException e) {
-      log.error(
-        String.format(
-          "Cannot initialize MySQL client: [%s]",
-          e.getMessage()
-        )
-      );
-    }
   }
 
   public void setClusters(Clusters model) {
@@ -70,6 +61,14 @@ public class TwitterStreamProcessor implements Runnable {
 
   public void setModel(Clusters model) {
     this.model = model;
+  }
+
+  public StorageService getStorage() {
+    return storage;
+  }
+
+  public void setStorage(StorageService storage) {
+    this.storage = storage;
   }
 
   @Override
@@ -114,7 +113,7 @@ public class TwitterStreamProcessor implements Runnable {
           if (batch.size() == (BATCH_SIZE + STEP)) {
             // saving current batch in database
             log.debug("Saving current tweets batch in database");
-            mysql.saveTweetsBatch(batch);
+            storage.saveTweetsBatch(batch);
 
             log.debug("Clean model. We start full scale clustering.");
             model.cleanClusters();

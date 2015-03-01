@@ -73,6 +73,7 @@
     <bean id="twitter-stream-processor"
           class="com.maximgalushka.classifier.twitter.stream.TwitterStreamProcessor">
         <property name="settings" ref="settings"/>
+        <property name="storage" ref="storage"/>
         <property name="clustering" ref="lingo-clustering-algorithm"/>
         <property name="clusters" ref="clusters"/>
         <property name="streamClient" ref="twitter-stream-client"/>

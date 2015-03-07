@@ -1,7 +1,7 @@
-package com.maximgalushka.classifier.clustring.realtime;
+package com.maximgalushka.classifier.clustering.legacy.realtime;
 
-import com.maximgalushka.classifier.clustring.model.Document;
-import com.maximgalushka.classifier.clustring.model.WordCountSparseVector;
+import com.maximgalushka.classifier.clustering.legacy.Document;
+import com.maximgalushka.classifier.clustering.legacy.WordCountSparseVector;
 
 import java.util.concurrent.atomic.AtomicLong;
 

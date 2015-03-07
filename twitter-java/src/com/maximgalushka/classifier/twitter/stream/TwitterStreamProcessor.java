@@ -102,6 +102,10 @@ public class TwitterStreamProcessor implements Runnable {
         try {
           if (batch.size() < (BATCH_SIZE + STEP) &&
             (batch.size() % STEP) == 0) {
+            // saving current batch to database
+            log.debug("Saving current tweets batch to database");
+            storage.saveTweetsBatch(batch);
+
             log.debug("Pre-batch cluster estimation.");
             clustering.classify(
               slice(batch, batch.size() - STEP, batch.size()),
@@ -111,8 +115,8 @@ public class TwitterStreamProcessor implements Runnable {
           // we need to collect full batch of elements and then classify the
           // whole batch
           if (batch.size() == (BATCH_SIZE + STEP)) {
-            // saving current batch in database
-            log.debug("Saving current tweets batch in database");
+            // saving current batch to database
+            log.debug("Saving current tweets batch to database");
             storage.saveTweetsBatch(batch);
 
             log.debug("Clean model. We start full scale clustering.");

@@ -1,7 +1,7 @@
-package com.maximgalushka.classifier.clustring.realtime;
+package com.maximgalushka.classifier.clustering.legacy.realtime;
 
 import com.google.common.collect.Sets;
-import com.maximgalushka.classifier.clustring.model.*;
+import com.maximgalushka.classifier.clustering.legacy.*;
 
 import java.util.*;
 

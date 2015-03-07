@@ -1,13 +1,11 @@
-package com.maximgalushka.classifier.clustring
+package com.maximgalushka.classifier.clustering.legacy
 
-import com.maximgalushka.classifier.clustring.model.Document
-import com.maximgalushka.classifier.clustring.realtime.ClusterClassifier
+import com.maximgalushka.classifier.clustering.legacy.realtime.ClusterClassifier
 import org.springframework.context.support.ClassPathXmlApplicationContext
-
 /**
  * @author Maxim Galushka
  */
-
+@Deprecated
 def IN = new BufferedReader(
         new FileReader(
                 "D:\\projects\\opinions-classifier\\200.txt"))

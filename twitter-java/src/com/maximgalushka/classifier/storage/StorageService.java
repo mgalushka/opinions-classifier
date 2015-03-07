@@ -144,6 +144,10 @@ public class StorageService {
     mysql.saveTweetsBatch(tweets);
   }
 
+  public void saveTweetsClustersBatch(Collection<Tweet> tweets) {
+    mysql.saveTweetsBatch(tweets);
+  }
+
   private void checkConsistency() {
     if (memcached == null) {
       log.error(

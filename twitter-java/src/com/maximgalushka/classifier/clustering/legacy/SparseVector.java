@@ -1,4 +1,4 @@
-package com.maximgalushka.classifier.clustring.model;
+package com.maximgalushka.classifier.clustering.legacy;
 
 import java.util.Map;
 

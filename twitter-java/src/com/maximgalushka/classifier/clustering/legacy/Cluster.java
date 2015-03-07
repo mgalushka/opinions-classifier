@@ -1,4 +1,4 @@
-package com.maximgalushka.classifier.clustring.model;
+package com.maximgalushka.classifier.clustering.legacy;
 
 import org.tartarus.snowball.ext.EnglishStemmer;
 
@@ -10,6 +10,7 @@ import java.util.List;
  * @author Maxim Galushka
  */
 @Immutable
+@Deprecated
 public final class Cluster extends Document {
 
     private static final boolean DEBUG = true;

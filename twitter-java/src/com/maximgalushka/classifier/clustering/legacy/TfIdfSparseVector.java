@@ -1,4 +1,4 @@
-package com.maximgalushka.classifier.clustring.model;
+package com.maximgalushka.classifier.clustering.legacy;
 
 import javax.annotation.concurrent.Immutable;
 import java.util.Collections;

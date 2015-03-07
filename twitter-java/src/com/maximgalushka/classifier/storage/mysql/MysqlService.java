@@ -139,12 +139,22 @@ public class MysqlService {
             "values (?, ?, now())"
         )
       ) {
-        for(Tweet tweet: tweets) {
+        for (Tweet tweet : tweets) {
           stmt.setLong(1, tweet.getId());
           stmt.setString(2, gson.toJson(tweet));
           stmt.addBatch();
         }
         stmt.executeBatch();
+      } catch (BatchUpdateException e) {
+        if(e.getMessage().contains("Duplicate entry")) {
+          log.trace(
+            String.format("Ignoring constraint violation exception"),
+            e
+          );
+        }
+        else{
+          throw e;
+        }
       }
     } catch (SQLException e) {
       e.printStackTrace();

@@ -1,4 +1,4 @@
-package com.maximgalushka.classifier.clustring.model;
+package com.maximgalushka.classifier.clustering.legacy;
 
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
@@ -9,6 +9,7 @@ import java.io.Serializable;
  */
 @SuppressWarnings("UnusedDeclaration")
 @Immutable
+@Deprecated
 public class Document implements Comparable, Serializable {
 
     private long id;

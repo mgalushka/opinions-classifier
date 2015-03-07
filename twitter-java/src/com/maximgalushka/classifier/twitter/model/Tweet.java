@@ -27,6 +27,11 @@ public class Tweet {
   public Tweet() {
   }
 
+  public Tweet(long id, String text) {
+    this.id = id;
+    this.text = text;
+  }
+
   public Tweet(String text) {
     this.text = text;
   }

@@ -109,14 +109,14 @@
         </property>
     </bean>
     <bean id="stats"
-          class="com.maximgalushka.classifier.clustring.realtime.StatsHolder">
+          class="com.maximgalushka.classifier.clustering.legacy.realtime.StatsHolder">
         <property name="clustersToScan" value="50"/>
         <property name="documentsCount" value="0"/>
         <property name="threshold" value="0.99"/>
     </bean>
 
     <bean id="classifier"
-          class="com.maximgalushka.classifier.clustring.realtime.ClusterClassifier">
+          class="com.maximgalushka.classifier.clustering.legacy.realtime.ClusterClassifier">
         <property name="stats" ref="stats"/>
     </bean>
 

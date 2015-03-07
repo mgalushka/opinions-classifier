@@ -1,4 +1,4 @@
-package com.maximgalushka.classifier.clustring.model;
+package com.maximgalushka.classifier.clustering.legacy;
 
 import com.maximgalushka.classifier.twitter.classify.TextCleanup;
 import org.tartarus.snowball.ext.EnglishStemmer;

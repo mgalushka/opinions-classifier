@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="
+           http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+    <bean id="statsJmx"
+          class="org.springframework.jmx.export.MBeanExporter"
+          lazy-init="false">
+        <property name="beans">
+            <map>
+                <entry key="bean:name=stats" value-ref="stats"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="stats"
+          class="com.maximgalushka.classifier.clustering.legacy.realtime.StatsHolder">
+        <property name="clustersToScan" value="50"/>
+        <property name="documentsCount" value="0"/>
+        <property name="threshold" value="0.99"/>
+    </bean>
+
+    <bean id="classifier"
+          class="com.maximgalushka.classifier.clustering.legacy.realtime.ClusterClassifier">
+        <property name="stats" ref="stats"/>
+    </bean>
+
+</beans>

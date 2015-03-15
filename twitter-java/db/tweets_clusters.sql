@@ -1,5 +1,6 @@
 CREATE TABLE `tweets_clusters` (
 	`cluster_id` BIGINT(20) NOT NULL AUTO_INCREMENT,
+	`name` VARCHAR(255) NULL DEFAULT NULL,
 	`best_tweet_id` BIGINT(20) NULL DEFAULT NULL,
 	`is_displayed` TINYINT(4) NOT NULL DEFAULT '1',
 	`cluster_run_id` BIGINT(20) NOT NULL DEFAULT '0',

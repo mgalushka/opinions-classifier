@@ -6,6 +6,7 @@ import com.maximgalushka.classifier.twitter.clusters.Clusters;
 import com.maximgalushka.classifier.twitter.clusters.TweetsCluster;
 import com.maximgalushka.classifier.twitter.model.Tweet;
 import org.apache.log4j.Logger;
+import org.carrot2.core.Cluster;
 
 import javax.annotation.Resource;
 import java.util.Collection;
@@ -144,8 +145,26 @@ public class StorageService {
     mysql.saveTweetsBatch(tweets);
   }
 
-  public void saveTweetsClustersBatch(Collection<Tweet> tweets) {
-    mysql.saveTweetsBatch(tweets);
+  public Long getMaxRunId() throws Exception {
+    return mysql.getMaxRunId();
+  }
+
+  public Long createNewCluster(Cluster cluster, long maxRunId)
+  throws Exception {
+    return mysql.createNewCluster(cluster, maxRunId);
+  }
+
+  public void saveTweetsClustersBatch(
+    Cluster cluster,
+    long nextRunId,
+    List<Tweet> tweetsInCluster
+  ) {
+    try {
+      long clusterId = createNewCluster(cluster, nextRunId);
+      mysql.saveTweetsClustersBatch(clusterId, tweetsInCluster);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
   }
 
   private void checkConsistency() {

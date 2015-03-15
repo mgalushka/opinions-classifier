@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.maximgalushka.classifier.twitter.clusters.Clusters;
 import com.maximgalushka.classifier.twitter.model.Tweet;
 import org.apache.log4j.Logger;
+import org.carrot2.core.Cluster;
 
 import javax.sql.DataSource;
 import java.io.*;
@@ -155,6 +156,75 @@ public class MysqlService {
         else{
           throw e;
         }
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+  }
+
+  public Long getMaxRunId()
+  throws Exception {
+    try (Connection conn = this.datasource.getConnection()) {
+      try (
+        PreparedStatement stmt = conn.prepareStatement(
+          "select coalesce(max(cluster_run_id), 0) as max_id " +
+            "from tweets_clusters"
+        )
+      ) {
+        ResultSet rs = stmt.executeQuery();
+        if(rs.next()){
+          return rs.getLong(1);
+        }
+        else{
+          throw new Exception("Cannot calculate max cluster_run_id");
+        }
+      }
+    }
+  }
+
+  public Long createNewCluster(Cluster cluster, long clusterRunId)
+  throws Exception {
+    try (Connection conn = this.datasource.getConnection()) {
+      try (
+        PreparedStatement stmt = conn.prepareStatement(
+          "insert into tweets_clusters" +
+            "(name, cluster_run_id, cluster_run_timestamp, " +
+            "created_timestamp, updated_timestamp) " +
+            "values (?, ?, now(), now(), now())",
+          Statement.RETURN_GENERATED_KEYS
+        )
+      ) {
+        stmt.setString(1, cluster.getLabel());
+        stmt.setLong(2, clusterRunId);
+        stmt.executeUpdate();
+        ResultSet rs = stmt.getGeneratedKeys();
+        if (rs.next()) {
+          return rs.getLong(1);
+        } else {
+          throw new Exception("Cannot retrieve created cluster id");
+        }
+      }
+    }
+  }
+
+  public void saveTweetsClustersBatch(
+    long newClusterId,
+    List<Tweet> tweetsInCluster
+  ) {
+    try (Connection conn = this.datasource.getConnection()) {
+      try (
+        PreparedStatement stmt = conn.prepareStatement(
+          "update tweets_all " +
+            "set cluster_id=? " +
+            "where id=?"
+        )
+      ) {
+        for (Tweet tweet : tweetsInCluster) {
+          stmt.setLong(1, newClusterId);
+          stmt.setLong(2, tweet.getId());
+          stmt.addBatch();
+        }
+        stmt.executeBatch();
       }
     } catch (SQLException e) {
       e.printStackTrace();

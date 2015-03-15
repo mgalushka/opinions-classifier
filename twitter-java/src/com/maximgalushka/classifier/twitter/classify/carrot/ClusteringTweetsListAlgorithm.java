@@ -2,8 +2,7 @@ package com.maximgalushka.classifier.twitter.classify.carrot;
 
 import com.google.common.base.Optional;
 import com.maximgalushka.classifier.storage.StorageService;
-import com.maximgalushka.classifier.twitter.classify
-  .ClusterRepresentativeFinder;
+import com.maximgalushka.classifier.twitter.classify.ClusterRepresentativeFinder;
 import com.maximgalushka.classifier.twitter.classify.TextCleanup;
 import com.maximgalushka.classifier.twitter.classify.Tools;
 import com.maximgalushka.classifier.twitter.clusters.Clusters;
@@ -22,8 +21,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.maximgalushka.classifier.twitter.classify.Tools
-  .cleanFromStart;
+import static com.maximgalushka.classifier.twitter.classify.Tools.cleanFromStart;
 import static com.maximgalushka.classifier.twitter.classify.Tools.slice;
 
 /**
@@ -312,7 +310,7 @@ public class ClusteringTweetsListAlgorithm {
   /**
    * @return map which contain mapping between old cluster id which was
    * migrated to new cluster id (optional if old
-   * cluster splitted)
+   * cluster split)
    */
   private Map<Integer, Optional<Integer>> compareWithPrev(
     List<Cluster> prev,

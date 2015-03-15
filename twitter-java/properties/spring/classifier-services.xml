@@ -37,6 +37,16 @@
         </property>
     </bean>
 
+    <!--
+    <bean id="taskExecutor"
+          class="java.util.concurrent.Executors"
+          factory-method="newScheduledThreadPool">
+        <constructor-arg name="corePoolSize"
+                         type="int"
+                         value="4"/>
+    </bean>
+    -->
+
     <bean id="mysql"
           class="com.maximgalushka.classifier.storage.mysql.MysqlService">
         <property name="datasource" ref="mysql-datasource"/>
@@ -61,13 +71,13 @@
     <bean id="clusters"
           class="com.maximgalushka.classifier.twitter.clusters.Clusters"/>
 
+    <bean id="lingo-controller" class="org.carrot2.core.ControllerFactory"
+          factory-method="createSimple"/>
+
     <bean id="lingo-clustering-algorithm"
           class="com.maximgalushka.classifier.twitter.classify.carrot.ClusteringTweetsListAlgorithm">
         <property name="storage" ref="storage"/>
-        <property name="controller">
-            <bean class="org.carrot2.core.ControllerFactory"
-                  factory-method="createSimple"/>
-        </property>
+        <property name="controller" ref="lingo-controller"/>
     </bean>
 
     <bean id="twitter-stream-processor"
@@ -79,6 +89,12 @@
         <property name="streamClient" ref="twitter-stream-client"/>
     </bean>
 
+    <bean id="twitter-classifier-pipeline"
+          class="com.maximgalushka.classifier.clustering.ClusteringPipeline">
+        <property name="storage" ref="storage"/>
+        <property name="controller" ref="lingo-controller"/>
+    </bean>
+
     <bean id="main"
           class="com.maximgalushka.classifier.twitter.service.MainServiceStart">
         <property name="settings" ref="settings"/>
@@ -88,36 +104,9 @@
     <bean id="stop-service"
           class="com.maximgalushka.classifier.twitter.service.StopServiceHandler">
         <property name="settings" ref="settings"/>
-        <property name="pool" ref="taskExecutor"/>
+        <!--property name="pool" ref="taskExecutor"/-->
         <property name="processor" ref="twitter-stream-processor"/>
     </bean>
 
-    <bean id="taskExecutor"
-          class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
-        <property name="corePoolSize" value="3"/>
-        <property name="maxPoolSize" value="10"/>
-        <property name="queueCapacity" value="25"/>
-    </bean>
-
-    <bean id="statsJmx"
-          class="org.springframework.jmx.export.MBeanExporter"
-          lazy-init="false">
-        <property name="beans">
-            <map>
-                <entry key="bean:name=stats" value-ref="stats"/>
-            </map>
-        </property>
-    </bean>
-    <bean id="stats"
-          class="com.maximgalushka.classifier.clustering.legacy.realtime.StatsHolder">
-        <property name="clustersToScan" value="50"/>
-        <property name="documentsCount" value="0"/>
-        <property name="threshold" value="0.99"/>
-    </bean>
-
-    <bean id="classifier"
-          class="com.maximgalushka.classifier.clustering.legacy.realtime.ClusterClassifier">
-        <property name="stats" ref="stats"/>
-    </bean>
 
 </beans>

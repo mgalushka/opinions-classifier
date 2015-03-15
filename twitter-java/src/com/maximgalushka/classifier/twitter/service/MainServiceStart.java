@@ -1,6 +1,7 @@
 package com.maximgalushka.classifier.twitter.service;
 
 import com.google.gson.Gson;
+import com.maximgalushka.classifier.clustering.ClusteringPipeline;
 import com.maximgalushka.classifier.storage.StorageService;
 import com.maximgalushka.classifier.twitter.LocalSettings;
 import com.maximgalushka.classifier.twitter.clusters.Clusters;
@@ -15,11 +16,13 @@ import org.simpleframework.transport.connect.Connection;
 import org.simpleframework.transport.connect.SocketConnection;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.io.PrintStream;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * TODO: 1 thread server, design is exceptionally bad
@@ -96,8 +99,7 @@ public class MainServiceStart implements Container {
         "spring/classifier-services.xml"
       );
 
-    ThreadPoolTaskExecutor pool = (ThreadPoolTaskExecutor)
-      ac.getBean("taskExecutor");
+    ScheduledExecutorService pool = Executors.newScheduledThreadPool(4);
     MainServiceStart container = (MainServiceStart) ac.getBean("main");
     Server server = new ContainerServer(container);
     Connection connection = new SocketConnection(server);
@@ -114,6 +116,14 @@ public class MainServiceStart implements Container {
 
     pool.execute(processor);
     log.debug("Twitter stream processor started");
+
+    final ClusteringPipeline pipeline = (ClusteringPipeline) ac.getBean(
+      "twitter-classifier-pipeline"
+    );
+    pool.scheduleAtFixedRate(
+      pipeline::clusterFromStorage,
+      0, 1, TimeUnit.HOURS
+    );
 
     // TODO: add credentials to be able to shutdown server
     StopServiceHandler stopHandler = (StopServiceHandler)

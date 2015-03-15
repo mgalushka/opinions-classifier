@@ -1,26 +1,22 @@
 package com.maximgalushka.classifier.clustering;
 
 import com.maximgalushka.classifier.storage.StorageService;
-import com.maximgalushka.classifier.twitter.classify.carrot.ClusteringTweetsListAlgorithm;
 import com.maximgalushka.classifier.twitter.model.Tweet;
 import org.apache.log4j.Logger;
 import org.carrot2.clustering.lingo.LingoClusteringAlgorithm;
 import org.carrot2.core.*;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author Maxim Galushka
  */
+@SuppressWarnings("UnusedDeclaration")
 public class ClusteringPipeline {
 
   public static final Logger log = Logger.getLogger(ClusteringPipeline.class);
 
   private StorageService storage;
-  private ClusteringTweetsListAlgorithm clustering;
   private Controller controller;
 
   public ClusteringPipeline() {
@@ -34,14 +30,6 @@ public class ClusteringPipeline {
     this.storage = storage;
   }
 
-  public ClusteringTweetsListAlgorithm getClustering() {
-    return clustering;
-  }
-
-  public void setClustering(ClusteringTweetsListAlgorithm clustering) {
-    this.clustering = clustering;
-  }
-
   public Controller getController() {
     return controller;
   }
@@ -52,9 +40,9 @@ public class ClusteringPipeline {
 
   /**
    * Business method:
-   *  retrieved tweets for latest 24 hours and apply
-   *  clustering algorithm to them, then store clusters back to
-   *  database.
+   * retrieved tweets for latest 24 hours and apply
+   * clustering algorithm to them, then store clusters back to
+   * database.
    */
   public void clusterFromStorage() {
     List<Tweet> latest24hours = storage.getLatestTweets(24);
@@ -69,7 +57,7 @@ public class ClusteringPipeline {
     List<Document> docs = readTweetsToDocs(documents);
 
     // helper map to extract any required tween metadata
-    //Map<String, Tweet> tweetsIndex = readTweetsToMap(batch);
+    Map<String, Tweet> tweetsIndex = readTweetsToMap(documents);
 
     // Perform clustering by topic using the Lingo algorithm.
     final ProcessingResult byTopicClusters = controller.process(
@@ -78,9 +66,21 @@ public class ClusteringPipeline {
       LingoClusteringAlgorithm.class
     );
     final List<Cluster> clustersByTopic = byTopicClusters.getClusters();
-
-    // TODO
-    storage.saveTweetsClustersBatch(null);
+    try {
+      // next run id is just incremented max run id
+      long nextRunId = storage.getMaxRunId() + 1;
+      for (Cluster cluster : clustersByTopic) {
+        final List<Tweet> tweetsInCluster = new ArrayList<>();
+        for (Document d : cluster.getDocuments()) {
+          Tweet t = tweetsIndex.get(d.getStringId());
+          tweetsInCluster.add(t);
+        }
+        // creates new cluster in database and associates all tweets with it
+        storage.saveTweetsClustersBatch(cluster, nextRunId, tweetsInCluster);
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
   }
 
   /**
@@ -108,5 +108,13 @@ public class ClusteringPipeline {
       }
     }
     return docs;
+  }
+
+  private Map<String, Tweet> readTweetsToMap(List<Tweet> tweets) {
+    Map<String, Tweet> map = new HashMap<>(2 * tweets.size());
+    for (Tweet t : tweets) {
+      map.put(Long.toString(t.getId()), t);
+    }
+    return map;
   }
 }

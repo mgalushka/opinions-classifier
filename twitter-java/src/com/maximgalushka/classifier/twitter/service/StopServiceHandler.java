@@ -3,9 +3,10 @@ package com.maximgalushka.classifier.twitter.service;
 import com.maximgalushka.classifier.twitter.LocalSettings;
 import com.maximgalushka.classifier.twitter.stream.TwitterStreamProcessor;
 import org.apache.log4j.Logger;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.net.ServerSocket;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * @since 9/11/2014.
@@ -15,8 +16,17 @@ public class StopServiceHandler implements Runnable {
 
   public static final Logger log = Logger.getLogger(StopServiceHandler.class);
   private LocalSettings settings;
-  private ThreadPoolTaskExecutor pool;
+
+  // TODO: dirty hack - figure out how fucking spring can initialize bean
+  // TODO: via static factory -this is not fucking work,
+  // TODO: bloody faggots are developers of shitty spring -
+  // TODO: fucking waste of my time
+  private ExecutorService pool = Executors.newFixedThreadPool(1);
+
   private TwitterStreamProcessor processor;
+
+  public StopServiceHandler() {
+  }
 
   @Override
   public void run() {
@@ -63,14 +73,6 @@ public class StopServiceHandler implements Runnable {
 
   public void setSettings(LocalSettings settings) {
     this.settings = settings;
-  }
-
-  public void setPool(ThreadPoolTaskExecutor pool) {
-    this.pool = pool;
-  }
-
-  public ThreadPoolTaskExecutor getPool() {
-    return pool;
   }
 
   public TwitterStreamProcessor getProcessor() {

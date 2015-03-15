@@ -38,6 +38,8 @@ public class ClusteringPipeline {
     this.controller = controller;
   }
 
+  private static final int LATEST_HOURS = 4;
+
   /**
    * Business method:
    * retrieved tweets for latest 24 hours and apply
@@ -45,23 +47,31 @@ public class ClusteringPipeline {
    * database.
    */
   public void clusterFromStorage() {
-    log.info("Starting tweets classifier for latest 24 hours");
-    List<Tweet> latest24hours = storage.getLatestTweets(24);
-    if (latest24hours.isEmpty()) {
+    log.info(
+      String.format(
+        "Starting tweets classifier for latest %d hours",
+        LATEST_HOURS
+      )
+    );
+    List<Tweet> latestHoursTweets = storage.getLatestTweets(LATEST_HOURS);
+    if (latestHoursTweets.isEmpty()) {
       log.error(
-        "Could not find any clusters for latest 24 hours. Check if twitter " +
-          "stream is running."
+        String.format(
+          "Could not find any clusters for latest %d hours. Check if twitter " +
+            "stream is running.",
+          LATEST_HOURS
+        )
       );
       return;
     } else {
       log.info(
         String.format(
           "Found [%d] clusters in database, starting clustering.",
-          latest24hours.size()
+          latestHoursTweets.size()
         )
       );
     }
-    List<Tweet> documents = new ArrayList<>(latest24hours.size());
+    List<Tweet> documents = new ArrayList<>(latestHoursTweets.size());
     List<Document> docs = readTweetsToDocs(documents);
 
     // helper map to extract any required tween metadata
@@ -74,19 +84,39 @@ public class ClusteringPipeline {
       LingoClusteringAlgorithm.class
     );
     final List<Cluster> clustersByTopic = byTopicClusters.getClusters();
+    log.debug(
+      String.format(
+        "As result of clustering latest %d hours tweets, got: [%d] clusters",
+        LATEST_HOURS,
+        clustersByTopic.size()
+      )
+    );
     try {
       // next run id is just incremented max run id
       long nextRunId = storage.getMaxRunId() + 1;
+      log.debug(
+        String.format(
+          "Next run ID: [%d]",
+          nextRunId
+        )
+      );
       for (Cluster cluster : clustersByTopic) {
         final List<Tweet> tweetsInCluster = new ArrayList<>();
         for (Document d : cluster.getDocuments()) {
           Tweet t = tweetsIndex.get(d.getStringId());
           tweetsInCluster.add(t);
         }
+        log.debug(
+          String.format(
+            "Storing cluster in database: [%s]",
+            cluster.getLabel()
+          )
+        );
         // creates new cluster in database and associates all tweets with it
         storage.saveTweetsClustersBatch(cluster, nextRunId, tweetsInCluster);
       }
     } catch (Exception e) {
+      log.error("", e);
       e.printStackTrace();
     }
   }

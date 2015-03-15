@@ -163,6 +163,7 @@ public class StorageService {
       long clusterId = createNewCluster(cluster, nextRunId);
       mysql.saveTweetsClustersBatch(clusterId, tweetsInCluster);
     } catch (Exception e) {
+      log.error("", e);
       e.printStackTrace();
     }
   }

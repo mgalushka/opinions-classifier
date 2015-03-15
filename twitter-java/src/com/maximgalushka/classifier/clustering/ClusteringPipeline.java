@@ -38,7 +38,7 @@ public class ClusteringPipeline {
     this.controller = controller;
   }
 
-  private static final int LATEST_HOURS = 4;
+  private static final int LATEST_HOURS = 24;
 
   /**
    * Business method:

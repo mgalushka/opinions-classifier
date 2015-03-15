@@ -53,6 +53,13 @@ public class ClusteringPipeline {
           "stream is running."
       );
       return;
+    } else {
+      log.info(
+        String.format(
+          "Found [%d] clusters in database, starting clustering.",
+          latest24hours.size()
+        )
+      );
     }
     List<Tweet> documents = new ArrayList<>(latest24hours.size());
     List<Document> docs = readTweetsToDocs(documents);

@@ -45,6 +45,7 @@ public class ClusteringPipeline {
    * database.
    */
   public void clusterFromStorage() {
+    log.info("Starting tweets classifier for latest 24 hours");
     List<Tweet> latest24hours = storage.getLatestTweets(24);
     if (latest24hours.isEmpty()) {
       log.error(

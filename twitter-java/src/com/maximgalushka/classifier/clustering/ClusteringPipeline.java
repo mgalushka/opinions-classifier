@@ -71,11 +71,10 @@ public class ClusteringPipeline {
         )
       );
     }
-    List<Tweet> documents = new ArrayList<>(latestHoursTweets.size());
-    List<Document> docs = readTweetsToDocs(documents);
+    List<Document> docs = readTweetsToDocs(latestHoursTweets);
 
     // helper map to extract any required tween metadata
-    Map<String, Tweet> tweetsIndex = readTweetsToMap(documents);
+    Map<String, Tweet> tweetsIndex = readTweetsToMap(latestHoursTweets);
 
     // Perform clustering by topic using the Lingo algorithm.
     final ProcessingResult byTopicClusters = controller.process(

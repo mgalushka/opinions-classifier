@@ -7,3 +7,5 @@
 /classifier-py/clustering/*.pyc
 /twitter-java/filters
 /twitter-java/*.iml
+/tools/.idea
+/tools/config.php

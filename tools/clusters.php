@@ -8,13 +8,24 @@ include 'header.php';
 $link = connect();
 
 $sql = 'SELECT
-            count(t.id)
+            count(t.id) as total_tweets
         FROM tweets_clusters c join tweets_all t on c.cluster_id = t.cluster_id
-            WHERE cluster_run_id = (select max(cluster_run_id) from tweets_clusters)
-            GROUP BY cluster_id
-            ORDER BY count(t.id) desc
-            LIMIT 1000';
+            WHERE cluster_run_id = (select max(cluster_run_id) from tweets_clusters)';
 $result = mysql_query($sql, $link);
+$total_tweets = 0;
+while ($row = mysql_fetch_assoc($result)) {
+    $total_tweets = $row['total_tweets'];
+}
+
+$sql = 'SELECT
+            count(1) as total_clusters
+        FROM tweets_clusters c
+        WHERE cluster_run_id = (select max(cluster_run_id) from tweets_clusters)';
+$result = mysql_query($sql, $link);
+$total_clusters = 0;
+while ($row = mysql_fetch_assoc($result)) {
+    $total_clusters = $row['total_clusters'];
+}
 
 $sql = 'SELECT
             c.cluster_id,
@@ -31,14 +42,9 @@ $sql = 'SELECT
             LIMIT 1000';
 $result = mysql_query($sql, $link);
 
-if (!$result) {
-    echo "DB Error, could not query the database\n";
-    echo 'MySQL Error: ' . mysql_error();
-    exit;
-}
 ?>
 <div class="page-header">
-    <h1>All latest clusters</h1>
+    <h1>All latest clusters (total <?=$total_clusters?>)</h1>
 </div>
 <div class="container-fluid">
 <?
@@ -48,7 +54,7 @@ while ($row = mysql_fetch_assoc($result)) {
     <div class="row-fluid">
     <div class="col-md-1"><?= $row['cluster_id'] ?></div>
     <div class="col-md-1"><?= $row['tweets_count'] ?></div>
-    <div class="col-md-1"><?= $row['tweets_count'] ?></div>
+    <div class="col-md-1"><?= round(100.0 * $row['tweets_count'] / $total_tweets, 2) ?></div>
     <div class="col-md-9">
         <a href="cluster.php?cluster_id=<?= $row['cluster_id'] ?>">
             <?= $row['name'] ?>

@@ -145,6 +145,10 @@ public class StorageService {
     mysql.saveTweetsBatch(tweets);
   }
 
+  public void saveTweetsCleanedBatch(Collection<Tweet> tweets) {
+    mysql.saveTweetsCleanedBatch(tweets);
+  }
+
   public Long getMaxRunId() throws Exception {
     return mysql.getMaxRunId();
   }
@@ -179,5 +183,9 @@ public class StorageService {
         "Mysql instance is null. Check spring configuration!"
       );
     }
+  }
+
+  public List<Tweet> getTweetsForRun(long runId) {
+    return mysql.getTweetsForRun(runId);
   }
 }

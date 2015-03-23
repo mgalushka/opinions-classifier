@@ -136,24 +136,24 @@ public class MysqlService {
       try (
         PreparedStatement stmt = conn.prepareStatement(
           "insert into tweets_all" +
-            "(id, content_json, created_timestamp)" +
-            "values (?, ?, now())"
+            "(id, content_json, tweet_cleaned, created_timestamp)" +
+            "values (?, ?, ?, now())"
         )
       ) {
         for (Tweet tweet : tweets) {
           stmt.setLong(1, tweet.getId());
           stmt.setString(2, gson.toJson(tweet));
+          stmt.setString(3, tweet.getText());
           stmt.addBatch();
         }
         stmt.executeBatch();
       } catch (BatchUpdateException e) {
-        if(e.getMessage().contains("Duplicate entry")) {
+        if (e.getMessage().contains("Duplicate entry")) {
           log.trace(
             String.format("Ignoring constraint violation exception"),
             e
           );
-        }
-        else{
+        } else {
           throw e;
         }
       }
@@ -172,10 +172,9 @@ public class MysqlService {
         )
       ) {
         ResultSet rs = stmt.executeQuery();
-        if(rs.next()){
+        if (rs.next()) {
           return rs.getLong(1);
-        }
-        else{
+        } else {
           throw new Exception("Cannot calculate max cluster_run_id");
         }
       }
@@ -231,6 +230,29 @@ public class MysqlService {
     }
   }
 
+  public void saveTweetsCleanedBatch(
+    Collection<Tweet> tweets
+  ) {
+    try (Connection conn = this.datasource.getConnection()) {
+      try (
+        PreparedStatement stmt = conn.prepareStatement(
+          "update tweets_all " +
+            "set tweet_cleaned=? " +
+            "where id=?"
+        )
+      ) {
+        for (Tweet tweet : tweets) {
+          stmt.setLong(1, tweet.getId());
+          stmt.setString(2, tweet.getText());
+          stmt.addBatch();
+        }
+        stmt.executeBatch();
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+  }
+
   /**
    * Latest tweets for latest frame in hours
    *
@@ -239,9 +261,34 @@ public class MysqlService {
   public List<Tweet> getLatestTweets(long hours) {
     return query(
       String.format(
-        "select id, cluster_id, content_json, created_timestamp " +
+        "select id, cluster_id, content_json, tweet_cleaned, " +
+          "created_timestamp " +
           "from tweets_all " +
           "where created_timestamp >= DATE_SUB(NOW(), INTERVAL %d HOUR)", hours
+      ),
+      set -> {
+        List<Tweet> tweets = new ArrayList<>();
+        try {
+          while (set.next()) {
+            tweets.add(gson.fromJson(set.getString(3), Tweet.class));
+          }
+        } catch (SQLException e) {
+          log.error(e);
+          e.printStackTrace();
+        }
+        return tweets;
+      }
+    );
+  }
+
+  public List<Tweet> getTweetsForRun(long runId) {
+    return query(
+      String.format(
+        "select t.id, t.cluster_id, t.content_json, t.tweet_cleaned, " +
+          "t.created_timestamp " +
+          "from tweets_all t join tweets_clusters c " +
+          "on t.cluster_id = c.cluster_id " +
+          "where c.cluster_run_id = %d", runId
       ),
       set -> {
         List<Tweet> tweets = new ArrayList<>();
@@ -298,5 +345,4 @@ public class MysqlService {
     }
     return null;
   }
-
 }

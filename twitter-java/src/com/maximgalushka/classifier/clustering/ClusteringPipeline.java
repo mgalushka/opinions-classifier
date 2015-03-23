@@ -1,6 +1,7 @@
 package com.maximgalushka.classifier.clustering;
 
 import com.maximgalushka.classifier.storage.StorageService;
+import com.maximgalushka.classifier.twitter.cleanup.CleanPipeline;
 import com.maximgalushka.classifier.twitter.model.Tweet;
 import org.apache.log4j.Logger;
 import org.carrot2.clustering.lingo.LingoClusteringAlgorithm;
@@ -18,6 +19,7 @@ public class ClusteringPipeline {
 
   private StorageService storage;
   private Controller controller;
+  private CleanPipeline cleanPipeline;
 
   public ClusteringPipeline() {
   }
@@ -36,6 +38,14 @@ public class ClusteringPipeline {
 
   public void setController(Controller controller) {
     this.controller = controller;
+  }
+
+  public CleanPipeline getCleanPipeline() {
+    return cleanPipeline;
+  }
+
+  public void setCleanPipeline(CleanPipeline cleanPipeline) {
+    this.cleanPipeline = cleanPipeline;
   }
 
   private static final int LATEST_HOURS = 24;
@@ -71,6 +81,9 @@ public class ClusteringPipeline {
         )
       );
     }
+
+    cleanPipeline.batchClean(latestHoursTweets);
+    storage.saveTweetsCleanedBatch(latestHoursTweets);
     List<Document> docs = readTweetsToDocs(latestHoursTweets);
 
     // helper map to extract any required tween metadata

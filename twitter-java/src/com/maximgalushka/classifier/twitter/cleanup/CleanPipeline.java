@@ -62,7 +62,7 @@ public class CleanPipeline implements Cleaner {
       "storage"
     );
 
-    List<Tweet> tweets = storage.getTweetsForRun(61);
+    List<Tweet> tweets = storage.getTweetsForRun(82);
     log.debug(String.format("Found [%d] tweets, cleaning...", tweets.size()));
     cleanPipeline.batchClean(tweets);
     storage.saveTweetsCleanedBatch(tweets);

@@ -241,10 +241,22 @@ public class MysqlService {
             "where id=?"
         )
       ) {
+        int BATCH_SIZE = 500;
+        int counter = 0;
         for (Tweet tweet : tweets) {
           stmt.setLong(1, tweet.getId());
           stmt.setString(2, tweet.getText());
           stmt.addBatch();
+          counter++;
+          if (counter % BATCH_SIZE == 0) {
+            log.debug(
+              String.format(
+                "Saving batch number [%d]",
+                counter / BATCH_SIZE
+              )
+            );
+            stmt.executeBatch();
+          }
         }
         stmt.executeBatch();
       }

@@ -13,7 +13,7 @@ if (empty($cluster_id)) {
 
 $link = connect();
 
-$sql = sprintf('SELECT id, cluster_id, content_json, created_timestamp
+$sql = sprintf('SELECT id, cluster_id, content_json, tweet_cleaned, created_timestamp
                 FROM tweets_all
                 WHERE cluster_id = %s
                 LIMIT 1000', $cluster_id);
@@ -32,12 +32,13 @@ if (!$result) {
 <div class="container-fluid"><?
     while ($row = mysql_fetch_assoc($result)) {
         $tweet_json = preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $row['content_json']);
-        $html_tweet = htmlentities(json_decode($tweet_json, true)['text'])
+        $html_tweet = htmlentities(json_decode($tweet_json, true)['text']);
         ?>
         <div class="row">
-            <div class="col-md-2"><span><?= $row['id'] ?></span></div>
-            <div class="col-md-8"><span><?= $html_tweet ?></span></div>
-            <div class="col-md-2"><span><?= $row['created_timestamp'] ?></span></div>
+            <div class="col-md-1"><span><?= $row['id'] ?></span></div>
+            <div class="col-md-5"><span><?= $html_tweet ?></span></div>
+            <div class="col-md-5"><span><?= $row['tweet_cleaned'] ?></span></div>
+            <div class="col-md-1"><span><?= $row['created_timestamp'] ?></span></div>
         </div>
     <?php
     }

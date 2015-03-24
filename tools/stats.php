@@ -7,6 +7,7 @@ $sql = '
     select
     unix_timestamp(date(created_timestamp)) as dt, count(1) as cnt
     from tweets_all
+    where created_timestamp > DATE_SUB(now(), INTERVAL 30 DAY)
     group by date(created_timestamp)
     order by date(created_timestamp)
 ';

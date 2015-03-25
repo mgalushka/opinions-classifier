@@ -65,7 +65,7 @@ $result = mysql_query($sql, $link);
     <h1>All latest clusters (total <?= $total_clusters ?>)</h1>
 </div>
 <div class="container-fluid">
-    <?
+    <?php
     while ($row = mysql_fetch_assoc($result)) {
         ?>
 
@@ -82,7 +82,7 @@ $result = mysql_query($sql, $link);
     }
     ?>
 </div>
-<?
+<?php
 
 mysql_free_result($result);
 mysql_close($link);

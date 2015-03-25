@@ -32,11 +32,11 @@ if (!$result) {
 <div class="container-fluid"><?
     while ($row = mysql_fetch_assoc($result)) {
         $tweet_json = preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $row['content_json']);
-        $html_tweet = htmlentities(json_decode($tweet_json, true)['text']);
+        //$html_tweet = htmlentities(json_decode($row['content_json'], true)['text']);
         ?>
         <div class="row">
             <div class="col-md-2"><span><?= $row['id'] ?></span></div>
-            <div class="col-md-4"><span><?= $html_tweet ?></span></div>
+            <div class="col-md-4"><span><?= $tweet_json ?></span></div>
             <div class="col-md-5"><span><?= $row['tweet_cleaned'] ?></span></div>
             <div class="col-md-1"><span><?= $row['created_timestamp'] ?></span></div>
         </div>

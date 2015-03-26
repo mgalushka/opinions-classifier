@@ -2,20 +2,26 @@
 header('Content-type: text/html; charset=utf-8');
 include 'db.php';
 include 'header.php';
-?>
-
-<?php
-
-$cluster_run_id = $_REQUEST['run_id'];
-if (empty($cluster_run_id)) {
-    $cluster_run_id = 82;  //magic
-}
 
 $link = connect();
 
+$cluster_run_id = $_REQUEST['run_id'];
+if (empty($cluster_run_id)) {
+    $cluster_run_id = 82;
+    $sql = sprintf(
+        'SELECT
+            max(cluster_run_id) as max_run_id
+         FROM tweets_clusters',
+         $cluster_run_id
+    );
+    $result = mysql_query($sql, $link);
+    while ($row = mysql_fetch_assoc($result)) {
+        $cluster_run_id = $row['max_run_id'];
+    }
+}
+
 $sql = sprintf(
-    '-- noinspection SqlNoDataSourceInspection
-    SELECT
+    'SELECT
         count(t.id) as total_tweets
     FROM tweets_clusters c join tweets_all t on c.cluster_id = t.cluster_id
         WHERE cluster_run_id = %d',
@@ -28,11 +34,10 @@ while ($row = mysql_fetch_assoc($result)) {
 }
 
 $sql = sprintf(
-    '-- noinspection SqlNoDataSourceInspection
-        SELECT
-            count(1) as total_clusters
-        FROM tweets_clusters c
-        WHERE cluster_run_id = %d',
+    'SELECT
+        count(1) as total_clusters
+    FROM tweets_clusters c
+    WHERE cluster_run_id = %d',
     $cluster_run_id
 );
 $result = mysql_query($sql, $link);
@@ -42,20 +47,19 @@ while ($row = mysql_fetch_assoc($result)) {
 }
 
 $sql = sprintf(
-    '-- noinspection SqlNoDataSourceInspection
-        SELECT
-            c.cluster_id,
-            c.name,
-            c.best_tweet_id,
-            c.is_displayed,
-            c.cluster_run_id,
-            c.updated_timestamp,
-            count(t.id) as tweets_count
-        FROM tweets_clusters c join tweets_all t on c.cluster_id = t.cluster_id
-            WHERE cluster_run_id = %d
-            GROUP BY cluster_id, name, best_tweet_id, is_displayed, cluster_run_id, updated_timestamp
-            ORDER BY count(t.id) desc
-            LIMIT 1000',
+    'SELECT
+        c.cluster_id,
+        c.name,
+        c.best_tweet_id,
+        c.is_displayed,
+        c.cluster_run_id,
+        c.updated_timestamp,
+        count(t.id) as tweets_count
+    FROM tweets_clusters c join tweets_all t on c.cluster_id = t.cluster_id
+        WHERE cluster_run_id = %d
+        GROUP BY cluster_id, name, best_tweet_id, is_displayed, cluster_run_id, updated_timestamp
+        ORDER BY count(t.id) desc
+        LIMIT 1000',
     $cluster_run_id
 );
 $result = mysql_query($sql, $link);

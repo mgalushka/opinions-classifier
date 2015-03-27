@@ -5,6 +5,47 @@ include 'header.php';
 
 $link = connect();
 
+?>
+<div class="page-header">
+    <h1>All clusters</h1>
+</div>
+<div class="container-fluid">
+<?
+$sql = sprintf(
+    'SELECT
+        c.cluster_run_id,
+        date(c.updated_timestamp) as dt,
+        count(distinct c.cluster_id) as clusters_count,
+        count(distinct t.id) as tweets_count
+    FROM tweets_clusters c join tweets_all t on c.cluster_id = t.cluster_id
+    GROUP BY
+        c.cluster_run_id,
+        date(c.updated_timestamp)
+    ORDER BY
+        c.cluster_run_id DESC
+    LIMIT 25'
+);
+$result = mysql_query($sql, $link);
+while ($row = mysql_fetch_assoc($result)) {
+    $total_tweets = $row['total_tweets'];
+    ?>
+    <div class="row-fluid">
+        <div class="col-md-2">
+            <a href="cluster.php?cluster_id=<?= $row['cluster_id'] ?>">
+                <?= $row['cluster_run_id'] ?>
+            </a>
+        </div>
+        <div class="col-md-2"><?= $row['dt'] ?></div>
+        <div class="col-md-2"><?= $row['clusters_count'] ?></div>
+        <div class="col-md-2"><?= $row['tweets_count'] ?></div>
+    </div>
+    <?
+}
+?>
+</div>
+<?
+
+// gettign cluster_id to display information for current cluster
 $cluster_run_id = $_REQUEST['run_id'];
 if (empty($cluster_run_id)) {
     $cluster_run_id = 82;

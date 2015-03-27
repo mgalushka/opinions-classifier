@@ -2,9 +2,7 @@
 header('Content-type: text/html; charset=utf-8');
 include 'db.php';
 include 'header.php';
-?>
 
-<?php
 $cluster_id = $_REQUEST['cluster_id'];
 if (empty($cluster_id)) {
     echo 'No cluster_id passed.';

@@ -6,6 +6,8 @@ include 'db.php';
 error_reporting(0);
 ini_set('display_errors', 'Off');
 
+date_default_timezone_set('Europe/London')
+
 $sys = strtoupper(PHP_OS);
 $JPGRAPH_ROOT = "/var/www/jpgraph-3.5.0b1/";
 if(substr($sys,0,3) == "WIN"){

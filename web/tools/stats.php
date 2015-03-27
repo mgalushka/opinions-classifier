@@ -18,8 +18,8 @@ $sql = '
 ';
 $link = connect();
 $result = mysql_query($sql, $link);
-$xdata = [];
-$ydata = [];
+$xdata = array();
+$ydata = array();
 
 // Some userdefined human readable version of the timestamp
 function formatDate(&$aVal) {

@@ -5,6 +5,7 @@ include 'db.php';
 # ignore errors for image generation scripts
 error_reporting(0);
 ini_set('display_errors', 'Off');
+DEFINE('DEFAULT_GFORMAT','jpg')
 
 date_default_timezone_set('Europe/London');
 
@@ -60,6 +61,7 @@ $graph->xaxis->SetLabelAngle(90);
 
 // Add the plot to the graph
 $graph->Add($lineplot);
+$graph->img->SetImgFormat('jpeg');
 
 // Display the graph
 $graph->Stroke()

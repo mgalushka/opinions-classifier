@@ -3,7 +3,7 @@ include 'db.php';
 $sys = strtoupper(PHP_OS);
 $JPGRAPH_ROOT = "/home/ec2-user/jpgraph-3.5.0b1/";
 if(substr($sys,0,3) == "WIN"){
-    $JPGRAPH_ROOT = "D:/dev/php/jpgraph-3.5.0b1.tar/jpgraph-3.5.0b1/"
+    $JPGRAPH_ROOT = "D:/dev/php/jpgraph-3.5.0b1.tar/jpgraph-3.5.0b1/";
 }
 require_once($JPGRAPH_ROOT . 'src/jpgraph.php');
 require_once($JPGRAPH_ROOT . 'src/jpgraph_line.php');

@@ -108,7 +108,9 @@ $result = mysql_query($sql, $link);
 
 ?>
 <div class="page-header">
-    <h1>All latest clusters (total <?= $total_clusters ?>)</h1>
+    <h1>All latest clusters
+        <small>(cluster_run_id=<?= $cluster_run_id ?>, total <?= $total_clusters ?>)</small>
+    </h1>
 </div>
 <div class="container-fluid">
     <?php

@@ -1,4 +1,7 @@
 <?php
+error_reporting(0);
+ini_set('display_errors', 'Off');
+
 include 'db.php';
 $sys = strtoupper(PHP_OS);
 $JPGRAPH_ROOT = "/var/www/jpgraph-3.5.0b1/";

@@ -3,7 +3,7 @@ CREATE TABLE `tweets_all` (
 	`cluster_id` BIGINT(20) NULL DEFAULT NULL,
 	`content_json` TEXT NULL,
 	`tweet_cleaned` TEXT NULL,
-	`created_timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	`created_timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	PRIMARY KEY (`id`),
 	INDEX `cluster_id_index` (`cluster_id`),
 	INDEX `created_timestamp_index` (`created_timestamp`)

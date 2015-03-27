@@ -5,10 +5,10 @@ import com.maximgalushka.classifier.twitter.cleanup.Cleaner;
 /**
  * @author Maxim Galushka
  */
-public class MentionsCleaner implements Cleaner {
+public class StartWithMentionsCleaner implements Cleaner {
 
   @Override
   public String clean(String input) {
-    return input.replaceAll("@\\S+", "");
+    return input.replaceAll("^(\\s*@\\S+)*", "");
   }
 }

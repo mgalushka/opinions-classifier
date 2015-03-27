@@ -9,4 +9,3 @@ $MYSQL_PASSWORD = 'classifieruser01';
 $MYSQL_DATABASE = 'classifier';
 
 ?>
-

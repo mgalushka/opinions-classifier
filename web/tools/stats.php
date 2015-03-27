@@ -5,7 +5,7 @@ include 'db.php';
 # ignore errors for image generation scripts
 error_reporting(0);
 ini_set('display_errors', 'Off');
-DEFINE('DEFAULT_GFORMAT','jpg')
+DEFINE('DEFAULT_GFORMAT','jpg');
 
 date_default_timezone_set('Europe/London');
 

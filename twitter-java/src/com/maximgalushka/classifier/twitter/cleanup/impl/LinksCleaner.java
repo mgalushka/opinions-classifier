@@ -20,7 +20,7 @@ public class LinksCleaner implements Cleaner {
     // remove all URLs' remains at the end of the string
     return input.replaceAll(
       "(http[s]?:[/]{1,2}\\S*|http[s]?:|http[s]?|htt|ht|h)(\\.*|," +
-        "|-|!|\\?)?\\s*$",
+        "|-|!|\\?|\\u2026)?\\s*$",
       ""
     );
   }

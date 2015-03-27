@@ -33,6 +33,9 @@ public class LinksCleanerTest {
     v = MAIN_COMPARE + "http://t.co...";
     Assert.assertEquals(MAIN_COMPARE, cleaner.cleanEndUrls(v));
 
+    v = MAIN_COMPARE + "http://t.co\u2026";
+    Assert.assertEquals(MAIN_COMPARE, cleaner.cleanEndUrls(v));
+
     v = MAIN_COMPARE + "htt,";
     Assert.assertEquals(MAIN_COMPARE, cleaner.cleanEndUrls(v));
 

@@ -27,18 +27,19 @@ $sql = sprintf(
 );
 $result = mysql_query($sql, $link);
 while ($row = mysql_fetch_assoc($result)) {
-    $total_tweets = $row['total_tweets'];
     ?>
-    <div class="row-fluid">
-        <div class="col-md-2">
-            <a href="cluster.php?cluster_id=<?= $row['cluster_id'] ?>">
-                <?= $row['cluster_run_id'] ?>
-            </a>
-        </div>
-        <div class="col-md-2"><?= $row['dt'] ?></div>
-        <div class="col-md-2"><?= $row['clusters_count'] ?></div>
-        <div class="col-md-2"><?= $row['tweets_count'] ?></div>
-    </div>
+    <table class="table table-hover">
+        <tr>
+            <td>
+                <a href="cluster.php?cluster_id=<?= $row['cluster_run_id'] ?>">
+                    <?= $row['cluster_run_id'] ?>
+                </a>
+            </td>
+            <td><?= $row['dt'] ?></td>
+            <td class="col-md-2"><?= $row['clusters_count'] ?></td>
+            <td class="col-md-2"><?= $row['tweets_count'] ?></td>
+        </tr>
+    </table>
     <?
 }
 ?>

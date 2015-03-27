@@ -31,7 +31,7 @@ while ($row = mysql_fetch_assoc($result)) {
     <table class="table table-hover">
         <tr>
             <td>
-                <a href="cluster.php?cluster_id=<?= $row['cluster_run_id'] ?>">
+                <a href="clusters.php?run_id=<?= $row['cluster_run_id'] ?>">
                     <?= $row['cluster_run_id'] ?>
                 </a>
             </td>
@@ -46,7 +46,7 @@ while ($row = mysql_fetch_assoc($result)) {
 </div>
 <?
 
-// gettign cluster_id to display information for current cluster
+// getting cluster_id to display information for current cluster
 $cluster_run_id = $_REQUEST['run_id'];
 if (empty($cluster_run_id)) {
     $cluster_run_id = 82;

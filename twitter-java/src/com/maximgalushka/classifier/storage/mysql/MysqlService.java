@@ -265,6 +265,24 @@ public class MysqlService {
     }
   }
 
+  public void saveBestTweetInCluster(long clusterId, long tweetId) {
+    try (Connection conn = this.datasource.getConnection()) {
+      try (
+        PreparedStatement stmt = conn.prepareStatement(
+          "update tweets_clusters " +
+            "set best_tweet_id=? " +
+            "where cluster_id=?"
+        )
+      ) {
+        stmt.setLong(1, tweetId);
+        stmt.setLong(2, clusterId);
+        stmt.execute();
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+  }
+
   /**
    * Latest tweets for latest frame in hours
    *

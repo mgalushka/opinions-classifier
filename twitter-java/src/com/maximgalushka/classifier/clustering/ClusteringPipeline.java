@@ -1,6 +1,8 @@
 package com.maximgalushka.classifier.clustering;
 
 import com.maximgalushka.classifier.storage.StorageService;
+import com.maximgalushka.classifier.twitter.classify
+  .ClusterRepresentativeFinder;
 import com.maximgalushka.classifier.twitter.cleanup.CleanPipeline;
 import com.maximgalushka.classifier.twitter.model.Tweet;
 import org.apache.log4j.Logger;
@@ -20,6 +22,7 @@ public class ClusteringPipeline {
   private StorageService storage;
   private Controller controller;
   private CleanPipeline cleanPipeline;
+  private ClusterRepresentativeFinder representativeFinder;
 
   public ClusteringPipeline() {
   }
@@ -46,6 +49,17 @@ public class ClusteringPipeline {
 
   public void setCleanPipeline(CleanPipeline cleanPipeline) {
     this.cleanPipeline = cleanPipeline;
+  }
+
+  public ClusterRepresentativeFinder getRepresentativeFinder() {
+    return representativeFinder;
+  }
+
+  public void setRepresentativeFinder(
+    ClusterRepresentativeFinder
+      representativeFinder
+  ) {
+    this.representativeFinder = representativeFinder;
   }
 
   private static final int LATEST_HOURS = 24;
@@ -125,7 +139,22 @@ public class ClusteringPipeline {
           )
         );
         // creates new cluster in database and associates all tweets with it
-        storage.saveTweetsClustersBatch(cluster, nextRunId, tweetsInCluster);
+        long clusterId = storage.saveTweetsClustersBatch(
+          cluster,
+          nextRunId,
+          tweetsInCluster
+        );
+
+        // find best tweet in cluster
+        Tweet representative = representativeFinder
+          .findRepresentativeScoreBased(
+            tweetsInCluster
+          );
+
+        storage.saveBestTweetInCluster(
+          clusterId,
+          representative.getId()
+        );
       }
     } catch (Exception e) {
       log.error("", e);

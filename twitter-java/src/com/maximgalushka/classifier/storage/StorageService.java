@@ -158,7 +158,10 @@ public class StorageService {
     return mysql.createNewCluster(cluster, maxRunId);
   }
 
-  public void saveTweetsClustersBatch(
+  /**
+   * @return newly created cluster id
+   */
+  public Long saveTweetsClustersBatch(
     Cluster cluster,
     long nextRunId,
     List<Tweet> tweetsInCluster
@@ -166,10 +169,12 @@ public class StorageService {
     try {
       long clusterId = createNewCluster(cluster, nextRunId);
       mysql.saveTweetsClustersBatch(clusterId, tweetsInCluster);
+      return clusterId;
     } catch (Exception e) {
       log.error("", e);
       e.printStackTrace();
     }
+    return null;
   }
 
   private void checkConsistency() {
@@ -187,5 +192,9 @@ public class StorageService {
 
   public List<Tweet> getTweetsForRun(long runId) {
     return mysql.getTweetsForRun(runId);
+  }
+
+  public void saveBestTweetInCluster(long clusterId, long tweetId) {
+    mysql.saveBestTweetInCluster(clusterId, tweetId);
   }
 }

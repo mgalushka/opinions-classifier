@@ -80,6 +80,9 @@
         <property name="controller" ref="lingo-controller"/>
     </bean>
 
+    <bean id="best-tweet-finder"
+          class="com.maximgalushka.classifier.twitter.classify"/>
+
     <bean id="twitter-stream-processor"
           class="com.maximgalushka.classifier.twitter.stream.TwitterStreamProcessor">
         <property name="settings" ref="settings"/>
@@ -100,6 +103,7 @@
                 <bean class="com.maximgalushka.classifier.twitter.cleanup.impl.SpacesCleaner"/>
             </list>
         </property>
+        <property name="representativeFinder" ref="best-tweet-finder"/>
     </bean>
 
     <bean id="twitter-classifier-pipeline"

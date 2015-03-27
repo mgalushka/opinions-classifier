@@ -96,6 +96,24 @@ public class ClusterRepresentativeFinder {
     return representative;
   }
 
+  public Tweet findRepresentativeScoreBased(
+    List<Tweet> cluster
+  ) {
+    if (cluster.isEmpty()) {
+      return null;
+    }
+
+    TreeMap<TweetTextWrapper, Integer> sorted = new TreeMap<>(
+      new TweetTextWrapperComparable()
+    );
+    for (Tweet tweet : cluster) {
+      int score = getTweetScore(tweet);
+      sorted.put(new TweetTextWrapper(tweet.getText(), tweet), score);
+    }
+    logRepresentative(sorted);
+    return sorted.firstEntry().getKey().getTweet();
+  }
+
   /**
    * Finds representative from cluster using next technique:
    * Calculates score for each document.
@@ -131,7 +149,10 @@ public class ClusterRepresentativeFinder {
     return sorted.firstEntry().getKey().getTweet();
   }
 
-  private void logRepresentative(final TreeMap<TweetTextWrapper, Integer> sorted) {
+  private void logRepresentative(
+    final TreeMap<TweetTextWrapper, Integer>
+      sorted
+  ) {
     StringBuilder sb = new StringBuilder("\n");
     for (TweetTextWrapper tw : sorted.keySet()) {
       sb.append(
@@ -171,8 +192,9 @@ public class ClusterRepresentativeFinder {
     public int compare(
       TweetTextWrapper first, TweetTextWrapper second
     ) {
-      return ClusterRepresentativeFinder.this.getTweetScore(first.getTweet()) -
-        ClusterRepresentativeFinder.this.getTweetScore(second.getTweet());
+      return
+        ClusterRepresentativeFinder.this.getTweetScore(first.getTweet()) -
+          ClusterRepresentativeFinder.this.getTweetScore(second.getTweet());
     }
   }
 

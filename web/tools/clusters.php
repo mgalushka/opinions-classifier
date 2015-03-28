@@ -23,7 +23,7 @@ $link = connect();
         date(c.updated_timestamp)
     ORDER BY
         c.cluster_run_id DESC
-    LIMIT 25'
+    LIMIT 10'
     );
     $result = mysql_query($sql, $link);
     while ($row = mysql_fetch_assoc($result)) {
@@ -55,7 +55,7 @@ $link = connect();
 // getting cluster_id to display information for current cluster
 $cluster_run_id = $_REQUEST['run_id'];
 if (empty($cluster_run_id)) {
-    $cluster_run_id = 82;
+    $cluster_run_id = 0;
     $sql = sprintf('
         SELECT
           max(cluster_run_id) AS max_run_id
@@ -120,6 +120,21 @@ $sql = sprintf('
 );
 $result = mysql_query($sql, $link);
 
+$best_tweets = array();
+$tweet_sql = sprintf('
+    SELECT
+        c.cluster_id,
+        t.tweet_cleaned
+    FROM tweets_clusters c LEFT OUTER JOIN tweets_all t
+      ON c.best_tweet_id = t.id
+    WHERE
+       cluster_run_id = %d',
+    $cluster_run_id
+);
+$tweet_result = mysql_query($tweet_sql, $link);
+while ($tweet_row = mysql_fetch_assoc($tweet_result)) {
+    $best_tweets[$tweet_row['cluster_id']] = $tweet_row['tweet_cleaned'];
+}
 ?>
 <div class="page-header">
     <h1>All latest clusters
@@ -139,7 +154,7 @@ $result = mysql_query($sql, $link);
                 <?= $row['name'] ?>
             </a>
         </div>
-        <div class="col-md-5"><?= $row['tweet_cleanedt'] ?></div>
+        <div class="col-md-5"><?= $best_tweets[$row['cluster_id']] ?>&nbsp;</div>
         </div><?php
     }
     ?>

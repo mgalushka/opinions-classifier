@@ -103,7 +103,6 @@
                 <bean class="com.maximgalushka.classifier.twitter.cleanup.impl.SpacesCleaner"/>
             </list>
         </property>
-        <property name="representativeFinder" ref="best-tweet-finder"/>
     </bean>
 
     <bean id="twitter-classifier-pipeline"
@@ -111,6 +110,7 @@
         <property name="storage" ref="storage"/>
         <property name="controller" ref="lingo-controller"/>
         <property name="cleanPipeline" ref="tweets-cleaner-pipeline"/>
+        <property name="representativeFinder" ref="best-tweet-finder"/>
     </bean>
 
     <bean id="main"

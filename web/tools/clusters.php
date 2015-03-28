@@ -11,8 +11,8 @@ $link = connect();
 </div>
 <div class="container-fluid">
     <?
-    $sql = sprintf(
-        'SELECT
+    $sql = sprintf('
+    SELECT
         c.cluster_run_id,
         date(c.updated_timestamp) AS dt,
         count(DISTINCT c.cluster_id) AS clusters_count,
@@ -56,10 +56,10 @@ $link = connect();
 $cluster_run_id = $_REQUEST['run_id'];
 if (empty($cluster_run_id)) {
     $cluster_run_id = 82;
-    $sql = sprintf(
-        'SELECT
-            max(cluster_run_id) AS max_run_id
-         FROM tweets_clusters',
+    $sql = sprintf('
+        SELECT
+          max(cluster_run_id) AS max_run_id
+        FROM tweets_clusters',
         $cluster_run_id
     );
     $result = mysql_query($sql, $link);
@@ -68,8 +68,8 @@ if (empty($cluster_run_id)) {
     }
 }
 
-$sql = sprintf(
-    'SELECT
+$sql = sprintf('
+    SELECT
         count(t.id) AS total_tweets
     FROM tweets_clusters c JOIN tweets_all t ON c.cluster_id = t.cluster_id
         WHERE cluster_run_id = %d',
@@ -81,12 +81,12 @@ while ($row = mysql_fetch_assoc($result)) {
     $total_tweets = $row['total_tweets'];
 }
 
-$sql = sprintf(
-    'SELECT
+$sql = sprintf('
+    SELECT
         count(1) AS total_clusters
-     FROM tweets_clusters c
-     WHERE cluster_run_id = %d',
-     $cluster_run_id
+    FROM tweets_clusters c
+    WHERE cluster_run_id = %d',
+    $cluster_run_id
 );
 $result = mysql_query($sql, $link);
 $total_clusters = 0;
@@ -94,8 +94,8 @@ while ($row = mysql_fetch_assoc($result)) {
     $total_clusters = $row['total_clusters'];
 }
 
-$sql = sprintf(
-    'SELECT
+$sql = sprintf('
+    SELECT
         c.cluster_id,
         c.name,
         c.best_tweet_id,
@@ -103,12 +103,20 @@ $sql = sprintf(
         c.cluster_run_id,
         c.updated_timestamp,
         count(t.id) AS tweets_count
-     FROM tweets_clusters c JOIN tweets_all t ON c.cluster_id = t.cluster_id
-        WHERE cluster_run_id = %d
-        GROUP BY cluster_id, name, best_tweet_id, is_displayed, cluster_run_id, updated_timestamp
-        ORDER BY count(t.id) DESC
-        LIMIT 1000',
-     $cluster_run_id
+    FROM tweets_clusters c JOIN tweets_all t
+      ON c.cluster_id = t.cluster_id
+    WHERE cluster_run_id = %d
+    GROUP BY
+      cluster_id,
+      name,
+      best_tweet_id,
+      is_displayed,
+      cluster_run_id,
+      updated_timestamp
+    ORDER BY
+      count(t.id) DESC
+    LIMIT 1000',
+    $cluster_run_id
 );
 $result = mysql_query($sql, $link);
 
@@ -122,16 +130,16 @@ $result = mysql_query($sql, $link);
     <?php
     while ($row = mysql_fetch_assoc($result)) {
         ?>
-
         <div class="row-fluid">
         <div class="col-md-1"><?= $row['cluster_id'] ?></div>
         <div class="col-md-1"><?= $row['tweets_count'] ?></div>
         <div class="col-md-1"><?= round(100.0 * $row['tweets_count'] / $total_tweets, 2) ?>%</div>
-        <div class="col-md-9">
+        <div class="col-md-4">
             <a href="cluster.php?cluster_id=<?= $row['cluster_id'] ?>">
                 <?= $row['name'] ?>
             </a>
         </div>
+        <div class="col-md-5"><?= $row['tweet_cleanedt'] ?></div>
         </div><?php
     }
     ?>

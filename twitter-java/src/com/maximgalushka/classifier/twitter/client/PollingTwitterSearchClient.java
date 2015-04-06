@@ -88,7 +88,7 @@ public class PollingTwitterSearchClient implements StreamClient {
         );
         try {
           String query = pendingQueries.takeFirst();
-          String token = this.getTwitterClient().oauth();
+          String token = this.getTwitterClient().bearer();
           final long sinceId = sinceTweetIds.getOrDefault(query, 0L);
           Statuses statuses = this.getTwitterClient().search(
             token,

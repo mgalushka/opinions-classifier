@@ -6,6 +6,7 @@ import com.maximgalushka.classifier.twitter.LocalSettings;
 import com.maximgalushka.classifier.twitter.model.Statuses;
 import com.maximgalushka.classifier.twitter.model.Tweet;
 import com.maximgalushka.classifier.twitter.model.TwitterOAuthToken;
+import com.sun.scenario.Settings;
 import com.twitter.hbc.BasicRateTracker;
 import com.twitter.hbc.BasicReconnectionManager;
 import com.twitter.hbc.core.Constants;
@@ -26,6 +27,10 @@ import org.apache.http.params.HttpParams;
 import org.glassfish.jersey.apache.connector.ApacheConnectorProvider;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
+import twitter4j.Status;
+import twitter4j.Twitter;
+import twitter4j.TwitterException;
+import twitter4j.TwitterFactory;
 
 import javax.annotation.PostConstruct;
 import javax.ws.rs.client.*;
@@ -66,10 +71,11 @@ public class TwitterStandardClient implements StreamClient {
     this.settings = settings;
   }
 
+
   /**
-   * @return access token
+   * @return bearer access token for application only by its secret details
    */
-  public String oauth() {
+  private String bearer(String tokenKey, String tokenSecret) {
     if (underTest) {
       return testingStub("TESTING_OAUTH_KEY");
     }
@@ -90,8 +96,8 @@ public class TwitterStandardClient implements StreamClient {
 
     String secret = String.format(
       "%s:%s",
-      settings.value(LocalSettings.CONSUMER_KEY),
-      settings.value(LocalSettings.CONSUMER_SECRET)
+      tokenKey,
+      tokenSecret
     );
     String encoded = new String(Base64.encodeBase64(secret.getBytes()));
     invocationBuilder.header(
@@ -113,9 +119,23 @@ public class TwitterStandardClient implements StreamClient {
   }
 
   /**
+   * @return bearer access token for application
+   * @see <a href='https://dev.twitter
+   * .com/oauth/reference/post/oauth/access_token'>
+   * https://dev.twitter.com/oauth/reference/post/oauth/access_token
+   * </a>
+   */
+  public String bearer() {
+    return bearer(
+      Settings.get(LocalSettings.CONSUMER_KEY),
+      Settings.get(LocalSettings.CONSUMER_SECRET)
+    );
+  }
+
+  /**
    * Searches updates on twitter sinse sinceId tweet id.
    *
-   * @param token   twitter oauth token
+   * @param token   twitter bearer token
    * @param query   query streang to search for updates
    * @param sinceId latest id we already have results from
    * @return list of tweets which were sent on the query since sinceId
@@ -236,6 +256,19 @@ public class TwitterStandardClient implements StreamClient {
 
     // start streaming
     client.connect();
+  }
+
+  /**
+   * @param tweetId tweet to re-tweet from user account
+   */
+  public Status retweet(long tweetId) throws TwitterException {
+    if (underTest) {
+      return testingStub(null);
+    }
+
+    // The factory instance is re-useable and thread safe.
+    Twitter twitter = TwitterFactory.getSingleton();
+    return twitter.retweetStatus(tweetId);
   }
 
   private Client proxyHttpClient() {

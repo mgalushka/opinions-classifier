@@ -3,11 +3,13 @@ package com.maximgalushka.classifier.storage.mysql;
 import com.maximgalushka.classifier.twitter.clusters.TweetsCluster;
 import com.maximgalushka.classifier.twitter.clusters.Clusters;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.Date;
 
+@Ignore
 public class MysqlIntegrationServiceTest {
 
     @Test

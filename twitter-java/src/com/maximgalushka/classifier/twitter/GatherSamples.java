@@ -28,10 +28,11 @@ public class GatherSamples {
       new ClassPathXmlApplicationContext(
         "spring/classifier-services.xml"
       );
-    TwitterStandardClient client = (TwitterStandardClient) ac.getBean("twitter-client");
+    TwitterStandardClient client = (TwitterStandardClient)
+      ac.getBean("twitter-stream-client");
 
     PrintWriter pw = new PrintWriter(args[0]);
-    String token = client.oauth();
+    String token = client.bearer();
 
     Statuses statuses = client.search(token, "Ukraine", 0);
     List<Tweet> tweets = statuses.getTweets();

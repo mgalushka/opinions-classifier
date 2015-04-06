@@ -3,6 +3,7 @@ package com.maximgalushka.classifier.storage.memcached;
 import com.maximgalushka.classifier.twitter.clusters.TweetsCluster;
 import com.maximgalushka.classifier.twitter.clusters.Clusters;
 import org.apache.log4j.Logger;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.Assert;
 
@@ -11,6 +12,7 @@ import java.util.Arrays;
 /**
  * Test is using real data in memcached.
  */
+@Ignore
 public class MemcachedServiceIntegrationTest {
 
     public static final Logger log = Logger.getLogger(MemcachedServiceIntegrationTest.class);

@@ -1,5 +1,7 @@
 package com.maximgalushka.driller;
 
+import java.io.IOException;
+
 /**
  * Driller is a service which resolves short urls to actual final ones.
  * It can resolve redirects primarily.
@@ -14,5 +16,10 @@ public interface Driller {
    * @param url input URL
    * @return resolved final URL of resource
    */
-  String resolve(String url);
+  String resolve(String url) throws IOException;
+
+  /**
+   * Resolves url asynchronously.
+   */
+  void asyncResolve(String url, DrillerCallback callback);
 }

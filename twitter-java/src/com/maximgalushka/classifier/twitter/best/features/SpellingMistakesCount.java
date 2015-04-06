@@ -33,8 +33,10 @@ public final class SpellingMistakesCount implements TextCounterFeature {
   @Override
   public Long extract(String text) {
     int errors = 0;
+    // we need to ignore hashtags when checking for spelling
+    String withoutHashTags = text.replace("#", "");
     try {
-      errors = languageTool.check(text).size();
+      errors = languageTool.check(withoutHashTags).size();
     } catch (IOException e) {
       e.printStackTrace();
     }

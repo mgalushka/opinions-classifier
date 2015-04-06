@@ -11,4 +11,9 @@ public interface Feature<T, I> {
    * @return some feature
    */
   T extract(I text);
+
+  /**
+   * @return metric based on feature
+   */
+  double metric(T feature);
 }

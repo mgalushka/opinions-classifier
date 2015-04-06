@@ -15,4 +15,13 @@ public class MentionsCount extends PatternCounterFeature{
   protected Pattern getPattern() {
     return MENTION_PATTERN;
   }
+
+  @Override
+  public double metric(Long feature) {
+    if (feature == 0) {
+      return 0D;
+    } else {
+      return 1D;
+    }
+  }
 }

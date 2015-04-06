@@ -40,4 +40,9 @@ public final class SpellingMistakesCount implements TextCounterFeature {
     }
     return (long) errors;
   }
+
+  @Override
+  public double metric(Long feature) {
+    return feature / 2D;
+  }
 }

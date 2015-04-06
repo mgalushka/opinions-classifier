@@ -15,4 +15,16 @@ public class HashtagsCount extends PatternCounterFeature {
   protected Pattern getPattern() {
     return HASHTAG_PATTERN;
   }
+
+  @Override
+  public double metric(Long feature) {
+    if (feature == 0) {
+      return 0D;
+    }
+    if (feature <= 2) {
+      return 2D - feature;
+    } else {
+      return 2D;
+    }
+  }
 }

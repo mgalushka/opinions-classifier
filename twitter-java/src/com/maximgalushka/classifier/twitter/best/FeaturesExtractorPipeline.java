@@ -2,10 +2,7 @@ package com.maximgalushka.classifier.twitter.best;
 
 import com.maximgalushka.classifier.twitter.model.Tweet;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Maxim Galushka
@@ -32,11 +29,24 @@ public final class FeaturesExtractorPipeline
     Map<String, Object> features = new HashMap<>();
     String intermediate = input.getText();
     for (Feature extractor : featureExtractors) {
+      Object feature = extractor.extract(intermediate);
       features.put(
         extractor.getClass().toString(),
-        extractor.extract(intermediate)
+        extractor.metric(feature)
       );
     }
     return features;
+  }
+
+  /**
+   * @return sum of all the feature metrics for tweet from map
+   */
+  @Override
+  public double metric(Map<String, Object> features) {
+    Double sum = 0D;
+    for (Map.Entry<String, Object> value : features.entrySet()) {
+      sum += (Double) value.getValue();
+    }
+    return sum;
   }
 }

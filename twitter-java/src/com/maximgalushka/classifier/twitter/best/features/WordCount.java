@@ -11,4 +11,9 @@ public class WordCount implements TextCounterFeature {
   public Long extract(String text) {
     return (long) text.split("\\s+").length;
   }
+
+  @Override
+  public double metric(Long feature) {
+    return 10D / feature;
+  }
 }

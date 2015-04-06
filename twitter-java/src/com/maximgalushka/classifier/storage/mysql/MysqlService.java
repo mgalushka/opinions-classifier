@@ -265,6 +265,42 @@ public class MysqlService {
     }
   }
 
+  public void updateTweetsFeaturesBatch(
+    Map<Tweet, Map<String, Object>> features
+  ) {
+    try (Connection conn = this.datasource.getConnection()) {
+      try (
+        PreparedStatement stmt = conn.prepareStatement(
+          "update tweets_all " +
+            "set features=? " +
+            "where id=?"
+        )
+      ) {
+        int BATCH_SIZE = 100;
+        int counter = 0;
+        for (Map.Entry<Tweet, Map<String, Object>> feature : features.entrySet())
+        {
+          stmt.setString(1, gson.toJson(feature.getValue()));
+          stmt.setLong(2, feature.getKey().getId());
+          stmt.addBatch();
+          counter++;
+          if (counter % BATCH_SIZE == 0) {
+            log.debug(
+              String.format(
+                "Saving features batch number [%d]",
+                counter / BATCH_SIZE
+              )
+            );
+            stmt.executeBatch();
+          }
+        }
+        stmt.executeBatch();
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+  }
+
   public void saveBestTweetInCluster(long clusterId, long tweetId) {
     try (Connection conn = this.datasource.getConnection()) {
       try (

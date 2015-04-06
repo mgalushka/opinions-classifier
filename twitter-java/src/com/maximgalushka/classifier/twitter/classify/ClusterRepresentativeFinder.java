@@ -1,5 +1,6 @@
 package com.maximgalushka.classifier.twitter.classify;
 
+import com.maximgalushka.classifier.twitter.best.FeaturesExtractorPipeline;
 import com.maximgalushka.classifier.twitter.model.Tweet;
 import com.maximgalushka.classifier.twitter.model.TweetTextWrapper;
 import org.carrot2.core.Document;
@@ -15,9 +16,22 @@ import java.util.*;
 /**
  * @author Maxim Galushka
  */
+@SuppressWarnings({"UnusedDeclaration", "deprecation"})
 public class ClusterRepresentativeFinder {
 
   private JLanguageTool languageTool;
+  private FeaturesExtractorPipeline featuresExtractor;
+
+  public FeaturesExtractorPipeline getFeaturesExtractor() {
+    return featuresExtractor;
+  }
+
+  public void setFeaturesExtractor(
+    FeaturesExtractorPipeline
+      featuresExtractor
+  ) {
+    this.featuresExtractor = featuresExtractor;
+  }
 
   public ClusterRepresentativeFinder()
   throws IOException, ParserConfigurationException, SAXException {
@@ -96,6 +110,74 @@ public class ClusterRepresentativeFinder {
     return representative;
   }
 
+  public static <K, V extends Comparable<V>> Map<K, V>
+  sortByValues(final Map<K, V> map) {
+    Comparator<K> valueComparator =
+      (k1, k2) -> {
+        int compare =
+          map.get(k1).compareTo(map.get(k2));
+        if (compare == 0) {
+          return 1;
+        } else {
+          return compare;
+        }
+      };
+
+    Map<K, V> sortedByValues =
+      new TreeMap<>(valueComparator);
+    sortedByValues.putAll(map);
+    return sortedByValues;
+  }
+
+  public static class Pair<A, B> {
+    public A a;
+    public B b;
+
+    public Pair(A a, B b) {
+      this.a = a;
+      this.b = b;
+    }
+
+    public A getA() {
+      return a;
+    }
+
+    public B getB() {
+      return b;
+    }
+  }
+
+  private static final String METRIC = "METRIC";
+
+  /**
+   * @return pair -
+   * best tweet and full map of features for each tweet in current cluster.
+   */
+  public Pair<Tweet, Map<Tweet, Map<String, Object>>>
+  findRepresentativeFeaturesBased(
+    List<Tweet> cluster
+  ) {
+    if (cluster.isEmpty()) {
+      return null;
+    }
+
+    Map<Tweet, Map<String, Object>> features = new HashMap<>();
+    Map<Tweet, Double> tweets = new HashMap<>();
+    for (Tweet tweet : cluster) {
+      Map<String, Object> ftrs = featuresExtractor.extract(tweet);
+      double score = featuresExtractor.metric(ftrs);
+      tweets.put(tweet, score);
+
+      // adding total sum metric to list of features to save in DB.
+      ftrs.put(METRIC, score);
+      features.put(tweet, ftrs);
+    }
+    return new Pair<>(
+      sortByValues(tweets).keySet().iterator().next(),
+      features
+    );
+  }
+
   public Tweet findRepresentativeScoreBased(
     List<Tweet> cluster
   ) {
@@ -129,6 +211,7 @@ public class ClusterRepresentativeFinder {
    * @param tweetsIndex tweets reversed index - to speed up search
    * @return best tween in cluster
    */
+  @Deprecated
   public Tweet findRepresentativeScoreBased(
     List<Document> documents,
     Map<String, Tweet> tweetsIndex
@@ -149,8 +232,9 @@ public class ClusterRepresentativeFinder {
     return sorted.firstEntry().getKey().getTweet();
   }
 
+  @Deprecated
   private void logRepresentative(
-    final TreeMap<TweetTextWrapper, Integer>
+    final TreeMap<TweetTextWrapper, ? extends Number>
       sorted
   ) {
     StringBuilder sb = new StringBuilder("\n");
@@ -162,7 +246,7 @@ public class ClusterRepresentativeFinder {
         )
       )
         .append("\t")
-        .append(String.format("score: [%d]", sorted.get(tw)))
+        .append(String.format("score: [%f]", sorted.get(tw).doubleValue()))
         .append("\n");
     }
     Tweet chosen = sorted.firstEntry().getKey().getTweet();
@@ -176,9 +260,9 @@ public class ClusterRepresentativeFinder {
       .append("\t")
       .append(
         String.format(
-          "score: [%d]", sorted.get(
+          "score: [%f]", sorted.get(
             sorted.firstEntry().getKey()
-          )
+          ).doubleValue()
         )
       )
       .append("\n");
@@ -186,6 +270,7 @@ public class ClusterRepresentativeFinder {
     System.out.println(sb.toString());
   }
 
+  @Deprecated
   private class TweetTextWrapperComparable
     implements Comparator<TweetTextWrapper> {
     @Override
@@ -198,6 +283,10 @@ public class ClusterRepresentativeFinder {
     }
   }
 
+  /**
+   * @deprecated use features pipeline and extractors
+   */
+  @Deprecated
   public int getTweetScore(Tweet t) {
     String text = t.getText();
     int errors = 0;

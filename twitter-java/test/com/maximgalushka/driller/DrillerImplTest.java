@@ -3,7 +3,7 @@ package com.maximgalushka.driller;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testng.Assert;
+import org.junit.Assert;
 
 public class DrillerImplTest {
 

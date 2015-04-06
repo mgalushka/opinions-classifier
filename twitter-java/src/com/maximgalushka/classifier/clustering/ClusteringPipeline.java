@@ -96,6 +96,7 @@ public class ClusteringPipeline {
       );
     }
 
+    // NOTE: after this step - each tweet's text is cleaned.
     cleanPipeline.batchClean(latestHoursTweets);
     storage.saveTweetsCleanedBatch(latestHoursTweets);
     List<Document> docs = readTweetsToDocs(latestHoursTweets);
@@ -145,11 +146,17 @@ public class ClusteringPipeline {
           tweetsInCluster
         );
 
-        // find best tweet in cluster
-        Tweet representative = representativeFinder
-          .findRepresentativeScoreBased(
+        ClusterRepresentativeFinder.Pair<Tweet, Map<Tweet, Map<String, Object>>>
+          pair = representativeFinder
+          .findRepresentativeFeaturesBased(
             tweetsInCluster
           );
+
+        // find best tweet in cluster
+        Tweet representative = pair.getA();
+        Map<Tweet, Map<String, Object>> features = pair.getB();
+        // store all features for all tweets in batch in database
+        storage.updateTweetsFeaturesBatch(features);
 
         storage.saveBestTweetInCluster(
           clusterId,

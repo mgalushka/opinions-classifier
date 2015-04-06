@@ -81,7 +81,9 @@
     </bean>
 
     <bean id="best-tweet-finder"
-          class="com.maximgalushka.classifier.twitter.classify.ClusterRepresentativeFinder"/>
+          class="com.maximgalushka.classifier.twitter.classify.ClusterRepresentativeFinder">
+        <property name="featuresExtractor" ref="tweet-features-pipeline"/>
+    </bean>
 
     <bean id="twitter-stream-processor"
           class="com.maximgalushka.classifier.twitter.stream.TwitterStreamProcessor">

@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
  */
 public class HashtagsCount extends PatternCounterFeature {
 
-  private static final Pattern HASHTAG_PATTERN = Pattern.compile("\\s#\\S+\\s");
+  private static final Pattern HASHTAG_PATTERN = Pattern.compile("#\\S+");
 
   @Override
   protected Pattern getPattern() {

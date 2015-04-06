@@ -64,6 +64,9 @@ public class FeaturesExtractorPipelineTest {
 
     Map<String, Object> m = p.extract(new Tweet(T));
     log.debug(m);
+
+    double metric = p.metric(m);
+    Assert.assertEquals(metric, 5.66D, 0.1D);
   }
 
 }

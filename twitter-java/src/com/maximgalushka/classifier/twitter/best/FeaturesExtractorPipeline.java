@@ -31,7 +31,7 @@ public final class FeaturesExtractorPipeline
     for (Feature extractor : featureExtractors) {
       Object feature = extractor.extract(intermediate);
       features.put(
-        extractor.getClass().toString(),
+        extractor.getClass().getSimpleName(),
         extractor.metric(feature)
       );
     }

@@ -3,6 +3,7 @@ package com.maximgalushka.classifier.twitter.service;
 import com.google.gson.Gson;
 import com.maximgalushka.classifier.clustering.ClusteringPipeline;
 import com.maximgalushka.classifier.storage.StorageService;
+import com.maximgalushka.classifier.twitter.LocalSettings;
 import com.maximgalushka.classifier.twitter.clusters.Clusters;
 import com.maximgalushka.classifier.twitter.stream.TwitterStreamProcessor;
 import org.apache.log4j.Logger;
@@ -36,7 +37,9 @@ public class MainServiceStart implements Container {
   private static final long HOURS1 = 60 * 60 * 1000;
 
   private StorageService storage;
-  //private LocalSettings settings;
+
+  @SuppressWarnings("FieldCanBeLocal")
+  private LocalSettings settings;
   private final Gson gson;
 
   public MainServiceStart() {
@@ -47,12 +50,10 @@ public class MainServiceStart implements Container {
     this.storage = storage;
   }
 
-  /*
   @SuppressWarnings("UnusedDeclaration")
   public void setSettings(LocalSettings settings) {
     this.settings = settings;
   }
-  */
 
   public void headers(Response response) {
     long time = System.currentTimeMillis();

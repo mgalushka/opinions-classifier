@@ -2,7 +2,7 @@ package com.maximgalushka.classifier.twitter.classify.carrot;
 
 import com.google.common.base.Optional;
 import com.maximgalushka.classifier.storage.StorageService;
-import com.maximgalushka.classifier.twitter.classify.ClusterRepresentativeFinder;
+import com.maximgalushka.classifier.twitter.best.ClusterRepresentativeFinder;
 import com.maximgalushka.classifier.twitter.classify.TextCleanup;
 import com.maximgalushka.classifier.twitter.classify.Tools;
 import com.maximgalushka.classifier.twitter.clusters.Clusters;

@@ -3,23 +3,16 @@ package com.maximgalushka.classifier.twitter.service;
 import com.google.gson.Gson;
 import com.maximgalushka.classifier.clustering.ClusteringPipeline;
 import com.maximgalushka.classifier.storage.StorageService;
-import com.maximgalushka.classifier.twitter.LocalSettings;
 import com.maximgalushka.classifier.twitter.clusters.Clusters;
 import com.maximgalushka.classifier.twitter.stream.TwitterStreamProcessor;
 import org.apache.log4j.Logger;
 import org.simpleframework.http.Request;
 import org.simpleframework.http.Response;
 import org.simpleframework.http.core.Container;
-import org.simpleframework.http.core.ContainerServer;
-import org.simpleframework.transport.Server;
-import org.simpleframework.transport.connect.Connection;
-import org.simpleframework.transport.connect.SocketConnection;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.io.PrintStream;
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -43,7 +36,7 @@ public class MainServiceStart implements Container {
   private static final long HOURS1 = 60 * 60 * 1000;
 
   private StorageService storage;
-  private LocalSettings settings;
+  //private LocalSettings settings;
   private final Gson gson;
 
   public MainServiceStart() {
@@ -54,10 +47,12 @@ public class MainServiceStart implements Container {
     this.storage = storage;
   }
 
+  /*
   @SuppressWarnings("UnusedDeclaration")
   public void setSettings(LocalSettings settings) {
     this.settings = settings;
   }
+  */
 
   public void headers(Response response) {
     long time = System.currentTimeMillis();
@@ -100,6 +95,8 @@ public class MainServiceStart implements Container {
       );
 
     ScheduledExecutorService pool = Executors.newScheduledThreadPool(4);
+    // TODO: disable web-site as we pivoted to publish to twitter only for now.
+    /*
     MainServiceStart container = (MainServiceStart) ac.getBean("main");
     Server server = new ContainerServer(container);
     Connection connection = new SocketConnection(server);
@@ -110,6 +107,7 @@ public class MainServiceStart implements Container {
     SocketAddress address = new InetSocketAddress(port);
     connection.connect(address);
     log.debug(String.format("Server started on port [%d]", port));
+    */
 
     TwitterStreamProcessor processor = (TwitterStreamProcessor)
       ac.getBean("twitter-stream-processor");
@@ -122,7 +120,7 @@ public class MainServiceStart implements Container {
     );
     pool.scheduleAtFixedRate(
       pipeline::clusterFromStorage,
-      0, 1, TimeUnit.HOURS
+      0, 30, TimeUnit.MINUTES
     );
 
     // TODO: add credentials to be able to shutdown server

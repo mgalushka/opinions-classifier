@@ -1,6 +1,6 @@
-package com.maximgalushka.classifier.twitter.classify;
+package com.maximgalushka.classifier.twitter.best;
 
-import com.maximgalushka.classifier.twitter.best.FeaturesExtractorPipeline;
+import com.maximgalushka.classifier.twitter.classify.Tools;
 import com.maximgalushka.classifier.twitter.model.Tweet;
 import com.maximgalushka.classifier.twitter.model.TweetTextWrapper;
 import org.carrot2.core.Document;

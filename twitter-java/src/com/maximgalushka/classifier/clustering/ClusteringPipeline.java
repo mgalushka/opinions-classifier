@@ -1,9 +1,10 @@
 package com.maximgalushka.classifier.clustering;
 
 import com.maximgalushka.classifier.storage.StorageService;
-import com.maximgalushka.classifier.twitter.classify
-  .ClusterRepresentativeFinder;
+import com.maximgalushka.classifier.twitter.best.BestClusterFinder;
+import com.maximgalushka.classifier.twitter.best.ClusterRepresentativeFinder;
 import com.maximgalushka.classifier.twitter.cleanup.CleanPipeline;
+import com.maximgalushka.classifier.twitter.client.TwitterStandardClient;
 import com.maximgalushka.classifier.twitter.model.Tweet;
 import org.apache.log4j.Logger;
 import org.carrot2.clustering.lingo.LingoClusteringAlgorithm;
@@ -23,6 +24,8 @@ public class ClusteringPipeline {
   private Controller controller;
   private CleanPipeline cleanPipeline;
   private ClusterRepresentativeFinder representativeFinder;
+  private BestClusterFinder clusterFinder;
+  private TwitterStandardClient twitterClient;
 
   public ClusteringPipeline() {
   }
@@ -60,6 +63,22 @@ public class ClusteringPipeline {
       representativeFinder
   ) {
     this.representativeFinder = representativeFinder;
+  }
+
+  public BestClusterFinder getClusterFinder() {
+    return clusterFinder;
+  }
+
+  public void setClusterFinder(BestClusterFinder clusterFinder) {
+    this.clusterFinder = clusterFinder;
+  }
+
+  public TwitterStandardClient getTwitterClient() {
+    return twitterClient;
+  }
+
+  public void setTwitterClient(TwitterStandardClient twitterClient) {
+    this.twitterClient = twitterClient;
   }
 
   private static final int LATEST_HOURS = 24;
@@ -127,6 +146,8 @@ public class ClusteringPipeline {
           nextRunId
         )
       );
+      TreeMap<Integer, Long> countId = new TreeMap<>();
+      Map<Long, Long> bestTweetInCluster = new HashMap<>();
       for (Cluster cluster : clustersByTopic) {
         final List<Tweet> tweetsInCluster = new ArrayList<>();
         for (Document d : cluster.getDocuments()) {
@@ -145,6 +166,7 @@ public class ClusteringPipeline {
           nextRunId,
           tweetsInCluster
         );
+        countId.put(tweetsInCluster.size(), clusterId);
 
         ClusterRepresentativeFinder.Pair<Tweet, Map<Tweet, Map<String, Object>>>
           pair = representativeFinder
@@ -162,7 +184,23 @@ public class ClusteringPipeline {
           clusterId,
           representative.getId()
         );
+        bestTweetInCluster.put(clusterId, representative.getId());
       }
+
+      // TODO: this logic should be separated to special handler
+      // TODO: which chooses best tweet in cluster and re-tweet or
+      // TODO: creates new tweet based o  it.
+      long bestCluster = countId.descendingMap().firstEntry().getValue();
+      long retweetId = bestTweetInCluster.get(bestCluster);
+      storage.savePublishedTweet(retweetId);
+      log.debug(
+        String.format(
+          "Re-tweeting [%d]",
+          retweetId
+        )
+      );
+      twitterClient.retweet(retweetId);
+
     } catch (Exception e) {
       log.error("", e);
       e.printStackTrace();

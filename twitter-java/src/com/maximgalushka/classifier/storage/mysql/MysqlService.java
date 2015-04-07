@@ -162,6 +162,28 @@ public class MysqlService {
     }
   }
 
+  public void savePublishedTweet(long retweetId) {
+    try (Connection conn = this.datasource.getConnection()) {
+      try (
+        PreparedStatement stmt = conn.prepareStatement(
+          "insert into tweets_published " +
+            "select " +
+            "id, " +
+            "content_json as original_json, " +
+            "content_json as published, " +
+            "now() as published_timestamp " +
+            "from tweets_all " +
+            "where id=?"
+        )
+      ) {
+        stmt.setLong(1, retweetId);
+        stmt.executeUpdate();
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+  }
+
   public Long getMaxRunId()
   throws Exception {
     try (Connection conn = this.datasource.getConnection()) {
@@ -278,8 +300,8 @@ public class MysqlService {
       ) {
         int BATCH_SIZE = 100;
         int counter = 0;
-        for (Map.Entry<Tweet, Map<String, Object>> feature : features.entrySet())
-        {
+        for (Map.Entry<Tweet, Map<String, Object>> feature : features
+          .entrySet()) {
           stmt.setString(1, gson.toJson(feature.getValue()));
           stmt.setLong(2, feature.getKey().getId());
           stmt.addBatch();

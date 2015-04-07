@@ -1,5 +1,6 @@
 package com.maximgalushka.classifier.twitter.classify;
 
+import com.maximgalushka.classifier.twitter.best.ClusterRepresentativeFinder;
 import com.maximgalushka.classifier.twitter.model.Tweet;
 import org.junit.Assert;
 import org.junit.Test;

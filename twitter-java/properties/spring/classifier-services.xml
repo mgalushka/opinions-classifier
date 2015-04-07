@@ -81,8 +81,12 @@
     </bean>
 
     <bean id="best-tweet-finder"
-          class="com.maximgalushka.classifier.twitter.classify.ClusterRepresentativeFinder">
+          class="com.maximgalushka.classifier.twitter.best.ClusterRepresentativeFinder">
         <property name="featuresExtractor" ref="tweet-features-pipeline"/>
+    </bean>
+
+    <bean id="best-cluster-finder"
+          class="com.maximgalushka.classifier.twitter.best.BestClusterFinder">
     </bean>
 
     <bean id="twitter-stream-processor"
@@ -125,6 +129,7 @@
         <property name="controller" ref="lingo-controller"/>
         <property name="cleanPipeline" ref="tweets-cleaner-pipeline"/>
         <property name="representativeFinder" ref="best-tweet-finder"/>
+        <property name="twitterClient" ref="twitter-stream-client"/>
     </bean>
 
     <bean id="main"

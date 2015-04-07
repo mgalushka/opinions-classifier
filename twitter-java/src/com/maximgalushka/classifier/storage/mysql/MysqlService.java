@@ -162,7 +162,7 @@ public class MysqlService {
     }
   }
 
-  public void savePublishedTweet(long retweetId) {
+  public void savePublishedTweet(Tweet tweet, boolean retweet) {
     try (Connection conn = this.datasource.getConnection()) {
       try (
         PreparedStatement stmt = conn.prepareStatement(
@@ -170,13 +170,16 @@ public class MysqlService {
             "select " +
             "id, " +
             "content_json as original_json, " +
-            "content_json as published, " +
+            "? as published, " +
+            "? as retweet, " +
             "now() as published_timestamp " +
             "from tweets_all " +
             "where id=?"
         )
       ) {
-        stmt.setLong(1, retweetId);
+        stmt.setString(1, tweet.getText());
+        stmt.setInt(2, retweet ? 1 : 0);
+        stmt.setLong(3, tweet.getId());
         stmt.executeUpdate();
       }
     } catch (SQLException e) {
@@ -307,7 +310,7 @@ public class MysqlService {
           stmt.addBatch();
           counter++;
           if (counter % BATCH_SIZE == 0) {
-            log.debug(
+            log.trace(
               String.format(
                 "Saving features batch number [%d]",
                 counter / BATCH_SIZE

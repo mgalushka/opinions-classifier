@@ -194,8 +194,8 @@ public class ClusteringPipeline {
       // TODO: creates new tweet based o  it.
       long bestCluster = countId.descendingMap().firstEntry().getValue();
       Tweet tweet = bestTweetInCluster.get(bestCluster);
+      storage.savePublishedTweet(tweet, retweet);
       if (retweet) {
-        storage.savePublishedTweet(tweet.getId());
         log.warn(
           String.format(
             "Re-tweeting [%s]",
@@ -204,6 +204,12 @@ public class ClusteringPipeline {
         );
         twitterClient.retweet(tweet.getId());
       } else {
+        log.warn(
+          String.format(
+            "Straight tweet [%s]",
+            tweet
+          )
+        );
         twitterClient.post(tweet);
       }
 

@@ -205,7 +205,7 @@ public class StorageService {
     mysql.updateTweetsFeaturesBatch(features);
   }
 
-  public void savePublishedTweet(long retweetId) {
-    mysql.savePublishedTweet(retweetId);
+  public void savePublishedTweet(Tweet tweet, boolean retweet) {
+    mysql.savePublishedTweet(tweet, retweet);
   }
 }

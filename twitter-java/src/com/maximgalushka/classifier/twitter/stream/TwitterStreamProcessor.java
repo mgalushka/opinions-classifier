@@ -2,19 +2,16 @@ package com.maximgalushka.classifier.twitter.stream;
 
 import com.maximgalushka.classifier.storage.StorageService;
 import com.maximgalushka.classifier.twitter.LocalSettings;
-import com.maximgalushka.classifier.twitter.classify.carrot.ClusteringTweetsListAlgorithm;
+import com.maximgalushka.classifier.twitter.classify.carrot
+  .ClusteringTweetsListAlgorithm;
 import com.maximgalushka.classifier.twitter.client.StreamClient;
 import com.maximgalushka.classifier.twitter.clusters.Clusters;
 import com.maximgalushka.classifier.twitter.model.Tweet;
 import org.apache.log4j.Logger;
 
-import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-
-import static com.maximgalushka.classifier.twitter.classify.Tools.cleanFromStart;
-import static com.maximgalushka.classifier.twitter.classify.Tools.slice;
 
 /**
  * @since 8/11/2014.
@@ -89,16 +86,24 @@ public class TwitterStreamProcessor implements Runnable {
     // in separate thread and we will read from it and process
     streamClient.stream("Ukraine", q);
 
-    int BATCH_SIZE = 1000;
+    int BATCH_SIZE = 100;
 
     // TODO: experiment to find better ratio
-    int STEP = BATCH_SIZE / 20;
+    //int STEP = BATCH_SIZE / 20;
 
     ArrayDeque<Tweet> batch = new ArrayDeque<>();
     long messageCount = 0;
     while (!this.stopping) {
       try {
         Tweet tweet = q.take();
+        if (batch.size() >= BATCH_SIZE) {
+          storage.saveTweetsBatch(batch);
+          batch.clear();
+        } else {
+          batch.add(tweet);
+        }
+        // TODO: final step - we turn off old way of processing tweets.
+        /*
         try {
           if (batch.size() < (BATCH_SIZE + STEP) &&
             (batch.size() % STEP) == 0) {
@@ -140,6 +145,11 @@ public class TwitterStreamProcessor implements Runnable {
         }
       } catch (InterruptedException e) {
         log.error(e);
+        e.printStackTrace();
+      }
+    }
+    */
+      } catch (InterruptedException e) {
         e.printStackTrace();
       }
     }

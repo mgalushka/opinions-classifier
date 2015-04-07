@@ -3,9 +3,12 @@ package com.maximgalushka.classifier.twitter.client;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.maximgalushka.classifier.twitter.LocalSettings;
+import com.maximgalushka.classifier.twitter.model.Media;
 import com.maximgalushka.classifier.twitter.model.Statuses;
 import com.maximgalushka.classifier.twitter.model.Tweet;
 import com.maximgalushka.classifier.twitter.model.TwitterOAuthToken;
+import com.maximgalushka.driller.Driller;
+import com.maximgalushka.http.HttpHelper;
 import com.sun.scenario.Settings;
 import com.twitter.hbc.BasicRateTracker;
 import com.twitter.hbc.BasicReconnectionManager;
@@ -21,21 +24,21 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpHost;
 import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.SchemeRegistryFactory;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpParams;
 import org.glassfish.jersey.apache.connector.ApacheConnectorProvider;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
-import twitter4j.Status;
-import twitter4j.Twitter;
-import twitter4j.TwitterException;
-import twitter4j.TwitterFactory;
+import twitter4j.*;
 
 import javax.annotation.PostConstruct;
 import javax.ws.rs.client.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.File;
 import java.util.List;
 import java.util.concurrent.*;
 
@@ -48,6 +51,7 @@ public class TwitterStandardClient implements StreamClient {
   public static final String PROXY_ADDRESS = "http://localhost:4545";
   private Gson gson;
   private LocalSettings settings;
+  private Driller driller;
 
   private boolean underTest = false;
   private boolean useProxy = false;
@@ -71,6 +75,9 @@ public class TwitterStandardClient implements StreamClient {
     this.settings = settings;
   }
 
+  public void setDriller(Driller driller) {
+    this.driller = driller;
+  }
 
   /**
    * @return bearer access token for application only by its secret details
@@ -266,9 +273,47 @@ public class TwitterStandardClient implements StreamClient {
       return testingStub(null);
     }
 
-    // The factory instance is re-useable and thread safe.
     Twitter twitter = TwitterFactory.getSingleton();
     return twitter.retweetStatus(tweetId);
+  }
+
+  public Status post(Tweet tweet) throws Exception {
+    if (underTest) {
+      return testingStub(null);
+    }
+
+    CloseableHttpClient httpclient = HttpClients.createDefault();
+    HttpHelper helper = new HttpHelper(httpclient);
+    Twitter twitter = TwitterFactory.getSingleton();
+
+    String updateText = tweet.getText();
+    // TODO: hard-coded max URL length.
+    if (updateText.length() <= (140 - 24) &&
+      tweet.getEntities().getUrls() != null &&
+      !tweet.getEntities().getUrls().isEmpty()) {
+      String firstUrl = tweet.getEntities().getUrls().get(0).getUrl();
+      String resolved = driller.resolve(firstUrl);
+      updateText = String.format(
+        "%s %s",
+        tweet.getText(),
+        resolved
+      );
+    }
+    StatusUpdate update = new StatusUpdate(updateText);
+
+    if (tweet.getEntities().getMedia() != null &&
+      !tweet.getEntities().getMedia().isEmpty()) {
+      for (Media media : tweet.getEntities().getMedia()) {
+        File temp = File.createTempFile("download_", "");
+        // TODO: rethink - as resources are not indefinite
+        // TODO: track where attached fiels are stored
+        // TODO: temp.deleteOnExit();
+        helper.download(media.getUrl(), temp);
+        update.setMedia(temp);
+      }
+    }
+
+    return twitter.updateStatus(update);
   }
 
   private Client proxyHttpClient() {

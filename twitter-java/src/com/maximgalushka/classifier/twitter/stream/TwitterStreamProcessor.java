@@ -128,7 +128,10 @@ public class TwitterStreamProcessor implements Runnable {
             // remove first STEP elements from start
             cleanFromStart(batch, STEP);
           } else {
-            log.debug(String.format("[%d] %s", messageCount++, tweet));
+            log.trace(String.format("[%d] %s", messageCount++, tweet));
+            if(messageCount % 100 == 0){
+              log.debug("Receiving twitter messages...");
+            }
             batch.addLast(tweet);
           }
         } catch (IOException e) {

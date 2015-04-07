@@ -58,9 +58,12 @@
         <property name="mysql" ref="mysql"/>
     </bean>
 
+    <bean id="driller" class="com.maximgalushka.driller.DrillerImpl"/>
+
     <bean id="twitter-stream-client"
           class="com.maximgalushka.classifier.twitter.client.TwitterStandardClient">
         <property name="settings" ref="settings"/>
+        <property name="driller" ref="driller"/>
     </bean>
 
     <bean id="twitter-polling-client"

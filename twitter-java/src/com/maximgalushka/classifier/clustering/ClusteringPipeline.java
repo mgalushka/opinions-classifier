@@ -147,7 +147,7 @@ public class ClusteringPipeline {
         )
       );
       TreeMap<Integer, Long> countId = new TreeMap<>();
-      Map<Long, Long> bestTweetInCluster = new HashMap<>();
+      Map<Long, Tweet> bestTweetInCluster = new HashMap<>();
       for (Cluster cluster : clustersByTopic) {
         final List<Tweet> tweetsInCluster = new ArrayList<>();
         for (Document d : cluster.getDocuments()) {
@@ -184,22 +184,28 @@ public class ClusteringPipeline {
           clusterId,
           representative.getId()
         );
-        bestTweetInCluster.put(clusterId, representative.getId());
+        bestTweetInCluster.put(clusterId, representative);
       }
 
+      Random r = new Random(System.currentTimeMillis());
+      boolean retweet = (r.nextInt(10) <= 2);
       // TODO: this logic should be separated to special handler
       // TODO: which chooses best tweet in cluster and re-tweet or
       // TODO: creates new tweet based o  it.
       long bestCluster = countId.descendingMap().firstEntry().getValue();
-      long retweetId = bestTweetInCluster.get(bestCluster);
-      storage.savePublishedTweet(retweetId);
-      log.warn(
-        String.format(
-          "Re-tweeting [%d]",
-          retweetId
-        )
-      );
-      twitterClient.retweet(retweetId);
+      Tweet tweet = bestTweetInCluster.get(bestCluster);
+      if (retweet) {
+        storage.savePublishedTweet(tweet.getId());
+        log.warn(
+          String.format(
+            "Re-tweeting [%s]",
+            tweet
+          )
+        );
+        twitterClient.retweet(tweet.getId());
+      } else {
+        twitterClient.post(tweet);
+      }
 
     } catch (Exception e) {
       log.error("", e);

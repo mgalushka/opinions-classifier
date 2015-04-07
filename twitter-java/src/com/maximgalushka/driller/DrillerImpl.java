@@ -10,6 +10,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.HttpCoreContext;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 
@@ -22,6 +23,8 @@ import java.io.IOException;
  * @author Maxim Galushka
  */
 public class DrillerImpl implements Driller {
+
+  private static final Logger log = Logger.getLogger(DrillerImpl.class);
 
   @Override
   public String resolve(String url) throws IOException {
@@ -38,9 +41,17 @@ public class DrillerImpl implements Driller {
     HttpHost currentHost = (HttpHost) context.getAttribute(
       HttpCoreContext.HTTP_TARGET_HOST
     );
-    return (currentReq.getURI().isAbsolute()) ?
+    String resolved = (currentReq.getURI().isAbsolute()) ?
       currentReq.getURI().toString() : (
       currentHost.toURI() + currentReq.getURI());
+    log.debug(
+      String.format(
+        "Resolved from [%s] to [%s]",
+        url,
+        resolved
+      )
+    );
+    return resolved;
   }
 
   @Override

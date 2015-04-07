@@ -193,7 +193,7 @@ public class ClusteringPipeline {
       long bestCluster = countId.descendingMap().firstEntry().getValue();
       long retweetId = bestTweetInCluster.get(bestCluster);
       storage.savePublishedTweet(retweetId);
-      log.debug(
+      log.warn(
         String.format(
           "Re-tweeting [%d]",
           retweetId

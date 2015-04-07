@@ -19,12 +19,12 @@ public class HashtagsCount extends PatternCounterFeature {
   @Override
   public double metric(Long feature) {
     if (feature == 0) {
-      return 0D;
+      return 3D;
     }
-    if (feature <= 2) {
-      return 2D - feature;
+    if (feature <= 3) {
+      return 0;
     } else {
-      return 2D;
+      return 3D;
     }
   }
 }

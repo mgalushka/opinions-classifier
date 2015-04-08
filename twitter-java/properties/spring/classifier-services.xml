@@ -106,6 +106,7 @@
         <property name="cleaners">
             <list>
                 <bean class="com.maximgalushka.classifier.twitter.cleanup.impl.RetweetCleaner"/>
+                <bean class="com.maximgalushka.classifier.twitter.cleanup.impl.LongNumbersCleaner"/>
                 <bean class="com.maximgalushka.classifier.twitter.cleanup.impl.StartWithMentionsCleaner"/>
                 <bean class="com.maximgalushka.classifier.twitter.cleanup.impl.UnsupportedSymbolsCleaner"/>
                 <bean class="com.maximgalushka.classifier.twitter.cleanup.impl.LinksCleaner"/>

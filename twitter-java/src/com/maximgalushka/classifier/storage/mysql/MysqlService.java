@@ -188,7 +188,7 @@ public class MysqlService {
   }
 
   public Long getMaxRunId()
-    throws Exception {
+  throws Exception {
     try (Connection conn = this.datasource.getConnection()) {
       try (
         PreparedStatement stmt = conn.prepareStatement(
@@ -207,7 +207,7 @@ public class MysqlService {
   }
 
   public Long createNewCluster(Cluster cluster, long clusterRunId)
-    throws Exception {
+  throws Exception {
     try (Connection conn = this.datasource.getConnection()) {
       try (
         PreparedStatement stmt = conn.prepareStatement(
@@ -232,20 +232,21 @@ public class MysqlService {
   }
 
   public void saveTweetsClustersBatch(
+    long runId,
     long newClusterId,
     List<Tweet> tweetsInCluster
   ) {
     try (Connection conn = this.datasource.getConnection()) {
       try (
         PreparedStatement stmt = conn.prepareStatement(
-          "update tweets_all " +
-            "set cluster_id=? " +
-            "where id=?"
+          "insert into clusters_runs (run_id, tweet_id, cluster_id) " +
+            "values (?, ?, ?)"
         )
       ) {
         for (Tweet tweet : tweetsInCluster) {
-          stmt.setLong(1, newClusterId);
+          stmt.setLong(1, runId);
           stmt.setLong(2, tweet.getId());
+          stmt.setLong(3, newClusterId);
           stmt.addBatch();
         }
         stmt.executeBatch();
@@ -353,7 +354,7 @@ public class MysqlService {
   public List<Tweet> getLatestTweets(long hours) {
     return query(
       String.format(
-        "select id, cluster_id, content_json, tweet_cleaned, " +
+        "select id, content_json, tweet_cleaned, " +
           "created_timestamp " +
           "from tweets_all " +
           "where created_timestamp >= DATE_SUB(NOW(), INTERVAL %d HOUR) " +
@@ -377,11 +378,11 @@ public class MysqlService {
   public List<Tweet> getTweetsForRun(long runId) {
     return query(
       String.format(
-        "select t.id, t.cluster_id, t.content_json, t.tweet_cleaned, " +
+        "select t.id, t.content_json, t.tweet_cleaned, " +
           "t.created_timestamp " +
-          "from tweets_all t join tweets_clusters c " +
-          "on t.cluster_id = c.cluster_id " +
-          "where c.cluster_run_id = %d", runId
+          "from tweets_all t join clusters_run c " +
+          "on t.id = c.tweet_id " +
+          "where c.run_id = %d", runId
       ),
       set -> {
         List<Tweet> tweets = new ArrayList<>();

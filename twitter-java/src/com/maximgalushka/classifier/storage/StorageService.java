@@ -169,7 +169,7 @@ public class StorageService {
   ) {
     try {
       long clusterId = createNewCluster(cluster, nextRunId);
-      mysql.saveTweetsClustersBatch(clusterId, tweetsInCluster);
+      mysql.saveTweetsClustersBatch(nextRunId, clusterId, tweetsInCluster);
       return clusterId;
     } catch (Exception e) {
       log.error("", e);

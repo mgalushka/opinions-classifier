@@ -109,8 +109,9 @@ public class ClusteringPipeline {
     } else {
       log.info(
         String.format(
-          "Found [%d] clusters in database, starting clustering.",
-          latestHoursTweets.size()
+          "Found [%d] clusters in database for latest %d hours, starting clustering.",
+          latestHoursTweets.size(),
+          LATEST_HOURS
         )
       );
     }

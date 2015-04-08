@@ -188,7 +188,7 @@ public class MysqlService {
   }
 
   public Long getMaxRunId()
-  throws Exception {
+    throws Exception {
     try (Connection conn = this.datasource.getConnection()) {
       try (
         PreparedStatement stmt = conn.prepareStatement(
@@ -207,7 +207,7 @@ public class MysqlService {
   }
 
   public Long createNewCluster(Cluster cluster, long clusterRunId)
-  throws Exception {
+    throws Exception {
     try (Connection conn = this.datasource.getConnection()) {
       try (
         PreparedStatement stmt = conn.prepareStatement(
@@ -274,7 +274,7 @@ public class MysqlService {
           stmt.addBatch();
           counter++;
           if (counter % BATCH_SIZE == 0) {
-            log.debug(
+            log.trace(
               String.format(
                 "Saving batch number [%d]",
                 counter / BATCH_SIZE
@@ -283,6 +283,7 @@ public class MysqlService {
             stmt.executeBatch();
           }
         }
+        log.debug("Saved all batches with cleaned tweets.");
         stmt.executeBatch();
       }
     } catch (SQLException e) {
@@ -347,7 +348,7 @@ public class MysqlService {
   /**
    * Latest tweets for latest frame in hours
    *
-   * @param hours hours to find tweets from
+   * @param hours hours to find tweets from, no more then 5000 tweets.
    */
   public List<Tweet> getLatestTweets(long hours) {
     return query(
@@ -355,7 +356,8 @@ public class MysqlService {
         "select id, cluster_id, content_json, tweet_cleaned, " +
           "created_timestamp " +
           "from tweets_all " +
-          "where created_timestamp >= DATE_SUB(NOW(), INTERVAL %d HOUR)", hours
+          "where created_timestamp >= DATE_SUB(NOW(), INTERVAL %d HOUR) " +
+          "LIMIT 5000", hours
       ),
       set -> {
         List<Tweet> tweets = new ArrayList<>();

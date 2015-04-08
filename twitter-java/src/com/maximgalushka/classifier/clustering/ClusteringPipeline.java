@@ -157,8 +157,9 @@ public class ClusteringPipeline {
         }
         log.debug(
           String.format(
-            "Storing cluster in database: [%s]",
-            cluster.getLabel()
+            "Storing cluster in database: [%s], size = [%d]",
+            cluster.getLabel(),
+            cluster.getDocuments().size()
           )
         );
         // creates new cluster in database and associates all tweets with it
@@ -189,7 +190,7 @@ public class ClusteringPipeline {
       }
 
       Random r = new Random(System.currentTimeMillis());
-      boolean retweet = (r.nextInt(10) <= 3); // 30%
+      boolean retweet = (r.nextInt(10) <= 2); // 20%
       // TODO: this logic should be separated to special handler
       // TODO: which chooses best tweet in cluster and re-tweet or
       // TODO: creates new tweet based o  it.
@@ -205,7 +206,7 @@ public class ClusteringPipeline {
       }
       // TODO: randomize slightly to minimize clashes.
       // TODO: implement algorithm to eliminate posting what was already posted before.
-      int choice = r.nextInt(Math.min(size - 1, 3)) + 1;
+      int choice = r.nextInt(Math.min(size - 1, 4)) + 1;
       Object bestKey = countId.descendingMap().keySet().toArray()[choice];
       long bestCluster = countId.get(bestKey);
       Tweet tweet = bestTweetInCluster.get(bestCluster);

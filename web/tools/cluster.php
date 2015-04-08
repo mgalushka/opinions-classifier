@@ -3,12 +3,12 @@ header('Content-type: text/html; charset=utf-8');
 include 'db.php';
 include 'header.php';
 
-$cluster_id = $_REQUEST['cluster_id'];
-if (empty($cluster_id)) {
+if (!isset($_REQUEST['cluster_id'])) {
     echo 'No cluster_id passed.';
     exit;
 }
 
+$cluster_id = $_REQUEST['cluster_id'];
 $link = connect();
 
 $sql = sprintf('
@@ -26,14 +26,15 @@ while ($row = mysql_fetch_assoc($result)) {
 
 $sql = sprintf('
         SELECT
-            id,
-            cluster_id,
-            content_json,
-            tweet_cleaned,
-            features,
-            created_timestamp
-        FROM tweets_all
-        WHERE cluster_id = %s
+            t.id,
+            r.cluster_id,
+            t.content_json,
+            t.tweet_cleaned,
+            t.features,
+            DATE_FORMAT(t.created_timestamp, "%%Y-%%m-%%d %%H:%%i") as created_timestamp
+        FROM tweets_all t JOIN clusters_runs r
+          ON t.id = r.tweet_id
+        WHERE r.cluster_id = %s
         LIMIT 1000',
     $cluster_id
 );
@@ -48,7 +49,7 @@ if (!$result) {
 ?>
 <div class="page-header">
     <h1>All tweets for cluster
-        <small>cluster_id=<?= $cluster_id ?>, best=<?= $best_tweet?></small>
+        <small>cluster_id=<?= $cluster_id ?>, best=<?= $best_tweet ?></small>
     </h1>
 </div>
 <div class="container-fluid"><?
@@ -58,7 +59,7 @@ if (!$result) {
         $features = preg_replace('/,/', ', ', $row['features']);
         //$html_tweet = htmlentities(json_decode($row['content_json'], true)['text']);
         $best = '';
-        if($row['id'] == $best_tweet) $best = '<b>BEST</b>';
+        if ($row['id'] == $best_tweet) $best = '<b>BEST</b>';
         ?>
         <div class="row">
             <div class="col-md-2"><span><?= $row['id'] ?></span></div>

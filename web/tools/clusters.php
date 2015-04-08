@@ -14,16 +14,16 @@ $link = connect();
     $sql = sprintf('
     SELECT
         c.cluster_run_id,
-        date(c.updated_timestamp) AS dt,
+        DATE_FORMAT(c.updated_timestamp, "%%Y-%%m-%%d %%H:%%i") AS dt,
         count(DISTINCT c.cluster_id) AS clusters_count,
-        count(DISTINCT t.id) AS tweets_count
-    FROM tweets_clusters c JOIN tweets_all t ON c.cluster_id = t.cluster_id
+        count(DISTINCT r.tweet_id) AS tweets_count
+    FROM tweets_clusters c JOIN clusters_runs r ON c.cluster_id = r.cluster_id
     GROUP BY
         c.cluster_run_id,
         date(c.updated_timestamp)
     ORDER BY
         c.cluster_run_id DESC
-    LIMIT 10'
+    LIMIT 5'
     );
     $result = mysql_query($sql, $link);
     while ($row = mysql_fetch_assoc($result)) {
@@ -53,13 +53,13 @@ $link = connect();
 <?
 
 // getting cluster_id to display information for current cluster
-$cluster_run_id = $_REQUEST['run_id'];
+$cluster_run_id = isset($_REQUEST['run_id']) ? $_REQUEST['run_id'] : '';
 if (empty($cluster_run_id)) {
     $cluster_run_id = 0;
     $sql = sprintf('
         SELECT
-          max(cluster_run_id) AS max_run_id
-        FROM tweets_clusters',
+          max(run_id) AS max_run_id
+        FROM clusters_runs',
         $cluster_run_id
     );
     $result = mysql_query($sql, $link);
@@ -71,8 +71,8 @@ if (empty($cluster_run_id)) {
 $sql = sprintf('
     SELECT
         count(t.id) AS total_tweets
-    FROM tweets_clusters c JOIN tweets_all t ON c.cluster_id = t.cluster_id
-        WHERE cluster_run_id = %d',
+    FROM clusters_runs r JOIN tweets_all t ON r.tweet_id = t.id
+        WHERE r.run_id = %d',
     $cluster_run_id
 );
 $result = mysql_query($sql, $link);
@@ -84,8 +84,8 @@ while ($row = mysql_fetch_assoc($result)) {
 $sql = sprintf('
     SELECT
         count(1) AS total_clusters
-    FROM tweets_clusters c
-    WHERE cluster_run_id = %d',
+    FROM clusters_runs r
+    WHERE r.run_id = %d',
     $cluster_run_id
 );
 $result = mysql_query($sql, $link);
@@ -102,10 +102,10 @@ $sql = sprintf('
         c.is_displayed,
         c.cluster_run_id,
         c.updated_timestamp,
-        count(t.id) AS tweets_count
-    FROM tweets_clusters c JOIN tweets_all t
-      ON c.cluster_id = t.cluster_id
-    WHERE cluster_run_id = %d
+        count(r.tweet_id) AS tweets_count
+    FROM tweets_clusters c JOIN clusters_runs r
+      ON c.cluster_id = r.cluster_id
+    WHERE r.run_id = %d
     GROUP BY
       cluster_id,
       name,
@@ -114,7 +114,7 @@ $sql = sprintf('
       cluster_run_id,
       updated_timestamp
     ORDER BY
-      count(t.id) DESC
+      count(r.tweet_id) DESC
     LIMIT 1000',
     $cluster_run_id
 );

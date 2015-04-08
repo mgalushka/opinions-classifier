@@ -388,7 +388,7 @@ public class MysqlService {
         List<Tweet> tweets = new ArrayList<>();
         try {
           while (set.next()) {
-            tweets.add(gson.fromJson(set.getString(3), Tweet.class));
+            tweets.add(gson.fromJson(set.getString(2), Tweet.class));
           }
         } catch (SQLException e) {
           log.error(e);

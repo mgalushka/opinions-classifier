@@ -2,6 +2,25 @@
 
 include 'db.php';
 
+$scale = 'DAY';
+if (isset($_REQUEST['scale'])) {
+    $scale = $_REQUEST['scale'];
+}
+
+$scale_mysql_map = [
+    "MINUTE" => "%Y-%m-%d %H:%i",
+    "HOUR" => "%Y-%m-%d %H:00",
+    "DAY" => "%Y-%m-%d",
+    "MONTH" => "%Y-%m",
+];
+
+$scale_php_map = [
+    "MINUTE" => "Y-m-d H:i",
+    "HOUR" => "Y-m-d H:00",
+    "DAY" => "Y-m-d",
+    "MONTH" => "Y-m",
+];
+
 # ignore errors for image generation scripts
 error_reporting(0);
 ini_set('display_errors', 'Off');
@@ -11,28 +30,39 @@ date_default_timezone_set('Europe/London');
 
 $sys = strtoupper(PHP_OS);
 $JPGRAPH_ROOT = "/var/www/jpgraph-3.5.0b1/";
-if(substr($sys,0,3) == "WIN"){
+if (substr($sys, 0, 3) == "WIN") {
     $JPGRAPH_ROOT = "D:/dev/php/jpgraph-3.5.0b1.tar/jpgraph-3.5.0b1/";
 }
 require_once($JPGRAPH_ROOT . 'src/jpgraph.php');
 require_once($JPGRAPH_ROOT . 'src/jpgraph_line.php');
 
-$sql = '
-    select
-    unix_timestamp(date(created_timestamp)) as dt, count(1) as cnt
-    from tweets_all
-    where created_timestamp > DATE_SUB(now(), INTERVAL 30 DAY)
-    group by date(created_timestamp)
-    order by date(created_timestamp)
-';
+$sql = sprintf('
+    SELECT
+      unix_timestamp(DATE_FORMAT(created_timestamp, \'%s\')) AS dt,
+      count(id) AS cnt
+    FROM tweets_all
+    WHERE
+      created_timestamp > DATE_SUB(now(), INTERVAL 120 %s)
+    GROUP BY DATE_FORMAT(created_timestamp, \'%s\')
+    ORDER BY DATE_FORMAT(created_timestamp, \'%s\')
+    ',
+    $scale_mysql_map[$scale],
+    $scale,
+    $scale_mysql_map[$scale],
+    $scale_mysql_map[$scale]
+);
+
 $link = connect();
 $result = mysql_query($sql, $link);
 $xdata = array();
 $ydata = array();
 
-// Some userdefined human readable version of the timestamp
-function formatDate(&$aVal) {
-    $aVal = date('Y-m-d', $aVal);
+// Some user defined human readable version of the timestamp
+function formatDate(&$aVal)
+{
+    global $scale;
+    global $scale_php_map;
+    $aVal = date($scale_php_map[$scale], $aVal);
 }
 
 while ($rows = mysql_fetch_array($result)) {
@@ -40,8 +70,7 @@ while ($rows = mysql_fetch_array($result)) {
     array_push($ydata, $rows['cnt']);
 }
 
-array_walk($xdata,'formatDate');
-
+array_walk($xdata, 'formatDate');
 
 
 // Size of the overall graph
@@ -64,6 +93,4 @@ $graph->Add($lineplot);
 $graph->img->SetImgFormat('png');
 
 // Display the graph
-$graph->Stroke()
-
-?>
+$graph->Stroke();

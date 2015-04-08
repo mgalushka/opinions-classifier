@@ -7,19 +7,19 @@ if (isset($_REQUEST['scale'])) {
     $scale = $_REQUEST['scale'];
 }
 
-$scale_mysql_map = [
+$scale_mysql_map = array(
     "MINUTE" => "%Y-%m-%d %H:%i",
     "HOUR" => "%Y-%m-%d %H:00",
     "DAY" => "%Y-%m-%d",
     "MONTH" => "%Y-%m",
-];
+);
 
-$scale_php_map = [
+$scale_php_map = array(
     "MINUTE" => "Y-m-d H:i",
     "HOUR" => "Y-m-d H:00",
     "DAY" => "Y-m-d",
     "MONTH" => "Y-m",
-];
+);
 
 # ignore errors for image generation scripts
 error_reporting(0);

@@ -7,7 +7,7 @@ import com.maximgalushka.classifier.twitter.best.features.WordCount;
 import com.maximgalushka.classifier.twitter.model.Tweet;
 import org.apache.log4j.Logger;
 import org.junit.Test;
-import org.testng.Assert;
+import org.junit.Assert;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;

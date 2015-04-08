@@ -12,10 +12,10 @@
     <bean id="settings"
           class="com.maximgalushka.classifier.twitter.LocalSettings"/>
 
-    <bean id="memcached"
+    <!--bean id="memcached"
           class="com.maximgalushka.classifier.storage.memcached.MemcachedService">
         <property name="settings" ref="settings"/>
-    </bean>
+    </bean-->
 
     <bean id="mysql-datasource"
           class="org.apache.commons.dbcp2.BasicDataSource">
@@ -54,7 +54,7 @@
 
     <bean id="storage"
           class="com.maximgalushka.classifier.storage.StorageService">
-        <property name="memcached" ref="memcached"/>
+        <!--property name="memcached" ref="memcached"/-->
         <property name="mysql" ref="mysql"/>
     </bean>
 

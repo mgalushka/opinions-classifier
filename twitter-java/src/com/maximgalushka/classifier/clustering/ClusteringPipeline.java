@@ -188,11 +188,25 @@ public class ClusteringPipeline {
       }
 
       Random r = new Random(System.currentTimeMillis());
-      boolean retweet = (r.nextInt(10) <= 2);
+      boolean retweet = (r.nextInt(10) <= 3); // 30%
       // TODO: this logic should be separated to special handler
       // TODO: which chooses best tweet in cluster and re-tweet or
       // TODO: creates new tweet based o  it.
-      long bestCluster = countId.descendingMap().firstEntry().getValue();
+      int size = countId.size();
+      if (size <= 1) {
+        log.error(
+          String.format(
+            "Cannot find best from collection, too low number of elements: [%d]",
+            size
+          )
+        );
+        return;
+      }
+      // TODO: randomize slightly to minimize clashes.
+      // TODO: implement algorithm to eliminate posting what was already posted before.
+      int choice = r.nextInt(Math.min(size - 1, 3)) + 1;
+      Object bestKey = countId.descendingMap().keySet().toArray()[choice];
+      long bestCluster = countId.get(bestKey);
       Tweet tweet = bestTweetInCluster.get(bestCluster);
       storage.savePublishedTweet(tweet, retweet);
       if (retweet) {

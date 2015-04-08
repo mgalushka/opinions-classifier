@@ -5,8 +5,10 @@ import org.carrot2.core.Cluster;
 import java.util.List;
 
 /**
+ * TODO:
  * @author Maxim Galushka
  */
+@Deprecated
 public class BestClusterFinder {
 
   /**

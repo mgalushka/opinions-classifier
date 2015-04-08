@@ -3,5 +3,5 @@ package com.maximgalushka.classifier.twitter.best.features;
 /**
  * TODO:
  */
-public class HasUrlFeature {
+public class HasImageFeature {
 }

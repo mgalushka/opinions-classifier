@@ -121,7 +121,7 @@ public class MainServiceStart implements Container {
     );
     pool.scheduleAtFixedRate(
       pipeline::clusterFromStorage,
-      0, 30, TimeUnit.MINUTES
+      0, 20, TimeUnit.MINUTES
     );
 
     // TODO: add credentials to be able to shutdown server

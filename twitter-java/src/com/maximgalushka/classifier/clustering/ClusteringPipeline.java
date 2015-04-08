@@ -81,11 +81,11 @@ public class ClusteringPipeline {
     this.twitterClient = twitterClient;
   }
 
-  private static final int LATEST_HOURS = 24;
+  private static final int LATEST_HOURS = 4;
 
   /**
    * Business method:
-   * retrieved tweets for latest 24 hours and apply
+   * retrieved tweets for latest X hours and apply
    * clustering algorithm to them, then store clusters back to
    * database.
    */

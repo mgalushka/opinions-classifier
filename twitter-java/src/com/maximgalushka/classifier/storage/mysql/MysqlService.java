@@ -358,7 +358,7 @@ public class MysqlService {
           "created_timestamp " +
           "from tweets_all " +
           "where created_timestamp >= DATE_SUB(NOW(), INTERVAL %d HOUR) " +
-          "LIMIT 5000", hours
+          "LIMIT 2000", hours
       ),
       set -> {
         List<Tweet> tweets = new ArrayList<>();

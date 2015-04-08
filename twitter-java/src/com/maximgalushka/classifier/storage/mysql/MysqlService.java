@@ -364,9 +364,9 @@ public class MysqlService {
         List<Tweet> tweets = new ArrayList<>();
         try {
           while (set.next()) {
-            tweets.add(gson.fromJson(set.getString(3), Tweet.class));
+            tweets.add(gson.fromJson(set.getString(2), Tweet.class));
           }
-        } catch (SQLException e) {
+        } catch (Exception e) {
           log.error(e);
           e.printStackTrace();
         }
@@ -409,7 +409,7 @@ public class MysqlService {
       stmt = conn.prepareStatement(sql);
       rset = stmt.executeQuery();
       return callback.process(rset);
-    } catch (SQLException e) {
+    } catch (Exception e) {
       e.printStackTrace();
     } finally {
       try {

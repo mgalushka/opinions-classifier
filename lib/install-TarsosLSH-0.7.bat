@@ -1,0 +1,1 @@
+mvn install:install-file -Dfile=TarsosLSH-0.7.jar -DgroupId=be.tarsos -DartifactId=tarsos-lhs -Dversion=0.7 -Dpackaging=jar

@@ -52,6 +52,12 @@
         </dependency>
 
         <dependency>
+            <groupId>be.tarsos</groupId>
+            <artifactId>tarsos-lhs</artifactId>
+            <version>0.7</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.carrot2</groupId>
             <artifactId>carrot2-core</artifactId>
             <version>3.9.3</version>

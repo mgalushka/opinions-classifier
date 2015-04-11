@@ -1,3 +1,3 @@
 #!/bin/bash   
 
-/usr/bin/nc localhost 8091 | echo 0
+/usr/bin/nc localhost 8093 | echo 0

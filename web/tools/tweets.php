@@ -52,13 +52,13 @@ $link = connect();
         $tweet_json = preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $row['content_json']);
         $tweet_json_read = preg_replace('/,/', ', ', $tweet_json);
         $features = preg_replace('/,/', ', ', $row['features']);
-        $tweet_author = htmlentities(json_decode($row['content_json'], true)['author']);
-        $tweet_author = htmlentities(json_decode($row['content_json'], true)['author']);
+        $tweet_author = htmlentities(json_decode($row['content_json'], true)['user']['name']);
+        $tweet_login = htmlentities(json_decode($row['content_json'], true)['user']['screen_name']);
         ?>
         <div id="row_<?= $id ?>" class="row">
             <div class="col-md-9 col-xs-9">
                 <div class="panel panel-default">
-                    <div class="panel-heading"><?= $tweet_author ?></div>
+                    <div class="panel-heading"><?= $tweet_login ?> (<?= $tweet_author ?>)</div>
                     <div id="text_<?= $id ?>" class="panel-body"><?= $row['tweet_cleaned'] ?></div>
                     <div class="panel-footer"><?= $row['created_timestamp'] ?></div>
                 </div>
@@ -76,6 +76,34 @@ $link = connect();
     <?
     }
     ?>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="edit-tweet-modal" tabindex="-1" role="dialog" aria-labelledby="edit-tweet-modal-label"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Edit tweet</h4>
+            </div>
+            <div class="modal-body">
+                <form class="navbar-form navbar-left" role="search">
+                    <div class="form-group">
+                        <label>
+                            <textarea id="original-tweet" rows="5" cols="50"></textarea>
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button id="schedule_tweet_id" data-tweet="" type="button" class="btn btn-primary" data-dismiss="modal">
+                    Schedule
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <?php

@@ -76,7 +76,7 @@ public class TwitterEasyApi implements Container {
       if("update".equals(action)){
         Tweet original = storage.getTweetById(tweetId);
         Tweet updated = new Tweet(tweetId, text);
-        storage.scheduleTweet(original, updated, false);
+        storage.scheduleTweet(updated, original, false);
       }
       body.println(gson.toJson("OK"));
       body.close();

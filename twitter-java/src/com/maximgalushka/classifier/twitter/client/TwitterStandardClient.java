@@ -39,6 +39,7 @@ import javax.ws.rs.client.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.*;
 
@@ -202,7 +203,7 @@ public class TwitterStandardClient implements StreamClient {
     StatusesFilterEndpoint hosebirdEndpoint = new StatusesFilterEndpoint();
     // Optional: set up some followings and track terms
     //List<Long> followings = Lists.newArrayList(1234L, 566788L);
-    List<String> terms = Lists.newArrayList(term);
+    List<String> terms = Arrays.asList(term.split(","));
     List<String> languages = Lists.newArrayList("en");
     //hosebirdEndpoint.followings(followings);
     hosebirdEndpoint.trackTerms(terms);

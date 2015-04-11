@@ -84,7 +84,12 @@ public class TwitterStreamProcessor implements Runnable {
     BlockingQueue<Tweet> q = new ArrayBlockingQueue<>(1000);
     // twitter steam client is infinitely sends messages to this queue
     // in separate thread and we will read from it and process
-    streamClient.stream("Ukraine", q);
+    streamClient.stream(
+      settings.value(
+        LocalSettings.TWITTER_KEYWORDS
+      ),
+      q
+    );
 
     int BATCH_SIZE = 100;
 

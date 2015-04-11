@@ -187,6 +187,57 @@ public class MysqlService {
     }
   }
 
+  public Tweet getTweetById(long tweetId) {
+    return query(
+      String.format(
+        "select id, content_json, tweet_cleaned, " +
+          "created_timestamp " +
+          "from tweets_all " +
+          "where id = %d ",
+        tweetId
+      ),
+      set -> {
+        Tweet tweet = null;
+        try {
+          if (set.next()) {
+            tweet = gson.fromJson(set.getString(2), Tweet.class);
+          }
+        } catch (Exception e) {
+          log.error(e);
+          e.printStackTrace();
+        }
+        return tweet;
+      }
+    );
+
+  }
+
+  public void scheduleTweet(
+    Tweet tweet,
+    Tweet original,
+    boolean retweet
+  ) {
+    try (Connection conn = this.datasource.getConnection()) {
+      try (
+        PreparedStatement stmt = conn.prepareStatement(
+          "insert into tweets_scheduled " +
+            "(id, text, original_json, retweet, published, " +
+            "scheduled_timestamp) " +
+            "values (?, ?, ?, ?, 0, now())"
+        )
+      ) {
+        stmt.setLong(1, tweet.getId());
+        stmt.setString(2, tweet.getText());
+        stmt.setString(3, gson.toJson(original));
+        stmt.setInt(4, retweet ? 1 : 0);
+        stmt.executeUpdate();
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+
+  }
+
   public Long getMaxRunId()
   throws Exception {
     try (Connection conn = this.datasource.getConnection()) {

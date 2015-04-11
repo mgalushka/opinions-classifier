@@ -26,8 +26,11 @@ public class LocalSettings {
   public static final String USE_PROXY = "useproxy";
   public static final String INTEGRATION_TESTING = "integration.testing";
 
+  public static final String EASY_WEB_PORT = "easy.web.port";
   public static final String WEB_PORT = "service.web.port";
   public static final String SHUTDOWN_PORT = "service.shutdown.port";
+
+  public static final String TWITTER_KEYWORDS = "twitter.monitor.keywords";
 
   public static final String MEMCACHED_HOST = "memcached.host";
   public static final String MEMCACHED_PORT = "memcached.port";

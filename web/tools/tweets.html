@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Stats</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link href="css/bootstrap-theme.min.css" rel="stylesheet" media="screen">
+</head>
+<body>
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">TweetMaster</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li class="active"><a href="#">Suggested</a></li>
+                <li><a href="#">Deleted</a></li>
+                <li><a href="#">Settings</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container-fluid -->
+</nav>
+<div id="error" class="alert alert-danger alert-dismissible fade in hide" role="alert">
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+    <p>Error storing your update, try later</p>
+</div>
+
+<div class="container-fluid">
+    <div id="row_123" class="row">
+        <div class="col-md-9 col-xs-9">
+            <div class="panel panel-default">
+                <div class="panel-heading">@maria_engstrom</div>
+                <div id="text_123" class="panel-body">
+                    10 more questions Russian military pose to Ukraine, US & @EliotHiggins over MH17 crash:
+                </div>
+                <div class="panel-footer">2015-04-11 16:01</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-xs-3">
+            <div class="btn-group-vertical" role="group" aria-label="...">
+                <button data-id="123" data-action="retweet" type="button" class="btn btn-lg retweet">RT</button>
+                <button data-id="123" data-action="update" data-toggle="modal" data-target="#edit-tweet-modal"
+                        type="button"
+                        class="btn btn-lg">TW
+                </button>
+                <button data-id="123" data-action="delete" type="button" class="btn btn-lg btn-danger">DEL</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="row_1234" class="row">
+        <div class="col-md-9 col-xs-9">
+            <div class="panel panel-default">
+                <div class="panel-heading">@maria_engstrom</div>
+                <div id="text_1234" class="panel-body">
+                    10 more questions Russian military pose to Ukraine, US & @EliotHiggins over MH17 crash:
+                </div>
+                <div class="panel-footer">2015-04-11 16:01</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-xs-3">
+            <div class="btn-group-vertical" role="group" aria-label="...">
+                <button data-id="1234" data-action="retweet" type="button" class="btn btn-lg">RT</button>
+                <button data-id="1234" data-action="update" data-toggle="modal" data-target="#edit-tweet-modal"
+                        type="button" class="btn btn-lg">TW
+                </button>
+                <button data-id="1234" data-action="delete" type="button" class="btn btn-lg btn-danger">DEL</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="edit-tweet-modal" tabindex="-1" role="dialog" aria-labelledby="edit-tweet-modal-label"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Edit tweet</h4>
+            </div>
+            <div class="modal-body">
+                <form class="navbar-form navbar-left" role="search">
+                    <div class="form-group">
+                        <label>
+                            <textarea id="original-tweet" rows="5" cols="50"></textarea>
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button id="schedule_tweet_id" data-tweet="" type="button" class="btn btn-primary" data-dismiss="modal">
+                    Schedule
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="http://code.jquery.com/jquery.js"></script>
+<script type="text/javascript" src="js/bootstrap.min.js"></script>
+<script type="text/javascript" src="js/ui.js"></script>
+<script type="text/javascript" src="js/program.js"></script>
+</body>
+</html>

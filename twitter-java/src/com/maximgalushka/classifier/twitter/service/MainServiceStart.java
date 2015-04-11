@@ -10,10 +10,16 @@ import org.apache.log4j.Logger;
 import org.simpleframework.http.Request;
 import org.simpleframework.http.Response;
 import org.simpleframework.http.core.Container;
+import org.simpleframework.http.core.ContainerServer;
+import org.simpleframework.transport.Server;
+import org.simpleframework.transport.connect.Connection;
+import org.simpleframework.transport.connect.SocketConnection;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.io.PrintStream;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -109,6 +115,17 @@ public class MainServiceStart implements Container {
     connection.connect(address);
     log.debug(String.format("Server started on port [%d]", port));
     */
+
+    TwitterEasyApi container = (TwitterEasyApi) ac.getBean("easy-api");
+    Server server = new ContainerServer(container);
+    Connection connection = new SocketConnection(server);
+
+    int port = Integer.valueOf(
+      container.settings.value(LocalSettings.EASY_WEB_PORT)
+    );
+    SocketAddress address = new InetSocketAddress(port);
+    connection.connect(address);
+    log.debug(String.format("Easy API server started on port [%d]", port));
 
     TwitterStreamProcessor processor = (TwitterStreamProcessor)
       ac.getBean("twitter-stream-processor");

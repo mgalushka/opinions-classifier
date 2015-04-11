@@ -189,6 +189,8 @@ public class ClusteringPipeline {
         bestTweetInCluster.put(clusterId, representative);
       }
 
+      // TODO: we have pivoted and don't publish tweets as part of clustering job anymore
+      /**
       Random r = new Random(System.currentTimeMillis());
       boolean retweet = (r.nextInt(10) <= 2); // 20%
       // TODO: this logic should be separated to special handler
@@ -228,6 +230,7 @@ public class ClusteringPipeline {
         );
         twitterClient.post(tweet);
       }
+       */
 
     } catch (Exception e) {
       log.error("", e);

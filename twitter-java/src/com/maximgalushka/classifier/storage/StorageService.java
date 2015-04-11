@@ -142,6 +142,10 @@ public class StorageService {
     return mysql.getLatestTweets(hours);
   }
 
+  public Tweet getTweetById(long tweetId) {
+    return mysql.getTweetById(tweetId);
+  }
+
   public void saveTweetsBatch(Collection<Tweet> tweets) {
     mysql.saveTweetsBatch(tweets);
   }
@@ -207,5 +211,21 @@ public class StorageService {
 
   public void savePublishedTweet(Tweet tweet, boolean retweet) {
     mysql.savePublishedTweet(tweet, retweet);
+  }
+
+  public void scheduleTweet(Tweet tweet, Tweet original, boolean retweet) {
+    if (retweet) {
+      if (!tweet.getText().equals(original.getText())) {
+        throw new IllegalArgumentException(
+          String.format(
+            "When re-tweeting ensure that tweet and original have same texts," +
+              " tweet: [%s], original: [%s]",
+            tweet.getText(),
+            original.getText()
+          )
+        );
+      }
+    }
+    mysql.scheduleTweet(tweet, original, retweet);
   }
 }

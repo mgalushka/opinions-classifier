@@ -2,7 +2,7 @@
 
 CLASSPATH="./target/dependency/*:./target/opinions-tweets-classifier-1.0.jar"
 JAVA_MEM="-Xms256M -Xmx512M"
-JAVA_JMX="-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false"
+# JAVA_JMX="-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false"
 JAVA_GC="-verbose:gc"
 
 

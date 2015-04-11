@@ -2,7 +2,7 @@ var tt = tt || {};
 
 tt.core = function () {
 
-    var API = "http://localhost:8092/easy";
+    var API = "http://warua.org:8092/easy";
 
     var showSuccess = function (obj) {
         obj.addClass('btn-success');

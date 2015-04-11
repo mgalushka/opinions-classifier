@@ -202,7 +202,7 @@ public class TwitterStandardClient implements StreamClient {
     StatusesFilterEndpoint hosebirdEndpoint = new StatusesFilterEndpoint();
     // Optional: set up some followings and track terms
     //List<Long> followings = Lists.newArrayList(1234L, 566788L);
-    List<String> terms = Lists.newArrayList("ukraine");
+    List<String> terms = Lists.newArrayList(term);
     List<String> languages = Lists.newArrayList("en");
     //hosebirdEndpoint.followings(followings);
     hosebirdEndpoint.trackTerms(terms);

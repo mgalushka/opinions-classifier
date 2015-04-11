@@ -91,7 +91,7 @@ public class TwitterStreamProcessor implements Runnable {
       q
     );
 
-    int BATCH_SIZE = 5; // much slow for ML domain
+    int BATCH_SIZE = 20; // much slow for ML domain
 
     // TODO: experiment to find better ratio
     //int STEP = BATCH_SIZE / 20;

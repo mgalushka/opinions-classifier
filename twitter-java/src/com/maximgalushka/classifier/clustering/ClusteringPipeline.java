@@ -81,7 +81,7 @@ public class ClusteringPipeline {
     this.twitterClient = twitterClient;
   }
 
-  private static final int LATEST_HOURS = 24;
+  private static final int LATEST_HOURS = 6;
 
   /**
    * Business method:

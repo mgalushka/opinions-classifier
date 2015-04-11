@@ -101,6 +101,7 @@ public class TwitterStreamProcessor implements Runnable {
     while (!this.stopping) {
       try {
         Tweet tweet = q.take();
+        log.debug(tweet);
         if (batch.size() >= BATCH_SIZE) {
           storage.saveTweetsBatch(batch);
           batch.clear();

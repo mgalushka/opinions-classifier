@@ -96,13 +96,9 @@ $link = connect();
                 <h4 class="modal-title" id="myModalLabel">Edit tweet</h4>
             </div>
             <div class="modal-body">
-                <form class="navbar-form navbar-left" role="search">
-                    <div class="form-group">
-                        <label>
-                            <textarea id="original-tweet" rows="5" cols="50"></textarea>
-                        </label>
-                    </div>
-                </form>
+                <div class="form-group">
+                    <textarea id="original-tweet" class="form-control"></textarea>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>

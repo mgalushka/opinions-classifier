@@ -18,11 +18,11 @@ $(document).ready(function () {
     $('#edit-tweet-modal').on('show.bs.modal', function (event) {
         var button = $(event.relatedTarget); // Button that triggered the modal
         var tweetId = button.attr('data-id');
-        var originalTweet = $('#text_' + tweetId).text();
+        var originalTweet = $('#text_' + tweetId).text().replace(/ +/g,"").trim();
         console.log("Original tweet: " + originalTweet);
 
         var modal = $(this);
-        modal.find('#original-tweet').val(originalTweet.trim());
+        modal.find('#original-tweet').val(originalTweet);
         console.log("Textarea: " + modal.find('#original-tweet').val());
         // var recipient = button.data('whatever'); // Extract info from data-* attributes
         // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).

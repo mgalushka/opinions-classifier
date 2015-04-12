@@ -142,6 +142,14 @@
         <property name="storage" ref="storage"/>
     </bean>
 
+    <bean id="scheduler"
+          class="com.maximgalushka.classifier.twitter.service.TweetPublishScheduler">
+        <property name="settings" ref="settings"/>
+        <property name="storage" ref="storage"/>
+        <property name="twitter" ref="twitter-stream-client"/>
+    </bean>
+
+
     <bean id="easy-api"
           class="com.maximgalushka.classifier.twitter.service.TwitterEasyApi">
         <property name="settings" ref="settings"/>

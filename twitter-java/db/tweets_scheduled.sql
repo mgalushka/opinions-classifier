@@ -6,8 +6,9 @@ CREATE TABLE `tweets_scheduled` (
 	`original_json` TEXT NULL,
 	`retweet` TINYINT(4) NULL DEFAULT NULL,
 	`published` TINYINT(4) NOT NULL DEFAULT '0',
-	`scheduled_timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	`published_timestamp` TIMESTAMP NOT NULL DEFAULT '0000-00-00 00:00:00',
+	`created_timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	`scheduled_timestamp` TIMESTAMP NULL DEFAULT NULL,
+	`published_timestamp` TIMESTAMP NULL DEFAULT NULL,
 	PRIMARY KEY (`id`),
 	UNIQUE INDEX `published_id_index` (`published_id`),
 	UNIQUE INDEX `text_index` (`text`(100))

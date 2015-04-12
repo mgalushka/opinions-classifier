@@ -4,11 +4,13 @@ import com.maximgalushka.classifier.storage.memcached.MemcachedService;
 import com.maximgalushka.classifier.storage.mysql.MysqlService;
 import com.maximgalushka.classifier.twitter.clusters.Clusters;
 import com.maximgalushka.classifier.twitter.clusters.TweetsCluster;
+import com.maximgalushka.classifier.twitter.model.ScheduledTweet;
 import com.maximgalushka.classifier.twitter.model.Tweet;
 import org.apache.log4j.Logger;
 import org.carrot2.core.Cluster;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -231,5 +233,25 @@ public class StorageService {
 
   public void unpublishTweetCluster(long tweetId) {
     mysql.unpublishTweetCluster(tweetId);
+  }
+
+  public List<ScheduledTweet> getUnscheduledTweets() {
+    return mysql.getUnscheduledTweets();
+  }
+
+  public List<ScheduledTweet> getScheduledUnpublishedTweets() {
+    return mysql.getScheduledUnpublishedTweets();
+  }
+
+  public Date getLatestPublishedOrScheduledTimestamp(boolean retweet) {
+    return mysql.getLatestPublishedOrScheduledTimestamp(retweet);
+  }
+
+  public void updateScheduled(long id, Date scheduled) {
+    mysql.updateScheduled(id, scheduled);
+  }
+
+  public void updatePublished(long id, long publishedId) {
+    mysql.updatePublished(id, publishedId);
   }
 }

@@ -31,6 +31,10 @@ $link = connect();
     <!-- /.container-fluid -->
 </nav>
 
+<div class="page-header">
+    <h3>Example page header <small>Subtext for header</small></h3>
+</div>
+
 <div class="container-fluid">
     <?
     $sql = sprintf('

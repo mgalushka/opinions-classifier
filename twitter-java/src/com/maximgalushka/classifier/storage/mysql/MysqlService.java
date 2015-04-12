@@ -2,6 +2,7 @@ package com.maximgalushka.classifier.storage.mysql;
 
 import com.google.gson.Gson;
 import com.maximgalushka.classifier.twitter.clusters.Clusters;
+import com.maximgalushka.classifier.twitter.model.ScheduledTweet;
 import com.maximgalushka.classifier.twitter.model.Tweet;
 import org.apache.log4j.Logger;
 import org.carrot2.core.Cluster;
@@ -209,7 +210,6 @@ public class MysqlService {
         return tweet;
       }
     );
-
   }
 
   public void scheduleTweet(
@@ -221,9 +221,9 @@ public class MysqlService {
       try (
         PreparedStatement stmt = conn.prepareStatement(
           "insert into tweets_scheduled " +
-            "(id, text, original_json, retweet, published, " +
-            "scheduled_timestamp) " +
-            "values (?, ?, ?, ?, 0, now())"
+            "(id, text, original_json, retweet, scheduled, published, " +
+            "created_timestamp) " +
+            "values (?, ?, ?, ?, 0, 0, now())"
         )
       ) {
         stmt.setLong(1, tweet.getId());
@@ -253,6 +253,114 @@ public class MysqlService {
       e.printStackTrace();
     }
   }
+
+  public void updateScheduled(long id, Date scheduled) {
+    try (Connection conn = this.datasource.getConnection()) {
+      try (
+        PreparedStatement stmt = conn.prepareStatement(
+          "update tweets_scheduled " +
+            "set scheduled = 1, " +
+            "scheduled_timestamp = ? " +
+            "where id = ? "
+        )
+      ) {
+        stmt.setTimestamp(1, new java.sql.Timestamp(scheduled.getTime()));
+        stmt.setLong(2, id);
+        stmt.executeUpdate();
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+  }
+
+  public void updatePublished(long id, long publishedId) {
+    try (Connection conn = this.datasource.getConnection()) {
+      try (
+        PreparedStatement stmt = conn.prepareStatement(
+          "update tweets_scheduled " +
+            "set published = 1, " +
+            "published_id = ?, " +
+            "published_timestamp = now() " +
+            "where id = ? "
+        )
+      ) {
+        stmt.setLong(1, publishedId);
+        stmt.setLong(2, id);
+        stmt.executeUpdate();
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+  }
+
+  public List<ScheduledTweet> getUnscheduledTweets() {
+    return scheduledQuery(
+      "select id, text, original_json, retweet, scheduled_timestamp " +
+        "from tweets_scheduled " +
+        "where scheduled = 0"
+    );
+  }
+
+  public List<ScheduledTweet> getScheduledUnpublishedTweets() {
+    return scheduledQuery(
+      "select id, text, original_json, retweet, scheduled_timestamp " +
+        "from tweets_scheduled " +
+        "where scheduled = 1 and published = 0"
+    );
+  }
+
+  private List<ScheduledTweet> scheduledQuery(String query) {
+    return query(
+      query,
+      set -> {
+        List<ScheduledTweet> unscheduled = new ArrayList<>();
+        try {
+          while (set.next()) {
+            long id = set.getLong(1);
+            String text = set.getString(2);
+            Tweet original = gson.fromJson(set.getString(3), Tweet.class);
+            boolean retweet = (set.getInt(4) == 1);
+            if (!retweet) {
+              original.setText(text);
+            }
+            ScheduledTweet scheduled = new ScheduledTweet(original, retweet);
+            scheduled.setScheduled(set.getTimestamp(5));
+            unscheduled.add(scheduled);
+          }
+        } catch (Exception e) {
+          log.error(e);
+          e.printStackTrace();
+        }
+        return unscheduled;
+      }
+    );
+  }
+
+  public Date getLatestPublishedOrScheduledTimestamp(boolean retweet) {
+    return query(
+      String.format(
+        "select " +
+          "  coalesce(max(scheduled_timestamp), now()) as latest " +
+          "  from " +
+          "    tweets_scheduled " +
+          "  where (published = 1 or scheduled = 1) and retweet = %d",
+        retweet ? 1 : 0
+      ),
+      set -> {
+        Date latest = new Date();
+        try {
+          if (set.next()) {
+            latest = set.getTimestamp(1);
+          }
+        } catch (Exception e) {
+          log.error(e);
+          e.printStackTrace();
+        }
+        return latest;
+      }
+    );
+  }
+
 
   public Long getMaxRunId()
   throws Exception {

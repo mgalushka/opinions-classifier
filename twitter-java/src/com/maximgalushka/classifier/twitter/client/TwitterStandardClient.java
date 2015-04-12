@@ -278,7 +278,12 @@ public class TwitterStandardClient implements StreamClient {
     return twitter.retweetStatus(tweetId);
   }
 
-  public Status post(Tweet tweet) throws Exception {
+  public Status post(
+    Tweet tweet,
+    boolean attachUrl,
+    boolean attachImage
+  )
+  throws Exception {
     if (underTest) {
       return testingStub(null);
     }
@@ -288,29 +293,33 @@ public class TwitterStandardClient implements StreamClient {
     Twitter twitter = TwitterFactory.getSingleton();
 
     String updateText = tweet.getText();
-    // TODO: hard-coded max URL length.
-    if (updateText.length() <= (140 - 24) &&
-      tweet.getEntities().getUrls() != null &&
-      !tweet.getEntities().getUrls().isEmpty()) {
-      String firstUrl = tweet.getEntities().getUrls().get(0).getUrl();
-      String resolved = driller.resolve(firstUrl);
-      updateText = String.format(
-        "%s %s",
-        tweet.getText(),
-        resolved
-      );
+    if (attachUrl) {
+      // TODO: hard-coded max URL length.
+      if (updateText.length() <= (140 - 24) &&
+        tweet.getEntities().getUrls() != null &&
+        !tweet.getEntities().getUrls().isEmpty()) {
+        String firstUrl = tweet.getEntities().getUrls().get(0).getUrl();
+        String resolved = driller.resolve(firstUrl);
+        updateText = String.format(
+          "%s %s",
+          tweet.getText(),
+          resolved
+        );
+      }
     }
     StatusUpdate update = new StatusUpdate(updateText);
 
-    if (tweet.getEntities().getMedia() != null &&
-      !tweet.getEntities().getMedia().isEmpty()) {
-      for (Media media : tweet.getEntities().getMedia()) {
-        File temp = File.createTempFile("download_", "");
-        // TODO: rethink - as resources are not indefinite
-        // TODO: track where attached fiels are stored
-        // TODO: temp.deleteOnExit();
-        helper.download(media.getUrl(), temp);
-        update.setMedia(temp);
+    if (attachImage) {
+      if (tweet.getEntities().getMedia() != null &&
+        !tweet.getEntities().getMedia().isEmpty()) {
+        for (Media media : tweet.getEntities().getMedia()) {
+          File temp = File.createTempFile("download_", "");
+          // TODO: rethink - as resources are not indefinite
+          // TODO: track where attached fiels are stored
+          // TODO: temp.deleteOnExit();
+          helper.download(media.getUrl(), temp);
+          update.setMedia(temp);
+        }
       }
     }
 

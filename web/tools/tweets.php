@@ -39,13 +39,20 @@ $link = connect();
             t.content_json,
             t.tweet_cleaned,
             t.features,
-            DATE_FORMAT(t.created_timestamp, "%%Y-%%m-%%d %%H:%%i") AS created_timestamp
+            DATE_FORMAT(t.created_timestamp, "%%Y-%%m-%%d %%H:%%i") AS created_timestamp,
+            count(r.tweet_id) as tweets_in_cluster
         FROM
             tweets_clusters c JOIN tweets_all t
             ON c.best_tweet_id = t.id
+            JOIN clusters_runs r
+            ON c.cluster_id = r.cluster_id
         WHERE
             c.cluster_run_id = (SELECT max(cluster_run_id) FROM tweets_clusters) AND
             c.is_displayed = 1
+        GROUP BY
+          1, 2, 3, 4, 5
+        ORDER BY
+          count(r.tweet_id) DESC
     ');
     $result = mysqli_query($link, $sql);
     while ($row = mysqli_fetch_assoc($result)) {
@@ -60,7 +67,10 @@ $link = connect();
         <div id="row_<?= $id ?>" class="row">
             <div class="col-md-9 col-xs-9">
                 <div class="panel panel-default">
-                    <div class="panel-heading"><?= $tweet_login ?> (<?= $tweet_author ?>) (<?= $id ?>)</div>
+                    <div class="panel-heading">
+                        <?= $tweet_login ?> (<?= $tweet_author ?>)
+                        (<?= $id ?>) (<?= $row['tweets_in_cluster'] ?>)
+                    </div>
                     <div id="text_<?= $id ?>" class="panel-body"><?= $row['tweet_cleaned'] ?>
                         &nbsp;<a href="<?= $tweet_link ?>" target="_blank"><?= $tweet_link ?></a></div>
                     <div class="panel-footer"><?= $row['created_timestamp'] ?></div>

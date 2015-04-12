@@ -25,8 +25,8 @@ $link = connect();
         c.cluster_run_id DESC
     LIMIT 5'
     );
-    $result = mysql_query($sql, $link);
-    while ($row = mysql_fetch_assoc($result)) {
+    $result = mysqli_query($link, $sql);
+    while ($row = mysqli_fetch_assoc($result)) {
         ?>
         <div class="container-fluid">
             <div class="row-fluid">
@@ -62,8 +62,8 @@ if (empty($cluster_run_id)) {
         FROM clusters_runs',
         $cluster_run_id
     );
-    $result = mysql_query($sql, $link);
-    while ($row = mysql_fetch_assoc($result)) {
+    $result = mysqli_query($link, $sql);
+    while ($row = mysqli_fetch_assoc($result)) {
         $cluster_run_id = $row['max_run_id'];
     }
 }
@@ -75,7 +75,7 @@ $sql = sprintf('
         WHERE r.run_id = %d',
     $cluster_run_id
 );
-$result = mysql_query($sql, $link);
+$result = mysqli_query($link, $sql);
 $total_tweets = 0;
 while ($row = mysql_fetch_assoc($result)) {
     $total_tweets = $row['total_tweets'];
@@ -88,7 +88,7 @@ $sql = sprintf('
     WHERE r.run_id = %d',
     $cluster_run_id
 );
-$result = mysql_query($sql, $link);
+$result = mysqli_query($link, $sql);
 $total_clusters = 0;
 while ($row = mysql_fetch_assoc($result)) {
     $total_clusters = $row['total_clusters'];
@@ -118,7 +118,7 @@ $sql = sprintf('
     LIMIT 1000',
     $cluster_run_id
 );
-$result = mysql_query($sql, $link);
+$result = mysqli_query($link, $sql);
 
 $best_tweets = array();
 $tweet_sql = sprintf('
@@ -131,8 +131,8 @@ $tweet_sql = sprintf('
        cluster_run_id = %d',
     $cluster_run_id
 );
-$tweet_result = mysql_query($tweet_sql, $link);
-while ($tweet_row = mysql_fetch_assoc($tweet_result)) {
+$tweet_result = mysqli_query($link, $tweet_sql);
+while ($tweet_row = mysqli_fetch_assoc($tweet_result)) {
     $best_tweets[$tweet_row['cluster_id']] = $tweet_row['tweet_cleaned'];
 }
 ?>
@@ -161,8 +161,8 @@ while ($tweet_row = mysql_fetch_assoc($tweet_result)) {
 </div>
 <?php
 
-mysql_free_result($result);
-mysql_close($link);
+mysqli_free_result($result);
+mysqli_close($link);
 
 include 'footer.php';
 ?>

@@ -18,9 +18,9 @@ $sql = sprintf('
     WHERE cluster_id = %s',
     $cluster_id
 );
-$result = mysql_query($sql, $link);
+$result = mysqli_query($link, $sql);
 $best_tweet = 0;
-while ($row = mysql_fetch_assoc($result)) {
+while ($row = mysqli_fetch_assoc($result)) {
     $best_tweet = $row['best_tweet_id'];
 }
 
@@ -39,7 +39,7 @@ $sql = sprintf('
     $cluster_id
 );
 
-$result = mysql_query($sql, $link);
+$result = mysqli_query($link, $sql);
 
 if (!$result) {
     echo "DB Error, could not query the database\n";
@@ -74,8 +74,8 @@ if (!$result) {
     ?>
 </div>
 <?
-mysql_free_result($result);
-mysql_close($link);
+mysqli_free_result($result);
+mysqli_close($link);
 
 include 'footer.php';
 ?>

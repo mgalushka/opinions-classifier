@@ -53,7 +53,7 @@ $sql = sprintf('
 );
 
 $link = connect();
-$result = mysql_query($sql, $link);
+$result = mysqli_query($link, $sql);
 $xdata = array();
 $ydata = array();
 
@@ -65,7 +65,7 @@ function formatDate(&$aVal)
     $aVal = date($scale_php_map[$scale], $aVal);
 }
 
-while ($rows = mysql_fetch_array($result)) {
+while ($rows = mysqli_fetch_array($result)) {
     array_push($xdata, $rows['dt']);
     array_push($ydata, $rows['cnt']);
 }

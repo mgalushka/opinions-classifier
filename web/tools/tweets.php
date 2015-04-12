@@ -34,43 +34,50 @@ $link = connect();
 <div class="container-fluid">
     <?
     $sql = sprintf('
-        select
+        SELECT
             t.id,
             t.content_json,
             t.tweet_cleaned,
             t.features,
-            DATE_FORMAT(t.created_timestamp, "%%Y-%%m-%%d %%H:%%i") as created_timestamp
-        from
-            tweets_clusters c join tweets_all t
+            DATE_FORMAT(t.created_timestamp, "%%Y-%%m-%%d %%H:%%i") AS created_timestamp
+        FROM
+            tweets_clusters c JOIN tweets_all t
             ON c.best_tweet_id = t.id
-        where
-            c.cluster_run_id = (select max(cluster_run_id) from tweets_clusters) AND
+        WHERE
+            c.cluster_run_id = (SELECT max(cluster_run_id) FROM tweets_clusters) AND
             c.is_displayed = 1
     ');
-    $result = mysql_query($sql, $link);
-    while ($row = mysql_fetch_assoc($result)) {
+    $result = mysqli_query($link, $sql);
+    while ($row = mysqli_fetch_assoc($result)) {
         $id = $row['id'];
         $tweet_json = preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $row['content_json']);
         $tweet_json_read = preg_replace('/,/', ', ', $tweet_json);
         $features = preg_replace('/,/', ', ', $row['features']);
-        $tweet_author = htmlentities(json_decode($row['content_json'], true)['user']['name']);
-        $tweet_login = htmlentities(json_decode($row['content_json'], true)['user']['screen_name']);
+        $tweet_author = htmlentities(json_decode($tweet_json, true)['user']['name']);
+        $tweet_login = htmlentities(json_decode($tweet_json, true)['user']['screen_name']);
+        $tweet_link = json_decode($tweet_json, true)['entities']['urls'][0]['expanded_url'];
         ?>
         <div id="row_<?= $id ?>" class="row">
             <div class="col-md-9 col-xs-9">
                 <div class="panel panel-default">
-                    <div class="panel-heading"><?= $tweet_login ?> (<?= $tweet_author ?>)</div>
-                    <div id="text_<?= $id ?>" class="panel-body"><?= $row['tweet_cleaned'] ?></div>
+                    <div class="panel-heading"><?= $tweet_login ?> (<?= $tweet_author ?>) (<?= $id ?>)</div>
+                    <div id="text_<?= $id ?>" class="panel-body"><?= $row['tweet_cleaned'] ?>
+                        &nbsp;<a href="<?= $tweet_link ?>" target="_blank"><?= $tweet_link ?></a></div>
                     <div class="panel-footer"><?= $row['created_timestamp'] ?></div>
                 </div>
             </div>
             <div class="col-md-3 col-xs-3">
                 <div class="btn-group-vertical" role="group" aria-label="...">
-                    <button data-id="<?= $id ?>" data-action="retweet" type="button" class="btn btn-lg retweet">RT</button>
-                    <button data-id="<?= $id ?>" data-action="update" data-toggle="modal" data-target="#edit-tweet-modal"
+                    <button data-id="<?= $id ?>" data-action="retweet" type="button" class="btn btn-lg retweet">RT
+                    </button>
+                    <button data-id="<?= $id ?>" data-action="update" data-toggle="modal"
+                            data-target="#edit-tweet-modal"
                             type="button"
-                            class="btn btn-lg">TW</button>
-                    <button data-id="<?= $id ?>" data-action="delete" type="button" class="btn btn-lg btn-danger delete">DEL</button>
+                            class="btn btn-lg">TW
+                    </button>
+                    <button data-id="<?= $id ?>" data-action="delete" type="button"
+                            class="btn btn-lg btn-danger delete">DEL
+                    </button>
                 </div>
             </div>
         </div>
@@ -109,8 +116,8 @@ $link = connect();
 
 <?php
 
-mysql_free_result($result);
-mysql_close($link);
+mysqli_free_result($result);
+mysqli_close($link);
 
 include 'footer.php';
 ?>

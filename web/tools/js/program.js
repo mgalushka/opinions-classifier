@@ -11,7 +11,7 @@ $(document).ready(function () {
     $('.delete').on('click', function () {
         var tweetId = $(this).attr('data-id');
         console.log("Deleting tweet: " + tweetId);
-        // TODO: delete
+        tt.core.statusUpdate(tweetId, '', 'delete', $(this));
         $('#row_' + tweetId).addClass('hide');
     });
 

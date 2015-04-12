@@ -44,7 +44,8 @@ $link = connect();
             tweets_clusters c join tweets_all t
             ON c.best_tweet_id = t.id
         where
-            cluster_run_id = (select max(cluster_run_id) from tweets_clusters)
+            c.cluster_run_id = (select max(cluster_run_id) from tweets_clusters) AND
+            c.is_displayed = 1
     ');
     $result = mysql_query($sql, $link);
     while ($row = mysql_fetch_assoc($result)) {
@@ -52,6 +53,7 @@ $link = connect();
         $tweet_json = preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $row['content_json']);
         $tweet_json_read = preg_replace('/,/', ', ', $tweet_json);
         $features = preg_replace('/,/', ', ', $row['features']);
+        $tweet_author = htmlentities(json_decode($tweet_json, true)['user']['name']);
         /*
         // TODO; temporary as old PHP version does not support it.
         $tweet_author = htmlentities(json_decode($row['content_json'], true)['user']['name']);

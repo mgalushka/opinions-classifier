@@ -21,12 +21,12 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author Maxim Galushka
  */
-public class TweetPublishScheduler {
+public class TweetPublishScheduler implements Runnable {
   public static final Logger log =
     Logger.getLogger(TweetPublishScheduler.class);
 
-  private final ScheduledExecutorService pool =
-    Executors.newScheduledThreadPool(1);
+  private static final ScheduledExecutorService pool =
+    Executors.newScheduledThreadPool(2);
 
   private StorageService storage;
   @SuppressWarnings({"FieldCanBeLocal", "UnusedDeclaration"})
@@ -63,7 +63,7 @@ public class TweetPublishScheduler {
    * Gets unscheduled tweets from storage.
    * Schedule them based on caps.
    */
-  public void schedule() {
+  public void run() {
     log.debug("Picking scheduled but unpublished tweets");
     List<ScheduledTweet> unpublished = storage.getScheduledUnpublishedTweets();
     log.debug(
@@ -198,7 +198,7 @@ public class TweetPublishScheduler {
     TweetPublishScheduler scheduler = (TweetPublishScheduler)
       ac.getBean("scheduler");
 
-    scheduler.schedule();
+    pool.scheduleWithFixedDelay(scheduler, 0, 1, TimeUnit.HOURS);
     log.debug("Twitter scheduler started");
   }
 }

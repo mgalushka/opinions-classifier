@@ -163,6 +163,15 @@ public class TweetPublishScheduler implements Runnable {
   private void schedule(final ScheduledTweet tweet) {
     long current = System.currentTimeMillis();
     long scheduled = tweet.getScheduled().getTime();
+    long delay = scheduled - current;
+    if (delay < 0) {
+      log.error(
+        String.format(
+          "Tweet %s is scheduled in the PAST. Ignoring.",
+          tweet
+        )
+      );
+    }
     pool.schedule(
       () -> {
         try {
@@ -185,7 +194,7 @@ public class TweetPublishScheduler implements Runnable {
           log.error(e);
         }
       },
-      scheduled - current, TimeUnit.MILLISECONDS
+      delay, TimeUnit.MILLISECONDS
     );
   }
 

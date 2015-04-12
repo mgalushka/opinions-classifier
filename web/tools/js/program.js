@@ -18,7 +18,7 @@ $(document).ready(function () {
     $('#edit-tweet-modal').on('show.bs.modal', function (event) {
         var button = $(event.relatedTarget); // Button that triggered the modal
         var tweetId = button.attr('data-id');
-        var originalTweet = $('#text_' + tweetId).text().replace(/ +/g,"").trim();
+        var originalTweet = $('#text_' + tweetId).text().replace(/ +/g, " ").trim();
         console.log("Original tweet: " + originalTweet);
 
         var modal = $(this);

@@ -78,6 +78,9 @@ public class TwitterEasyApi implements Container {
         Tweet updated = new Tweet(tweetId, text);
         storage.scheduleTweet(updated, original, false);
       }
+      if("delete".equals(action)){
+        storage.unpublishTweetCluster(tweetId);
+      }
       body.println(gson.toJson("OK"));
       body.close();
       log.trace("Response sent");

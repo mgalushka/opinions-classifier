@@ -228,4 +228,8 @@ public class StorageService {
     }
     mysql.scheduleTweet(tweet, original, retweet);
   }
+
+  public void unpublishTweetCluster(long tweetId) {
+    mysql.unpublishTweetCluster(tweetId);
+  }
 }

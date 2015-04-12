@@ -235,7 +235,23 @@ public class MysqlService {
     } catch (SQLException e) {
       e.printStackTrace();
     }
+  }
 
+  public void unpublishTweetCluster(long tweetId) {
+    try (Connection conn = this.datasource.getConnection()) {
+      try (
+        PreparedStatement stmt = conn.prepareStatement(
+          "update tweets_clusters " +
+            "set is_displayed = 0 " +
+            "where best_tweet_id = ? "
+        )
+      ) {
+        stmt.setLong(1, tweetId);
+        stmt.executeUpdate();
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
   }
 
   public Long getMaxRunId()

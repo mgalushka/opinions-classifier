@@ -53,18 +53,13 @@ $link = connect();
         $tweet_json = preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $row['content_json']);
         $tweet_json_read = preg_replace('/,/', ', ', $tweet_json);
         $features = preg_replace('/,/', ', ', $row['features']);
-        $tweet_author = htmlentities(json_decode($tweet_json, true)['user']['name']);
-        /*
-        // TODO; temporary as old PHP version does not support it.
         $tweet_author = htmlentities(json_decode($row['content_json'], true)['user']['name']);
         $tweet_login = htmlentities(json_decode($row['content_json'], true)['user']['screen_name']);
-        // <?= $tweet_login ?> (<?= $tweet_author ?>)
-        */
         ?>
         <div id="row_<?= $id ?>" class="row">
             <div class="col-md-9 col-xs-9">
                 <div class="panel panel-default">
-                    <div class="panel-heading"></div>
+                    <div class="panel-heading"><?= $tweet_login ?> (<?= $tweet_author ?>)</div>
                     <div id="text_<?= $id ?>" class="panel-body"><?= $row['tweet_cleaned'] ?></div>
                     <div class="panel-footer"><?= $row['created_timestamp'] ?></div>
                 </div>

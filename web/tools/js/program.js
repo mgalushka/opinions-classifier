@@ -5,14 +5,14 @@ $(document).ready(function () {
     $('.retweet').on('click', function () {
         var tweetId = $(this).attr('data-id');
         var action = $(this).attr('data-action');
-        console.log(action + " tweet: " + tweetId);
-        if (action === "delete") {
-            // TODO: delete
-            $('#row_' + tweetId).addClass('hide');
-        }
-        else {
-            tt.core.statusUpdate(tweetId, '', action, $(this));
-        }
+        tt.core.statusUpdate(tweetId, '', action, $(this));
+    });
+
+    $('.delete').on('click', function () {
+        var tweetId = $(this).attr('data-id');
+        console.log("Deleting tweet: " + tweetId);
+        // TODO: delete
+        $('#row_' + tweetId).addClass('hide');
     });
 
     $('#edit-tweet-modal').on('show.bs.modal', function (event) {

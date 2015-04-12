@@ -52,8 +52,11 @@ $link = connect();
         $tweet_json = preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $row['content_json']);
         $tweet_json_read = preg_replace('/,/', ', ', $tweet_json);
         $features = preg_replace('/,/', ', ', $row['features']);
+        /*
+        // TODO; temporary as old PHP version does not support it.
         $tweet_author = htmlentities(json_decode($row['content_json'], true)['user']['name']);
         $tweet_login = htmlentities(json_decode($row['content_json'], true)['user']['screen_name']);
+        */
         ?>
         <div id="row_<?= $id ?>" class="row">
             <div class="col-md-9 col-xs-9">
@@ -69,7 +72,7 @@ $link = connect();
                     <button data-id="<?= $id ?>" data-action="update" data-toggle="modal" data-target="#edit-tweet-modal"
                             type="button"
                             class="btn btn-lg">TW</button>
-                    <button data-id="<?= $id ?>" data-action="delete" type="button" class="btn btn-lg btn-danger">DEL</button>
+                    <button data-id="<?= $id ?>" data-action="delete" type="button" class="btn btn-lg btn-danger delete">DEL</button>
                 </div>
             </div>
         </div>

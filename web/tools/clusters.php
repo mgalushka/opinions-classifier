@@ -77,7 +77,7 @@ $sql = sprintf('
 );
 $result = mysqli_query($link, $sql);
 $total_tweets = 0;
-while ($row = mysql_fetch_assoc($result)) {
+while ($row = mysqli_fetch_assoc($result)) {
     $total_tweets = $row['total_tweets'];
 }
 
@@ -90,7 +90,7 @@ $sql = sprintf('
 );
 $result = mysqli_query($link, $sql);
 $total_clusters = 0;
-while ($row = mysql_fetch_assoc($result)) {
+while ($row = mysqli_fetch_assoc($result)) {
     $total_clusters = $row['total_clusters'];
 }
 
@@ -143,7 +143,7 @@ while ($tweet_row = mysqli_fetch_assoc($tweet_result)) {
 </div>
 <div class="container-fluid">
     <?php
-    while ($row = mysql_fetch_assoc($result)) {
+    while ($row = mysqli_fetch_assoc($result)) {
         ?>
         <div class="row-fluid">
         <div class="col-md-1"><?= $row['cluster_id'] ?></div>

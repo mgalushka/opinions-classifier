@@ -53,7 +53,7 @@ if (!$result) {
     </h1>
 </div>
 <div class="container-fluid"><?
-    while ($row = mysql_fetch_assoc($result)) {
+    while ($row = mysqli_fetch_assoc($result)) {
         $tweet_json = preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $row['content_json']);
         $tweet_json_read = preg_replace('/,/', ', ', $tweet_json);
         $features = preg_replace('/,/', ', ', $row['features']);

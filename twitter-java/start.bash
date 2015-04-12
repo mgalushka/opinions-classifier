@@ -10,5 +10,4 @@ JAVA_GC="-verbose:gc"
 # nohup jstatd -J-Djava.security.policy=/home/ec2-user/jstatd.all -p 8089 &
 
 nohup java -cp ${CLASSPATH} ${JAVA_MEM} ${JAVA_GC} ${JAVA_JMX} com.maximgalushka.classifier.twitter.service.MainServiceStart > out.log 2>&1 &
-nohup ./scheduler.bash &
 echo 0

@@ -273,19 +273,21 @@ public class MysqlService {
     }
   }
 
-  public void updatePublished(long id, long publishedId) {
+  public void updatePublished(long id, long publishedId, boolean success) {
     try (Connection conn = this.datasource.getConnection()) {
       try (
         PreparedStatement stmt = conn.prepareStatement(
           "update tweets_scheduled " +
             "set published = 1, " +
             "published_id = ?, " +
+            "status = ?, " +
             "published_timestamp = now() " +
             "where id = ? "
         )
       ) {
         stmt.setLong(1, publishedId);
-        stmt.setLong(2, id);
+        stmt.setInt(2, success ? 1 : 0);
+        stmt.setLong(3, id);
         stmt.executeUpdate();
       }
     } catch (SQLException e) {
@@ -340,7 +342,9 @@ public class MysqlService {
     return query(
       String.format(
         "select " +
-          "  coalesce(max(scheduled_timestamp), now()) as latest " +
+          "  greatest(" +
+          "   now(), " +
+          "   coalesce(max(scheduled_timestamp), now())) as latest " +
           "  from " +
           "    tweets_scheduled " +
           "  where (published = 1 or scheduled = 1) and retweet = %d",
@@ -363,7 +367,7 @@ public class MysqlService {
 
 
   public Long getMaxRunId()
-  throws Exception {
+    throws Exception {
     try (Connection conn = this.datasource.getConnection()) {
       try (
         PreparedStatement stmt = conn.prepareStatement(
@@ -382,7 +386,7 @@ public class MysqlService {
   }
 
   public Long createNewCluster(Cluster cluster, long clusterRunId)
-  throws Exception {
+    throws Exception {
     try (Connection conn = this.datasource.getConnection()) {
       try (
         PreparedStatement stmt = conn.prepareStatement(

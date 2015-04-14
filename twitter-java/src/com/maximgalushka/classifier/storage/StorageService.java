@@ -251,7 +251,7 @@ public class StorageService {
     mysql.updateScheduled(id, scheduled);
   }
 
-  public void updatePublished(long id, long publishedId) {
-    mysql.updatePublished(id, publishedId);
+  public void updatePublished(long id, long publishedId, boolean success) {
+    mysql.updatePublished(id, publishedId, success);
   }
 }

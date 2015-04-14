@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import twitter4j.Status;
+import twitter4j.TwitterException;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -183,13 +184,26 @@ public class TweetPublishScheduler implements Runnable {
           );
           boolean retweet = tweet.isRetweet();
           Status status = null;
-          if (retweet) {
-            status = twitter.retweet(tweet.getData().getId());
-          } else {
-            status = twitter.post(tweet.getData(), false, false);
+          boolean success = true;
+          try {
+            if (retweet) {
+              status = twitter.retweet(tweet.getData().getId());
+            } else {
+              status = twitter.post(tweet.getData(), false, false);
+            }
+          } catch (TwitterException ex) {
+            success = false;
+            log.error(
+              "Tweet action failed.",
+              ex
+            );
           }
-          long publishedId = status.getId();
-          storage.updatePublished(tweet.getData().getId(), publishedId);
+          // still need to update published status in database or it will be infinite loop
+          // TODO: save exact status in database
+          if (status != null) {
+            long publishedId = status.getId();
+            storage.updatePublished(tweet.getData().getId(), publishedId, success);
+          }
         } catch (Exception e) {
           log.error(e);
         }

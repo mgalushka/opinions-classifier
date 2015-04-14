@@ -31,6 +31,7 @@ public class LocalSettings {
   public static final String SHUTDOWN_PORT = "service.shutdown.port";
 
   public static final String TWITTER_KEYWORDS = "twitter.monitor.keywords";
+  public static final String TWITTER_BLACKLIST = "twitter.monitor.blacklist";
 
   public static final String MEMCACHED_HOST = "memcached.host";
   public static final String MEMCACHED_PORT = "memcached.port";

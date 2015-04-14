@@ -91,7 +91,7 @@ public class ClusteringPipeline {
     this.blacklistProcessor = blacklistProcessor;
   }
 
-  private static final int LATEST_HOURS = 2;
+  private static final int LATEST_HOURS = 1;
 
   /**
    * Business method:

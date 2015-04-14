@@ -21,9 +21,11 @@ public class BlacklistProcessor {
   public List<Tweet> clean(List<Tweet> tweets) {
     List<Tweet> cleaned = new ArrayList<>();
     String black = settings.value(LocalSettings.TWITTER_BLACKLIST);
-    List<String> banned = Arrays.asList(black.split(","));
+    List<String> banned = Arrays.asList(black.toLowerCase().split(","));
     for (Tweet tweet : tweets) {
-      List<String> tokens = Arrays.asList(tweet.getText().split("\\s+"));
+      List<String> tokens = Arrays.asList(
+        tweet.getText().toLowerCase().split("\\s+")
+      );
       tokens.retainAll(banned);
       if (!tokens.isEmpty()) {
         tweet.setExcluded(true);
@@ -32,7 +34,7 @@ public class BlacklistProcessor {
             "blacklisted words: [%s]", tokens
           )
         );
-      } else{
+      } else {
         cleaned.add(tweet);
       }
     }

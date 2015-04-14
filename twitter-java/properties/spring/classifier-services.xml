@@ -115,6 +115,11 @@
         </property>
     </bean>
 
+    <bean id="blacklist-processor"
+          class="com.maximgalushka.classifier.twitter.cleanup.BlacklistProcessor">
+        <property name="settings" ref="settings"/>
+    </bean>
+
     <bean id="tweet-features-pipeline"
           class="com.maximgalushka.classifier.twitter.best.FeaturesExtractorPipeline">
         <property name="featureExtractors">
@@ -134,6 +139,7 @@
         <property name="cleanPipeline" ref="tweets-cleaner-pipeline"/>
         <property name="representativeFinder" ref="best-tweet-finder"/>
         <property name="twitterClient" ref="twitter-stream-client"/>
+        <property name="blacklistProcessor" ref="blacklist-processor"/>
     </bean>
 
     <bean id="main"

@@ -3,6 +3,7 @@ package com.maximgalushka.classifier.clustering;
 import com.maximgalushka.classifier.storage.StorageService;
 import com.maximgalushka.classifier.twitter.best.BestClusterFinder;
 import com.maximgalushka.classifier.twitter.best.ClusterRepresentativeFinder;
+import com.maximgalushka.classifier.twitter.cleanup.BlacklistProcessor;
 import com.maximgalushka.classifier.twitter.cleanup.CleanPipeline;
 import com.maximgalushka.classifier.twitter.client.TwitterStandardClient;
 import com.maximgalushka.classifier.twitter.model.Tweet;
@@ -26,6 +27,7 @@ public class ClusteringPipeline {
   private ClusterRepresentativeFinder representativeFinder;
   private BestClusterFinder clusterFinder;
   private TwitterStandardClient twitterClient;
+  private BlacklistProcessor blacklistProcessor;
 
   public ClusteringPipeline() {
   }
@@ -81,6 +83,14 @@ public class ClusteringPipeline {
     this.twitterClient = twitterClient;
   }
 
+  public BlacklistProcessor getBlacklistProcessor() {
+    return blacklistProcessor;
+  }
+
+  public void setBlacklistProcessor(BlacklistProcessor blacklistProcessor) {
+    this.blacklistProcessor = blacklistProcessor;
+  }
+
   private static final int LATEST_HOURS = 2;
 
   /**
@@ -109,20 +119,35 @@ public class ClusteringPipeline {
     } else {
       log.info(
         String.format(
-          "Found [%d] clusters in database for latest %d hours, starting clustering.",
+          "Found [%d] clusters in database for latest %d hours, starting " +
+            "clustering.",
           latestHoursTweets.size(),
           LATEST_HOURS
         )
       );
     }
 
-    // NOTE: after this step - each tweet's text is cleaned.
-    cleanPipeline.batchClean(latestHoursTweets);
+    List<Tweet> cleaned4Clustering =
+      blacklistProcessor.clean(latestHoursTweets);
+
+    log.info(
+      String.format(
+        "Black-listed tweets removed: [%d], total for clustering: [%d]",
+        latestHoursTweets.size() - cleaned4Clustering.size(),
+        cleaned4Clustering.size()
+      )
+    );
+
+    // storing processed list as during processing we are
     storage.saveTweetsCleanedBatch(latestHoursTweets);
-    List<Document> docs = readTweetsToDocs(latestHoursTweets);
+
+    // NOTE: after this step - each tweet's text is cleaned.
+    cleanPipeline.batchClean(cleaned4Clustering);
+    storage.saveTweetsCleanedBatch(cleaned4Clustering);
+    List<Document> docs = readTweetsToDocs(cleaned4Clustering);
 
     // helper map to extract any required tween metadata
-    Map<String, Tweet> tweetsIndex = readTweetsToMap(latestHoursTweets);
+    Map<String, Tweet> tweetsIndex = readTweetsToMap(cleaned4Clustering);
 
     // Perform clustering by topic using the Lingo algorithm.
     final ProcessingResult byTopicClusters = controller.process(
@@ -147,8 +172,8 @@ public class ClusteringPipeline {
           nextRunId
         )
       );
-      TreeMap<Integer, Long> countId = new TreeMap<>();
-      Map<Long, Tweet> bestTweetInCluster = new HashMap<>();
+      //TreeMap<Integer, Long> countId = new TreeMap<>();
+      //Map<Long, Tweet> bestTweetInCluster = new HashMap<>();
       for (Cluster cluster : clustersByTopic) {
         final List<Tweet> tweetsInCluster = new ArrayList<>();
         for (Document d : cluster.getDocuments()) {
@@ -168,7 +193,7 @@ public class ClusteringPipeline {
           nextRunId,
           tweetsInCluster
         );
-        countId.put(tweetsInCluster.size(), clusterId);
+        //countId.put(tweetsInCluster.size(), clusterId);
 
         ClusterRepresentativeFinder.Pair<Tweet, Map<Tweet, Map<String, Object>>>
           pair = representativeFinder
@@ -186,50 +211,52 @@ public class ClusteringPipeline {
           clusterId,
           representative.getId()
         );
-        bestTweetInCluster.put(clusterId, representative);
+        //bestTweetInCluster.put(clusterId, representative);
       }
 
-      // TODO: we have pivoted and don't publish tweets as part of clustering job anymore
+      // TODO: we have pivoted and don't publish tweets as part of clustering
+      // job anymore
       /**
-      Random r = new Random(System.currentTimeMillis());
-      boolean retweet = (r.nextInt(10) <= 2); // 20%
-      // TODO: this logic should be separated to special handler
-      // TODO: which chooses best tweet in cluster and re-tweet or
-      // TODO: creates new tweet based o  it.
-      int size = countId.size();
-      if (size <= 1) {
-        log.error(
-          String.format(
-            "Cannot find best from collection, too low number of elements: [%d]",
-            size
-          )
-        );
-        return;
-      }
-      // TODO: randomize slightly to minimize clashes.
-      // TODO: implement algorithm to eliminate posting what was already posted before.
-      int choice = r.nextInt(Math.min(size - 1, 4)) + 1;
-      Object bestKey = countId.descendingMap().keySet().toArray()[choice];
-      long bestCluster = countId.get(bestKey);
-      Tweet tweet = bestTweetInCluster.get(bestCluster);
-      storage.savePublishedTweet(tweet, retweet);
-      if (retweet) {
-        log.warn(
-          String.format(
-            "Re-tweeting [%s]",
-            tweet
-          )
-        );
-        twitterClient.retweet(tweet.getId());
-      } else {
-        log.warn(
-          String.format(
-            "Straight tweet [%s]",
-            tweet
-          )
-        );
-        twitterClient.post(tweet);
-      }
+       Random r = new Random(System.currentTimeMillis());
+       boolean retweet = (r.nextInt(10) <= 2); // 20%
+       // TODO: this logic should be separated to special handler
+       // TODO: which chooses best tweet in cluster and re-tweet or
+       // TODO: creates new tweet based o  it.
+       int size = countId.size();
+       if (size <= 1) {
+       log.error(
+       String.format(
+       "Cannot find best from collection, too low number of elements: [%d]",
+       size
+       )
+       );
+       return;
+       }
+       // TODO: randomize slightly to minimize clashes.
+       // TODO: implement algorithm to eliminate posting what was already
+       posted before.
+       int choice = r.nextInt(Math.min(size - 1, 4)) + 1;
+       Object bestKey = countId.descendingMap().keySet().toArray()[choice];
+       long bestCluster = countId.get(bestKey);
+       Tweet tweet = bestTweetInCluster.get(bestCluster);
+       storage.savePublishedTweet(tweet, retweet);
+       if (retweet) {
+       log.warn(
+       String.format(
+       "Re-tweeting [%s]",
+       tweet
+       )
+       );
+       twitterClient.retweet(tweet.getId());
+       } else {
+       log.warn(
+       String.format(
+       "Straight tweet [%s]",
+       tweet
+       )
+       );
+       twitterClient.post(tweet);
+       }
        */
 
     } catch (Exception e) {

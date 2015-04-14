@@ -24,6 +24,9 @@ public class Tweet {
   @SerializedName("retweet_count")
   private int retweetCount;
 
+  private transient boolean excluded;
+  private transient String excludedReason;
+
   public Tweet() {
   }
 
@@ -74,6 +77,22 @@ public class Tweet {
 
   public void setFavouriteCount(int favouriteCount) {
     this.favouriteCount = favouriteCount;
+  }
+
+  public boolean isExcluded() {
+    return excluded;
+  }
+
+  public void setExcluded(boolean excluded) {
+    this.excluded = excluded;
+  }
+
+  public String getExcludedReason() {
+    return excludedReason;
+  }
+
+  public void setExcludedReason(String excludedReason) {
+    this.excludedReason = excludedReason;
   }
 
   public int getRetweetCount() {

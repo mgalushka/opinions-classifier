@@ -367,7 +367,7 @@ public class MysqlService {
 
 
   public Long getMaxRunId()
-    throws Exception {
+  throws Exception {
     try (Connection conn = this.datasource.getConnection()) {
       try (
         PreparedStatement stmt = conn.prepareStatement(
@@ -386,7 +386,7 @@ public class MysqlService {
   }
 
   public Long createNewCluster(Cluster cluster, long clusterRunId)
-    throws Exception {
+  throws Exception {
     try (Connection conn = this.datasource.getConnection()) {
       try (
         PreparedStatement stmt = conn.prepareStatement(
@@ -442,7 +442,9 @@ public class MysqlService {
       try (
         PreparedStatement stmt = conn.prepareStatement(
           "update tweets_all " +
-            "set tweet_cleaned=? " +
+            "set tweet_cleaned=?, " +
+            "excluded=?, " +
+            "excluded_reason=? " +
             "where id=?"
         )
       ) {
@@ -450,7 +452,9 @@ public class MysqlService {
         int counter = 0;
         for (Tweet tweet : tweets) {
           stmt.setString(1, tweet.getText());
-          stmt.setLong(2, tweet.getId());
+          stmt.setInt(2, tweet.isExcluded() ? 1 : 0);
+          stmt.setString(3, tweet.getExcludedReason());
+          stmt.setLong(4, tweet.getId());
           stmt.addBatch();
           counter++;
           if (counter % BATCH_SIZE == 0) {

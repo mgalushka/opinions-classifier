@@ -534,13 +534,13 @@ public class MysqlService {
    *
    * @param hours hours to find tweets from, no more then 5000 tweets.
    */
-  public List<Tweet> getLatestTweets(long hours) {
+  public List<Tweet> getLatestTweets(double hours) {
     return query(
       String.format(
         "select id, content_json, tweet_cleaned, " +
           "created_timestamp " +
           "from tweets_all " +
-          "where created_timestamp >= DATE_SUB(NOW(), INTERVAL %d HOUR) " +
+          "where created_timestamp >= DATE_SUB(NOW(), INTERVAL %f HOUR) " +
           "LIMIT 2000", hours
       ),
       set -> {

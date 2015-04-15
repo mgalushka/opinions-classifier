@@ -91,7 +91,7 @@ public class ClusteringPipeline {
     this.blacklistProcessor = blacklistProcessor;
   }
 
-  private static final int LATEST_HOURS = 1;
+  private static final double LATEST_HOURS = 0.5D;
 
   /**
    * Business method:
@@ -102,7 +102,7 @@ public class ClusteringPipeline {
   public void clusterFromStorage() {
     log.info(
       String.format(
-        "Starting tweets classifier for latest %d hours",
+        "Starting tweets classifier for latest %f hours",
         LATEST_HOURS
       )
     );
@@ -110,7 +110,7 @@ public class ClusteringPipeline {
     if (latestHoursTweets.isEmpty()) {
       log.error(
         String.format(
-          "Could not find any clusters for latest %d hours. Check if twitter " +
+          "Could not find any clusters for latest %f hours. Check if twitter " +
             "stream is running.",
           LATEST_HOURS
         )
@@ -119,7 +119,7 @@ public class ClusteringPipeline {
     } else {
       log.info(
         String.format(
-          "Found [%d] clusters in database for latest %d hours, starting " +
+          "Found [%d] clusters in database for latest %f hours, starting " +
             "clustering.",
           latestHoursTweets.size(),
           LATEST_HOURS

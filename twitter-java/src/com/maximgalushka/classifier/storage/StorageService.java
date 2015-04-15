@@ -140,7 +140,7 @@ public class StorageService {
     );
   }
 
-  public List<Tweet> getLatestTweets(long hours) {
+  public List<Tweet> getLatestTweets(double hours) {
     return mysql.getLatestTweets(hours);
   }
 

@@ -23,15 +23,20 @@ public class BlacklistProcessor {
     String black = settings.value(LocalSettings.TWITTER_BLACKLIST);
     List<String> banned = Arrays.asList(black.toLowerCase().split(","));
     for (Tweet tweet : tweets) {
-      List<String> tokens = Arrays.asList(
-        tweet.getText().toLowerCase().split("\\s+")
-      );
-      tokens.retainAll(banned);
-      if (!tokens.isEmpty()) {
+      boolean excluded = false;
+      String forbiddenToken = "";
+      for (String b : banned) {
+        if (tweet.getText().toLowerCase().contains(b)) {
+          excluded = true;
+          forbiddenToken = b;
+          break;
+        }
+      }
+      if (excluded) {
         tweet.setExcluded(true);
         tweet.setExcludedReason(
           String.format(
-            "blacklisted words: [%s]", tokens
+            "blacklisted words: [%s]", forbiddenToken
           )
         );
       } else {

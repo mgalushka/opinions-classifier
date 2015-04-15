@@ -51,11 +51,11 @@
             <version>1.5.3</version>
         </dependency>
 
-        <dependency>
+        <!--dependency>
             <groupId>be.tarsos</groupId>
             <artifactId>tarsos-lhs</artifactId>
             <version>0.7</version>
-        </dependency>
+        </dependency-->
 
         <dependency>
             <groupId>org.carrot2</groupId>

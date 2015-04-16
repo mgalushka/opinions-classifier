@@ -60,6 +60,7 @@ $link = connect();
     $result_average = mysqli_query($link, $sql_average);
     while ($row = mysqli_fetch_assoc($result_average)) {
         $average = $row['avg_count'];
+    }
 
     $sql = sprintf('
         SELECT

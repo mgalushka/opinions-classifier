@@ -37,6 +37,30 @@ $link = connect();
 
 <div class="container-fluid">
     <?
+    // ide here is to calculate average and then show tweets in order 
+    // of how far they are from average cluster size
+    $sql_average = sprintf('
+        SELECT AVG(cnt) as avg_count
+        FROM(
+            SELECT
+                count(distinct r.tweet_id) as cnt
+            FROM
+                tweets_clusters c JOIN tweets_all t
+                ON c.best_tweet_id = t.id
+                JOIN clusters_runs r
+                ON c.cluster_id = r.cluster_id
+            WHERE
+                c.cluster_run_id = (SELECT max(cluster_run_id) FROM tweets_clusters) AND
+                c.is_displayed = 1
+            GROUP BY 
+                r.cluster_id
+        ) t
+    ');
+    $average = 0;
+    $result_average = mysqli_query($link, $sql_average);
+    while ($row = mysqli_fetch_assoc($result_average)) {
+        $average = $row['avg_count'];
+
     $sql = sprintf('
         SELECT
             t.id,
@@ -54,10 +78,12 @@ $link = connect();
             c.cluster_run_id = (SELECT max(cluster_run_id) FROM tweets_clusters) AND
             c.is_displayed = 1
         GROUP BY
-          1, 2, 3, 4, 5
+            1, 2, 3, 4, 5
         ORDER BY
-          count(r.tweet_id) DESC
-    ');
+            ABS(count(r.tweet_id) - %f) ASC
+        ', 
+        $average
+    );
     $result = mysqli_query($link, $sql);
     while ($row = mysqli_fetch_assoc($result)) {
         $id = $row['id'];

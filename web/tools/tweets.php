@@ -152,6 +152,7 @@ $link = connect();
 
 <?php
 
+mysqli_free_result($result_average);
 mysqli_free_result($result);
 mysqli_close($link);
 

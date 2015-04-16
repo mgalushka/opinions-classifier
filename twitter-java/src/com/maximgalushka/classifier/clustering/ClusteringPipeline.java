@@ -158,7 +158,7 @@ public class ClusteringPipeline {
     final List<Cluster> clustersByTopic = byTopicClusters.getClusters();
     log.debug(
       String.format(
-        "As result of clustering latest %d hours tweets, got: [%d] clusters",
+        "As result of clustering latest %f hours tweets, got: [%d] clusters",
         LATEST_HOURS,
         clustersByTopic.size()
       )

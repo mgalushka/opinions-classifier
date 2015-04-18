@@ -5,6 +5,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.io.Files;
+import com.maximgalushka.classifier.clustering.graphs.ConnectedComponents;
+import com.maximgalushka.classifier.clustering.graphs.Graph;
 
 import java.io.File;
 import java.io.IOException;
@@ -78,6 +80,9 @@ public class Main {
     idx = 0;
     BitSet bits = new BitSet(docs.size());
 
+    // graph to calculate clusters at the end as connected components in it
+    Graph graph = new Graph(docs.size());
+
     for (String doc : docs) {
       // For each document.
 
@@ -118,32 +123,74 @@ public class Main {
       for (Integer i : docSimilarCandidates) {
         int dist = simHash.hammingDistance(docHash, docHashes.get(i));
         // TODO: setup the threshold
-        if (dist <= 30) {
+        if (dist <= 10) {
           similarDocs.add(i);
           bits.set(idx);
           docDistances.put(i, dist);
         }
       }
       if (!similarDocs.isEmpty()) {
+        /*
         Files.append(
           "Documents similar as [" + doc + "]:\n",
           output,
           Charsets.UTF_8
         );
+        */
         for (int i : similarDocs) {
           if (i == idx) {
             continue;
           }
+          /*
           Files.append(
             "[" + docs.get(i) + "]\tDistance=[" + docDistances.get(i) + "]\n",
             output,
             Charsets.UTF_8
           );
+          */
+          graph.addEdge(idx, i);
         }
-        Files.append("End\n", output, Charsets.UTF_8);
+        //Files.append("End\n", output, Charsets.UTF_8);
       }
       bits.set(idx);
       ++idx;
+    }
+
+    List<List<Integer>> cc = ConnectedComponents.getComponents(graph);
+
+    int clusterId = 0;
+
+    Files.append(
+      String.format(
+        "=========== TOTAL: %d ============\n\n\n",
+        cc.size()
+      ),
+      output,
+      Charsets.UTF_8
+    );
+
+    for (List<Integer> component : cc) {
+      Files.append(
+        String.format(
+          "=========== %d (%d) ============\n",
+          clusterId++,
+          component.size()
+        ),
+        output,
+        Charsets.UTF_8
+      );
+      for (int i : component) {
+        Files.append(
+          docs.get(i) + "\n",
+          output,
+          Charsets.UTF_8
+        );
+      }
+      Files.append(
+        "\n",
+        output,
+        Charsets.UTF_8
+      );
     }
 
     System.out.println(

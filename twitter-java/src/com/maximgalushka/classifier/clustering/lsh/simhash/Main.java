@@ -156,6 +156,15 @@ public class Main {
       ++idx;
     }
 
+    // TODO: idea on how to speed up checking if new best representatives are
+    // TODO same tweets that were published previously:
+    // let first N tweets are existing tweets (published already or rejected already)
+    // build a graph and after it go through connected components starting from
+    // 1..N for each already twitted/rejected tweet.
+    // and mark all tweets in this CC as duplicates with corresponding reason
+    // to spidify the process - if CC was marked - don't repeat it
+    // if there are self-duplicates across 1..N by themselves.
+    // 1..N - to choose for latest 30 days to avoid huge number of messages.
     List<List<Integer>> cc = ConnectedComponents.getComponents(graph);
 
     int clusterId = 0;

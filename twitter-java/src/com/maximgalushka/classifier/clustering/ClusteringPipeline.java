@@ -268,8 +268,7 @@ public class ClusteringPipeline {
           update
         )
       );
-      // TODO: enable after testing
-      //storage.saveTweetsCleanedBatch(update);
+      storage.saveTweetsCleanedBatch(update);
 
       // TODO: we have pivoted and don't publish tweets as part of clustering
       // job anymore

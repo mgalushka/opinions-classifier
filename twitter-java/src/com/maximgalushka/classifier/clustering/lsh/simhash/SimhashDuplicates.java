@@ -7,6 +7,8 @@ import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 import com.maximgalushka.classifier.clustering.graphs.ConnectedComponents;
 import com.maximgalushka.classifier.clustering.graphs.Graph;
+import com.maximgalushka.classifier.twitter.model.Tweet;
+import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,15 +18,20 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author zhangcheng
  */
-public class Main {
+public class SimhashDuplicates {
 
-  public static void main(String[] args) throws Exception {
+  public static final Logger log = Logger.getLogger(SimhashDuplicates.class);
 
-    if (args.length != 2) {
-      System.err.println("Usage: inputfile outputfile");
-      return;
+  public Graph buildTweetsGraph(List<Tweet> tweets) {
+    List<String> docs = new ArrayList<>(tweets.size());
+    for (Tweet t : tweets) {
+      docs.add(t.getText());
     }
-    long start = System.nanoTime();
+    return buildGraph(docs);
+  }
+
+  public Graph buildGraph(List<String> docs) {
+
     // Creates SimHash object.
     Simhash simHash = new Simhash(new BinaryWordSeg());
 
@@ -34,17 +41,14 @@ public class Main {
     // Maps 12-bit key with the documents matching the partial hash
     Map<BitSet, HashSet<Integer>> hashIndex = Maps.newHashMap();
 
-    // Read the documents. (Each line represents a document).
-    List<String> docs = readDocs(args);
-
     // this is effectively unique id of the document
     int idx = 0;
 
-    System.out.println("Start to build index...");
+    log.debug("Start to build simhash index...");
     for (String doc : docs) {
       // Calculate the document hash.
       long docHash = simHash.simhash64(doc);
-      System.out.println("Document=[" + doc + "] Hash=[" + docHash + "]");
+      log.trace("Document=[" + doc + "] Hash=[" + docHash + "]");
 
       // Store the document hash in a list.
       docHashes.add(docHash);
@@ -75,8 +79,8 @@ public class Main {
       }
       ++idx;
     }
-    System.out.println("Index has been built.");
-    File output = new File(args[1]);
+    log.debug("Simhash index has been built.");
+
     idx = 0;
     BitSet bits = new BitSet(docs.size());
 
@@ -158,14 +162,30 @@ public class Main {
 
     // TODO: idea on how to speed up checking if new best representatives are
     // TODO same tweets that were published previously:
-    // let first N tweets are existing tweets (published already or rejected already)
+    // let first N tweets are existing tweets (published already or rejected
+    // already)
     // build a graph and after it go through connected components starting from
     // 1..N for each already twitted/rejected tweet.
     // and mark all tweets in this CC as duplicates with corresponding reason
     // to spidify the process - if CC was marked - don't repeat it
     // if there are self-duplicates across 1..N by themselves.
     // 1..N - to choose for latest 30 days to avoid huge number of messages.
-    List<List<Integer>> cc = ConnectedComponents.getComponents(graph);
+    return graph;
+  }
+
+  public static void main(String[] args) throws Exception {
+    if (args.length != 2) {
+      System.err.println("Usage: inputfile outputfile");
+      return;
+    }
+    long start = System.nanoTime();
+    List<String> docs = readDocs(args);
+    File output = new File(args[1]);
+
+    SimhashDuplicates duplicates = new SimhashDuplicates();
+    List<List<Integer>> cc = ConnectedComponents.getComponents(
+      duplicates.buildGraph(docs)
+    );
 
     int clusterId = 0;
 

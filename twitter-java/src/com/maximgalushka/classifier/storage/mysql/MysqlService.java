@@ -558,6 +558,48 @@ public class MysqlService {
     );
   }
 
+  public List<Tweet> getLatestUsedTweets(
+    double hours,
+    boolean published,
+    boolean rejected
+  ) {
+    if (!published || !rejected) {
+      throw new IllegalArgumentException(
+        String.format(
+          "Currently only both published and rejected are supported as return"
+        )
+      );
+    }
+    return query(
+      String.format(
+        "select t.id, t.content_json " +
+          "from tweets_clusters c join tweets_all t " +
+          "on c.best_tweet_id = t.id " +
+          "where c.is_displayed = 0 " +
+          "created_timestamp > DATE_SUB(NOW(), INTERVAL %f HOUR) " +
+          "union all " +
+          "select id, original_json " +
+          "from tweets_scheduled t " +
+          "where published_timestamp > DATE_SUB(NOW(), INTERVAL %f HOUR)",
+        hours, hours
+      ),
+      set -> {
+        List<Tweet> tweets = new ArrayList<>();
+        try {
+          while (set.next()) {
+            Tweet tweet = gson.fromJson(set.getString(2), Tweet.class);
+            tweet.setExcluded(true);
+            tweets.add(tweet);
+          }
+        } catch (Exception e) {
+          log.error(e);
+          e.printStackTrace();
+        }
+        return tweets;
+      }
+    );
+  }
+
   public List<Tweet> getTweetsForRun(long runId) {
     return query(
       String.format(

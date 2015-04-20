@@ -1,5 +1,8 @@
 package com.maximgalushka.classifier.clustering;
 
+import com.maximgalushka.classifier.clustering.graphs.DepthFirstSearch;
+import com.maximgalushka.classifier.clustering.graphs.Graph;
+import com.maximgalushka.classifier.clustering.lsh.simhash.SimhashDuplicates;
 import com.maximgalushka.classifier.storage.StorageService;
 import com.maximgalushka.classifier.twitter.best.BestClusterFinder;
 import com.maximgalushka.classifier.twitter.best.ClusterRepresentativeFinder;
@@ -213,6 +216,59 @@ public class ClusteringPipeline {
         );
         //bestTweetInCluster.put(clusterId, representative);
       }
+
+      // retrieve current clusters for run
+      // get used tweets
+      // re-cluster
+      // go BFS and mark de-duplicated clusters as needed.
+      List<Tweet> current = storage.getTweetsForRun(nextRunId);
+      final List<Tweet> used = storage.getLatestUsedTweets(24D, true, true);
+      final int usedSize = used.size();
+
+      used.addAll(current);
+
+      SimhashDuplicates duplicates = new SimhashDuplicates();
+      Graph graph = duplicates.buildTweetsGraph(used);
+      final List<Tweet> update = new ArrayList<>();
+
+      for (int index = 0; index < usedSize; index++) {
+        // TODO: suboptimal - don't process if there are self-duplicates.
+        // TODO: screw it for now.
+        // TODO: just shit-code it for now.
+        DepthFirstSearch dfs = new DepthFirstSearch(
+          graph,
+          index,
+          vertexId -> {
+            // if already excluded - don't add to excluded list
+            if (vertexId < usedSize) {
+              return;
+            }
+            Tweet tweet = used.get(vertexId);
+            tweet.setExcluded(true);
+            // TODO: specify exactly
+            tweet.setExcludedReason(
+              "Already published or rejected"
+            );
+            update.add(tweet);
+          }
+        );
+      }
+
+      log.debug(
+        String.format(
+          "Already rejected or published tweets excluded [%d] clusters. " +
+            "Saving.",
+          update.size()
+        )
+      );
+      log.debug(
+        String.format(
+          "Excluded tweets: %s",
+          update
+        )
+      );
+      // TODO: enable after testing
+      //storage.saveTweetsCleanedBatch(update);
 
       // TODO: we have pivoted and don't publish tweets as part of clustering
       // job anymore

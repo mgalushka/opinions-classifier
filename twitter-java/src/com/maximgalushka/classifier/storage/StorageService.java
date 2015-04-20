@@ -144,6 +144,20 @@ public class StorageService {
     return mysql.getLatestTweets(hours);
   }
 
+  /**
+   * @param hours period to return tweets for
+   * @param published if return published
+   * @param rejected if return published
+   * @return latest published and/or rejected tweets for latest hours
+   */
+  public List<Tweet> getLatestUsedTweets(
+    double hours,
+    boolean published,
+    boolean rejected
+  ) {
+    return mysql.getLatestUsedTweets(hours, published, rejected);
+  }
+
   public Tweet getTweetById(long tweetId) {
     return mysql.getTweetById(tweetId);
   }

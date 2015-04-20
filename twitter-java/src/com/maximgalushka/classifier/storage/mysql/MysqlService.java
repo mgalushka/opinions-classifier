@@ -624,6 +624,32 @@ public class MysqlService {
     );
   }
 
+  public List<Tweet> getBestTweetsForRun(long runId) {
+    return query(
+      String.format(
+        "select t.id, t.content_json, t.tweet_cleaned, " +
+          "t.created_timestamp " +
+          "from tweets_clusters c join tweets_all t " +
+          "on c.best_tweet_id = t.id " +
+          "where c.run_id = %d", runId
+      ),
+      set -> {
+        List<Tweet> tweets = new ArrayList<>();
+        try {
+          while (set.next()) {
+            tweets.add(gson.fromJson(set.getString(2), Tweet.class));
+          }
+        } catch (SQLException e) {
+          log.error(e);
+          e.printStackTrace();
+        }
+        return tweets;
+      }
+    );
+  }
+
+
+
   private <T> T query(String sql, Command<T> callback) {
     Connection conn = null;
     PreparedStatement stmt = null;

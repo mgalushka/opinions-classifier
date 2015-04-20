@@ -221,7 +221,7 @@ public class ClusteringPipeline {
       // get used tweets
       // re-cluster
       // go BFS and mark de-duplicated clusters as needed.
-      List<Tweet> current = storage.getTweetsForRun(nextRunId);
+      List<Tweet> current = storage.getBestTweetsForRun(nextRunId);
       // TODO: make configurable
       final List<Tweet> used = storage.getLatestUsedTweets(7 * 24D, true, true);
       final int usedSize = used.size();

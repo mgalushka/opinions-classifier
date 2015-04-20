@@ -215,6 +215,10 @@ public class StorageService {
     return mysql.getTweetsForRun(runId);
   }
 
+  public List<Tweet> getBestTweetsForRun(long runId) {
+    return mysql.getBestTweetsForRun(runId);
+  }
+
   public void saveBestTweetInCluster(long clusterId, long tweetId) {
     mysql.saveBestTweetInCluster(clusterId, tweetId);
   }

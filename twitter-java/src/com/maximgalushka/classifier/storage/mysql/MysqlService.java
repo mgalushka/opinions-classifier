@@ -605,7 +605,7 @@ public class MysqlService {
       String.format(
         "select t.id, t.content_json, t.tweet_cleaned, " +
           "t.created_timestamp " +
-          "from tweets_all t join clusters_run c " +
+          "from tweets_all t join clusters_runs c " +
           "on t.id = c.tweet_id " +
           "where c.run_id = %d", runId
       ),

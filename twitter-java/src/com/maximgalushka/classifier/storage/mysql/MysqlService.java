@@ -631,7 +631,7 @@ public class MysqlService {
           "t.created_timestamp " +
           "from tweets_clusters c join tweets_all t " +
           "on c.best_tweet_id = t.id " +
-          "where c.run_id = %d", runId
+          "where c.cluster_run_id = %d", runId
       ),
       set -> {
         List<Tweet> tweets = new ArrayList<>();

@@ -576,7 +576,7 @@ public class MysqlService {
           "from tweets_clusters c join tweets_all t " +
           "on c.best_tweet_id = t.id " +
           "where c.is_displayed = 0 " +
-          "created_timestamp > DATE_SUB(NOW(), INTERVAL %f HOUR) " +
+          "c.created_timestamp > DATE_SUB(NOW(), INTERVAL %f HOUR) " +
           "union all " +
           "select id, original_json " +
           "from tweets_scheduled t " +

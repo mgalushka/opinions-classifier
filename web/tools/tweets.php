@@ -51,7 +51,8 @@ $link = connect();
                 ON c.cluster_id = r.cluster_id
             WHERE
                 c.cluster_run_id = (SELECT max(cluster_run_id) FROM tweets_clusters) AND
-                c.is_displayed = 1
+                c.is_displayed = 1 AND
+                t.excluded = 0
             GROUP BY 
                 r.cluster_id
         ) t
@@ -77,7 +78,8 @@ $link = connect();
             ON c.cluster_id = r.cluster_id
         WHERE
             c.cluster_run_id = (SELECT max(cluster_run_id) FROM tweets_clusters) AND
-            c.is_displayed = 1
+            c.is_displayed = 1 AND
+            t.excluded = 0
         GROUP BY
             1, 2, 3, 4, 5
         ORDER BY

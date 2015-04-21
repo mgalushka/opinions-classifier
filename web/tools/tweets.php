@@ -112,7 +112,11 @@ $count_row= DB::queryFirstRow("
         $features = preg_replace('/,/', ', ', $row['features']);
         $tweet_author = htmlentities(json_decode($tweet_json, true)['user']['name']);
         $tweet_login = htmlentities(json_decode($tweet_json, true)['user']['screen_name']);
-        $tweet_link = json_decode($tweet_json, true)['entities']['urls'][0]['expanded_url'];
+        $urls = json_decode($tweet_json, true)['entities']['urls'];
+        $tweet_link = '';
+        if($urls){
+            $tweet_link = $urls[0]['expanded_url'];
+        }
         ?>
         <div id="row_<?= $id ?>" class="row">
             <div class="col-md-9 col-xs-9">

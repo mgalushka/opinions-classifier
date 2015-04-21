@@ -96,6 +96,15 @@ public class ClusteringPipeline {
     this.blacklistProcessor = blacklistProcessor;
   }
 
+  public FeaturesExtractorPipeline getFeaturesExtractor() {
+    return featuresExtractor;
+  }
+
+  public void setFeaturesExtractor(FeaturesExtractorPipeline
+                                     featuresExtractor) {
+    this.featuresExtractor = featuresExtractor;
+  }
+
   private static final double LATEST_HOURS = 0.5D;
 
   /**

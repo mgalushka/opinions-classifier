@@ -6,6 +6,7 @@ import com.maximgalushka.classifier.clustering.lsh.simhash.SimhashDuplicates;
 import com.maximgalushka.classifier.storage.StorageService;
 import com.maximgalushka.classifier.twitter.best.BestClusterFinder;
 import com.maximgalushka.classifier.twitter.best.ClusterRepresentativeFinder;
+import com.maximgalushka.classifier.twitter.best.FeaturesExtractorPipeline;
 import com.maximgalushka.classifier.twitter.cleanup.BlacklistProcessor;
 import com.maximgalushka.classifier.twitter.cleanup.CleanPipeline;
 import com.maximgalushka.classifier.twitter.client.TwitterStandardClient;
@@ -31,6 +32,7 @@ public class ClusteringPipeline {
   private BestClusterFinder clusterFinder;
   private TwitterStandardClient twitterClient;
   private BlacklistProcessor blacklistProcessor;
+  private FeaturesExtractorPipeline featuresExtractor;
 
   public ClusteringPipeline() {
   }
@@ -141,6 +143,13 @@ public class ClusteringPipeline {
       )
     );
 
+    // extract features and clean tweets before clustering based on features
+    // TODO: in current design we are extracting features twice:
+    // 1 - pre-cleaning
+    // 2 - choosing best representative tweet from cluster.
+    // we can potentially optimize it later.
+    featuresExtractor.processBatch(latestHoursTweets);
+
     // storing processed list as during processing we are
     storage.saveTweetsCleanedBatch(latestHoursTweets);
 
@@ -198,6 +207,7 @@ public class ClusteringPipeline {
         );
         //countId.put(tweetsInCluster.size(), clusterId);
 
+        // TODO: this method internally exclude tweets based on same metrics
         ClusterRepresentativeFinder.Pair<Tweet, Map<Tweet, Map<String, Object>>>
           pair = representativeFinder
           .findRepresentativeFeaturesBased(
@@ -248,7 +258,10 @@ public class ClusteringPipeline {
             tweet.setExcluded(true);
             // TODO: specify exactly
             tweet.setExcludedReason(
-              "Already published or rejected"
+              String.format(
+                "[Already published or rejected]%s",
+                tweet.getExcludedReason()
+              )
             );
             update.add(tweet);
           }

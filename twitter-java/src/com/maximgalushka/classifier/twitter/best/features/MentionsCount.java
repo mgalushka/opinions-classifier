@@ -24,4 +24,9 @@ public class MentionsCount extends PatternCounterFeature{
       return 1D;
     }
   }
+
+  @Override
+  public boolean exclude(Long feature) {
+    return feature > 1;
+  }
 }

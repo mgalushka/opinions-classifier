@@ -1,6 +1,7 @@
 package com.maximgalushka.classifier.twitter.best.features;
 
 import com.maximgalushka.classifier.twitter.best.TextCounterFeature;
+import com.maximgalushka.classifier.twitter.model.Tweet;
 import org.languagetool.JLanguageTool;
 import org.languagetool.MultiThreadedJLanguageTool;
 import org.languagetool.language.BritishEnglish;
@@ -31,10 +32,10 @@ public final class SpellingMistakesCount implements TextCounterFeature {
   }
 
   @Override
-  public Long extract(String text) {
+  public Long extract(Tweet tweet) {
     int errors = 0;
     // we need to ignore hashtags when checking for spelling
-    String withoutHashTags = text.replace("#", "");
+    String withoutHashTags = tweet.getText().replace("#", "");
     try {
       errors = languageTool.check(withoutHashTags).size();
     } catch (IOException e) {
@@ -46,5 +47,11 @@ public final class SpellingMistakesCount implements TextCounterFeature {
   @Override
   public double metric(Long feature) {
     return feature / 2D;
+  }
+
+  @Override
+  public boolean exclude(Long feature) {
+    // we don't excluded on mistakes count now
+    return false;
   }
 }

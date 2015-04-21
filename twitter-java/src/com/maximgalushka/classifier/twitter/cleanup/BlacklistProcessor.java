@@ -36,7 +36,9 @@ public class BlacklistProcessor {
         tweet.setExcluded(true);
         tweet.setExcludedReason(
           String.format(
-            "blacklisted words: [%s]", forbiddenToken
+            "blacklisted words: [%s]%s",
+            forbiddenToken,
+            tweet.getExcludedReason()
           )
         );
       } else {

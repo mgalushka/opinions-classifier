@@ -1,6 +1,7 @@
 package com.maximgalushka.classifier.twitter.model;
 
 import com.google.gson.annotations.SerializedName;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.util.CollectionUtils;
 
 /**
@@ -88,7 +89,7 @@ public class Tweet {
   }
 
   public String getExcludedReason() {
-    return excludedReason;
+    return StringUtils.isBlank(excludedReason) ? "" : excludedReason;
   }
 
   public void setExcludedReason(String excludedReason) {

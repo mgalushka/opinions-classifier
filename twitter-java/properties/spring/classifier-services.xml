@@ -124,10 +124,12 @@
           class="com.maximgalushka.classifier.twitter.best.FeaturesExtractorPipeline">
         <property name="featureExtractors">
             <list>
-                <bean class="com.maximgalushka.classifier.twitter.best.features.WordCount"/>
+                <!--bean class="com.maximgalushka.classifier.twitter.best.features.WordCount"/-->
                 <bean class="com.maximgalushka.classifier.twitter.best.features.MentionsCount"/>
                 <bean class="com.maximgalushka.classifier.twitter.best.features.SpellingMistakesCount"/>
-                <!--bean class="com.maximgalushka.classifier.twitter.best.features.HashtagsCount"/-->
+                <bean class="com.maximgalushka.classifier.twitter.best.features.HashtagsCount"/>
+                <bean class="com.maximgalushka.classifier.twitter.best.features.HasUrlFeature"/>
+                <bean class="com.maximgalushka.classifier.twitter.best.features.HasMediaFeature"/>
             </list>
         </property>
     </bean>
@@ -140,6 +142,7 @@
         <property name="representativeFinder" ref="best-tweet-finder"/>
         <property name="twitterClient" ref="twitter-stream-client"/>
         <property name="blacklistProcessor" ref="blacklist-processor"/>
+        <property name="featuresExtractor" ref="tweet-features-pipeline"/>
     </bean>
 
     <bean id="main"

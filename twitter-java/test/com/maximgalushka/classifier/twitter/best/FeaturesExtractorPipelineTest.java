@@ -20,9 +20,11 @@ public class FeaturesExtractorPipelineTest {
   public static final Logger log =
     Logger.getLogger(FeaturesExtractorPipelineTest.class);
 
-  private static final String T = "'RT @GrahamWP_UK: \"Ukraine’s neo-Nazi leader (Dmitry " +
+  private static final String TSTR = "'RT @GrahamWP_UK: \"Ukraine’s neo-Nazi leader (Dmitry " +
     "@Yarosh) becomes top military #adviser, legalizes fighters\" http://t" +
     ".co/VkX6Rz4J7Z #Donbass";
+
+  private static final Tweet T = new Tweet(TSTR);
 
   @Test
   public void testWordCount(){
@@ -62,7 +64,7 @@ public class FeaturesExtractorPipelineTest {
       )
     );
 
-    Map<String, Object> m = p.extract(new Tweet(T));
+    Map<String, Object> m = p.extract(T);
     log.debug(m);
 
     double metric = p.metric(m);

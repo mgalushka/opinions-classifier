@@ -453,7 +453,11 @@ public class MysqlService {
         for (Tweet tweet : tweets) {
           stmt.setString(1, tweet.getText());
           stmt.setInt(2, tweet.isExcluded() ? 1 : 0);
-          stmt.setString(3, tweet.getExcludedReason());
+          String reason = tweet.getExcludedReason();
+          String truncatedReason = reason.substring(
+            0, Math.min(reason.length(), 256)
+          );
+          stmt.setString(3, truncatedReason);
           stmt.setLong(4, tweet.getId());
           stmt.addBatch();
           counter++;
@@ -647,7 +651,6 @@ public class MysqlService {
       }
     );
   }
-
 
 
   private <T> T query(String sql, Command<T> callback) {

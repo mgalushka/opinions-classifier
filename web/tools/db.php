@@ -1,7 +1,16 @@
 <?php
+require_once 'db.class.php';
 include 'config.php';
 
-function connect(){
+DB::$host = $MYSQL_SERVER;
+DB::$port = $MYSQL_PORT;
+DB::$user = $MYSQL_USER;
+DB::$password = $MYSQL_PASSWORD;
+DB::$dbName = $MYSQL_DATABASE;
+DB::$encoding = 'utf8_general_ci';
+
+function connect()
+{
     global $MYSQL_SERVER, $MYSQL_USER, $MYSQL_PASSWORD, $MYSQL_DATABASE;
     $link = mysqli_connect($MYSQL_SERVER, $MYSQL_USER, $MYSQL_PASSWORD);
     if (!$link) {
@@ -14,4 +23,5 @@ function connect(){
     }
     return $link;
 }
+
 ?>

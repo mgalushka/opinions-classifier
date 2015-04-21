@@ -30,9 +30,24 @@ $link = connect();
     </div>
     <!-- /.container-fluid -->
 </nav>
-
+<?
+$count_row= DB::queryFirstRow("
+    SELECT
+         count(c.best_tweet_id) AS clusters_count
+    FROM
+         tweets_clusters c JOIN tweets_all t
+         ON c.best_tweet_id = t.id
+    WHERE
+         c.cluster_run_id = (SELECT max(cluster_run_id) FROM tweets_clusters) AND
+         c.is_displayed = 1 AND
+         t.excluded = 0
+    "
+);
+?>
 <div class="page-header">
-    <h3>Example page header <small>Subtext for header</small></h3>
+    <h3>Cleaned tweets: <b><?= $count_row['clusters_count'] ?></b>
+        <!--small>Subtext for header</small-->
+    </h3>
 </div>
 
 <div class="container-fluid">
@@ -40,10 +55,12 @@ $link = connect();
     // ide here is to calculate average and then show tweets in order 
     // of how far they are from average cluster size
     $sql_average = sprintf('
-        SELECT AVG(cnt) as avg_count
+        SELECT
+          SUM(cnt) AS cnt,
+          AVG(cnt) AS avg_count
         FROM(
             SELECT
-                count(distinct r.tweet_id) as cnt
+                count(DISTINCT r.tweet_id) AS cnt
             FROM
                 tweets_clusters c JOIN tweets_all t
                 ON c.best_tweet_id = t.id
@@ -70,7 +87,7 @@ $link = connect();
             t.tweet_cleaned,
             t.features,
             DATE_FORMAT(t.created_timestamp, "%%Y-%%m-%%d %%H:%%i") AS created_timestamp,
-            count(r.tweet_id) as tweets_in_cluster
+            count(r.tweet_id) AS tweets_in_cluster
         FROM
             tweets_clusters c JOIN tweets_all t
             ON c.best_tweet_id = t.id
@@ -84,7 +101,7 @@ $link = connect();
             1, 2, 3, 4, 5
         ORDER BY
             ABS(count(r.tweet_id) - %f) ASC
-        ', 
+        ',
         $average
     );
     $result = mysqli_query($link, $sql);

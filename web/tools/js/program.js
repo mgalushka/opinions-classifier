@@ -6,6 +6,7 @@ $(document).ready(function () {
         var tweetId = $(this).attr('data-id');
         var action = $(this).attr('data-action');
         tt.core.statusUpdate(tweetId, '', action, $(this));
+        $('#row_' + tweetId).addClass('hide');
     });
 
     $('.delete').on('click', function () {
@@ -39,6 +40,7 @@ $(document).ready(function () {
         console.log("Going to save tweet: " + tweetId + ' ' + editedText);
 
         tt.core.statusUpdate(tweetId, editedText, 'update', $(this));
+        $('#row_' + tweetId).addClass('hide');
     });
 
 

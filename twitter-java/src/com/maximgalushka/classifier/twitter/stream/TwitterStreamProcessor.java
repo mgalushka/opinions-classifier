@@ -16,6 +16,7 @@ import java.util.concurrent.BlockingQueue;
 /**
  * @since 8/11/2014.
  */
+@SuppressWarnings({"FieldCanBeLocal", "unused"})
 public class TwitterStreamProcessor implements Runnable {
   public static final Logger log = Logger.getLogger(
     TwitterStreamProcessor
@@ -93,7 +94,7 @@ public class TwitterStreamProcessor implements Runnable {
 
     int BATCH_SIZE = 20; // much slow for ML domain
 
-    // TODO: experiment to find better ratio
+    // experiment to find better ratio
     //int STEP = BATCH_SIZE / 20;
 
     ArrayDeque<Tweet> batch = new ArrayDeque<>();
@@ -108,7 +109,8 @@ public class TwitterStreamProcessor implements Runnable {
         } else {
           batch.add(tweet);
         }
-        // TODO: final step - we turn off old way of processing tweets.
+        // final step - we turn off old way of processing tweets. This is just for legacy reasons.
+        // to remember how this product was grown.
         /*
         try {
           if (batch.size() < (BATCH_SIZE + STEP) &&

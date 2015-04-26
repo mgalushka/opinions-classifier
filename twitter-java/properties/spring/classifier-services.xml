@@ -88,10 +88,6 @@
         <property name="featuresExtractor" ref="tweet-features-pipeline"/>
     </bean>
 
-    <bean id="best-cluster-finder"
-          class="com.maximgalushka.classifier.twitter.best.BestClusterFinder">
-    </bean>
-
     <bean id="twitter-stream-processor"
           class="com.maximgalushka.classifier.twitter.stream.TwitterStreamProcessor">
         <property name="settings" ref="settings"/>
@@ -130,6 +126,7 @@
                 <bean class="com.maximgalushka.classifier.twitter.best.features.HashtagsCount"/>
                 <bean class="com.maximgalushka.classifier.twitter.best.features.HasUrlFeature"/>
                 <bean class="com.maximgalushka.classifier.twitter.best.features.HasMediaFeature"/>
+                <bean class="com.maximgalushka.classifier.twitter.best.features.CapsLockWordsPercentage"/>
             </list>
         </property>
     </bean>

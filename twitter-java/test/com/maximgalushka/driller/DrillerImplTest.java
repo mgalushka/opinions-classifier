@@ -1,5 +1,7 @@
 package com.maximgalushka.driller;
 
+import com.maximgalushka.classifier.twitter.LocalSettings;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,10 +15,18 @@ public class DrillerImplTest {
 
   @Test
   public void testResolve() throws Exception {
-    Driller driller = new DrillerImpl();
-    Assert.assertEquals(
-      driller.resolve("http://t.co/59WJLfWk3y"),
-      driller.resolve("http://trib.al/ypTW4Te")
-    );
+    LocalSettings settings = new LocalSettings();
+    settings.init();
+    boolean integration = Boolean.valueOf(settings.value(LocalSettings.INTEGRATION_TESTING));
+
+    if (!integration) {
+      Driller driller = new DrillerImpl();
+      Assert.assertEquals(
+        driller.resolve("http://t.co/59WJLfWk3y"),
+        driller.resolve("http://trib.al/ypTW4Te")
+      );
+    } else {
+      log.warn("Ignoring Driller test because of integration testing mode.");
+    }
   }
 }

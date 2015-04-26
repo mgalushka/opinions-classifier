@@ -14,12 +14,12 @@ public class Clusters implements Serializable {
 
     private static final long serialVersionUID = -5519589416029255789L;
 
-    private List<TweetsCluster> clusters = new ArrayList<TweetsCluster>();
+    private List<TweetsCluster> clusters = new ArrayList<>();
 
     private transient Map<Integer, TweetsCluster> reversedIndex;
 
     public Clusters() {
-        this.reversedIndex = new HashMap<Integer, TweetsCluster>();
+        this.reversedIndex = new HashMap<>();
     }
 
     private void rebuildIndex() {
@@ -43,7 +43,7 @@ public class Clusters implements Serializable {
         rebuildIndex();
     }
 
-    // TODO: looks like crap
+    // TODO: looks badly
     public void addClustersNoIndex(List<TweetsCluster> clusters) {
         this.clusters.addAll(clusters);
     }

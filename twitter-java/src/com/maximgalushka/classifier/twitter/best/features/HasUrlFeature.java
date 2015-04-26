@@ -3,9 +3,6 @@ package com.maximgalushka.classifier.twitter.best.features;
 import com.maximgalushka.classifier.twitter.best.Feature;
 import com.maximgalushka.classifier.twitter.model.Tweet;
 
-/**
- * TODO:
- */
 public class HasUrlFeature implements Feature<Boolean, Tweet> {
 
   @Override

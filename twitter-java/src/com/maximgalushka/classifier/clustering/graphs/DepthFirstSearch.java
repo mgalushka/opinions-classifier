@@ -1,15 +1,29 @@
 package com.maximgalushka.classifier.clustering.graphs;
 
+import javax.annotation.concurrent.NotThreadSafe;
+
 /**
+ * Note - this class has internal state and once traversed via DFS from some node -
+ * it is impossible to traverse same connected component even from other node.
+ * Visited nodes are memoized in internal state of object.
+ *
+ * NOTE! We are executing visitor code on all vertices except first node passed to DFS
+ * as this is what expected byspecification.
+ *
+ * So this is limited implementation of DFS and cannot be reusable for other use-cases.
+ *
  * @author Maxim Galushka
  */
 @SuppressWarnings("UnusedDeclaration")
+@NotThreadSafe
 public class DepthFirstSearch {
-  private boolean[] marked;    // marked[v] = is there an s-v path?
-  private int count;           // number of vertices connected to s
+  private final Graph G;
+  private final DfsAction action;
+  private final boolean[] marked;    // marked[v] = is node v already visited?
+  private int count;                 // number of vertices processed by DFS
 
-  public static interface DfsAction {
-     void process(int vertexId);
+  public interface DfsAction {
+    void process(int vertexId);
   }
 
   /**
@@ -17,21 +31,25 @@ public class DepthFirstSearch {
    * connected to the source vertex <tt>s</tt>.
    *
    * @param G the graph
-   * @param s the source vertex
    */
-  public DepthFirstSearch(Graph G, int s, DfsAction action) {
-    marked = new boolean[G.V()];
-    dfs(G, s, action);
+  public DepthFirstSearch(Graph G, DfsAction action) {
+    this.marked = new boolean[G.V()];
+    this.G = G;
+    this.action = action;
   }
 
   // depth first search from v
-  private void dfs(Graph G, int v, DfsAction action) {
+  // note that we are executing visitor code on all vertices except v by itself
+  public void dfs(int v) {
+    if (marked(v)) {
+      return;
+    }
     count++;
     marked[v] = true;
     for (int w : G.adj(v)) {
       if (!marked[w]) {
         action.process(w);
-        dfs(G, w, action);
+        dfs(w);
       }
     }
   }

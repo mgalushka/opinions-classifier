@@ -17,10 +17,8 @@ public class StopServiceHandler implements Runnable {
   public static final Logger log = Logger.getLogger(StopServiceHandler.class);
   private LocalSettings settings;
 
-  // TODO: dirty hack - figure out how fucking spring can initialize bean
-  // TODO: via static factory -this is not fucking work,
-  // TODO: bloody faggots are developers of shitty spring -
-  // TODO: fucking waste of my time
+  // TODO: dirty hack - figure out how spring can initialize thread pool in spring via static
+  // factory
   private ExecutorService pool = Executors.newFixedThreadPool(1);
 
   private TwitterStreamProcessor processor;

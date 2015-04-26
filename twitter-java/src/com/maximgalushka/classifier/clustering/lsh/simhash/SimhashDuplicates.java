@@ -22,6 +22,12 @@ public class SimhashDuplicates {
 
   public static final Logger log = Logger.getLogger(SimhashDuplicates.class);
 
+  private int levenstainThreshold = 10;
+
+  public SimhashDuplicates(int threshold) {
+    this.levenstainThreshold = threshold;
+  }
+
   public Graph buildTweetsGraph(List<Tweet> tweets) {
     List<String> docs = new ArrayList<>(tweets.size());
     for (Tweet t : tweets) {
@@ -126,8 +132,7 @@ public class SimhashDuplicates {
       // match by using other metric - like Hamming distance in this example
       for (Integer i : docSimilarCandidates) {
         int dist = simHash.hammingDistance(docHash, docHashes.get(i));
-        // TODO: setup the threshold
-        if (dist <= 10) {
+        if (dist <= levenstainThreshold) {
           similarDocs.add(i);
           bits.set(idx);
           docDistances.put(i, dist);
@@ -159,17 +164,6 @@ public class SimhashDuplicates {
       bits.set(idx);
       ++idx;
     }
-
-    // TODO: idea on how to speed up checking if new best representatives are
-    // TODO same tweets that were published previously:
-    // let first N tweets are existing tweets (published already or rejected
-    // already)
-    // build a graph and after it go through connected components starting from
-    // 1..N for each already twitted/rejected tweet.
-    // and mark all tweets in this CC as duplicates with corresponding reason
-    // to spidify the process - if CC was marked - don't repeat it
-    // if there are self-duplicates across 1..N by themselves.
-    // 1..N - to choose for latest 30 days to avoid huge number of messages.
     return graph;
   }
 
@@ -182,7 +176,7 @@ public class SimhashDuplicates {
     List<String> docs = readDocs(args);
     File output = new File(args[1]);
 
-    SimhashDuplicates duplicates = new SimhashDuplicates();
+    SimhashDuplicates duplicates = new SimhashDuplicates(10);
     List<List<Integer>> cc = ConnectedComponents.getComponents(
       duplicates.buildGraph(docs)
     );

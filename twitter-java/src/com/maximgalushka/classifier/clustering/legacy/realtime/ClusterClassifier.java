@@ -30,7 +30,7 @@ public class ClusterClassifier {
             if (t++ >= stats.getClustersToScan()) break;
         }
         // no suitable cluster found - create a new one just with this document
-        // TODO: currently number of clusters can be only increased
+        // currently number of clusters can be only increased
         realtimeClusters.add(new Cluster(doc));
         stats.bumpClustersCount();
     }

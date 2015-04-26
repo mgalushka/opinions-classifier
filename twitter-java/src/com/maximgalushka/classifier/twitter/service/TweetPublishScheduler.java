@@ -73,9 +73,7 @@ public class TweetPublishScheduler implements Runnable {
         unpublished.size() == 0 ? "[none]" : unpublished
       )
     );
-    for (ScheduledTweet tweet : unpublished) {
-      schedule(tweet);
-    }
+    unpublished.forEach(this::schedule);
 
     log.debug("Getting unscheduled tweets");
     List<ScheduledTweet> tweets = storage.getUnscheduledTweets();
@@ -198,10 +196,9 @@ public class TweetPublishScheduler implements Runnable {
               ex
             );
           }
-          // still need to update published status in database or it will be infinite loop
-          // TODO: save exact status in database
           if (status != null) {
             long publishedId = status.getId();
+            //noinspection ConstantConditions
             storage.updatePublished(tweet.getData().getId(), publishedId, success);
           }
         } catch (Exception e) {

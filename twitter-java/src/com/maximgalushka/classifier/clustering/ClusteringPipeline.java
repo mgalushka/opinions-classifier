@@ -4,7 +4,6 @@ import com.maximgalushka.classifier.clustering.graphs.DepthFirstSearch;
 import com.maximgalushka.classifier.clustering.graphs.Graph;
 import com.maximgalushka.classifier.clustering.lsh.simhash.SimhashDuplicates;
 import com.maximgalushka.classifier.storage.StorageService;
-import com.maximgalushka.classifier.twitter.best.BestClusterFinder;
 import com.maximgalushka.classifier.twitter.best.ClusterRepresentativeFinder;
 import com.maximgalushka.classifier.twitter.best.FeaturesExtractorPipeline;
 import com.maximgalushka.classifier.twitter.cleanup.BlacklistProcessor;
@@ -18,6 +17,19 @@ import org.carrot2.core.*;
 import java.util.*;
 
 /**
+ * Performs logic for full end-to-end clustering process:
+ * 1. Retrieves potential tweets from db and clean-up according to black-listed rules.
+ * 2. Do cleanup according to features (if thresholds are violated)
+ * 3. Cleans tweet texts to remove training links from text, "RT" from start etc...
+ * 4. Saves everything in database and performs clustering
+ * 5. Chooses best representative from each cluster
+ * 6. Retrieves from db all tweets previously published or rejected for latest X days
+ * 7. De-duplicates with simhash against already published or rejected tweets to avoid multiple
+ * duplicates to be displayed to user.
+ * 8. Saves everything back to db.
+ * <p>
+ * This process is run periodically and stores each subsequent run under incremented run id.
+ *
  * @author Maxim Galushka
  */
 @SuppressWarnings("UnusedDeclaration")
@@ -29,7 +41,6 @@ public class ClusteringPipeline {
   private Controller controller;
   private CleanPipeline cleanPipeline;
   private ClusterRepresentativeFinder representativeFinder;
-  private BestClusterFinder clusterFinder;
   private TwitterStandardClient twitterClient;
   private BlacklistProcessor blacklistProcessor;
   private FeaturesExtractorPipeline featuresExtractor;
@@ -72,14 +83,6 @@ public class ClusteringPipeline {
     this.representativeFinder = representativeFinder;
   }
 
-  public BestClusterFinder getClusterFinder() {
-    return clusterFinder;
-  }
-
-  public void setClusterFinder(BestClusterFinder clusterFinder) {
-    this.clusterFinder = clusterFinder;
-  }
-
   public TwitterStandardClient getTwitterClient() {
     return twitterClient;
   }
@@ -100,8 +103,10 @@ public class ClusteringPipeline {
     return featuresExtractor;
   }
 
-  public void setFeaturesExtractor(FeaturesExtractorPipeline
-                                     featuresExtractor) {
+  public void setFeaturesExtractor(
+    FeaturesExtractorPipeline
+      featuresExtractor
+  ) {
     this.featuresExtractor = featuresExtractor;
   }
 
@@ -156,7 +161,8 @@ public class ClusteringPipeline {
     // TODO: in current design we are extracting features twice:
     // 1 - pre-cleaning
     // 2 - choosing best representative tweet from cluster.
-    // we can potentially optimize it later.
+    // this is not an issue if number of clusters is small as we anyway are doing everything in
+    // memory
     featuresExtractor.processBatch(latestHoursTweets);
 
     // storing processed list as during processing we are
@@ -216,7 +222,8 @@ public class ClusteringPipeline {
         );
         //countId.put(tweetsInCluster.size(), clusterId);
 
-        // TODO: this method internally exclude tweets based on same metrics
+        // NOTE: this method internally exclude tweets based on same metrics
+        // this is not clear from code that this will be done
         ClusterRepresentativeFinder.Pair<Tweet, Map<Tweet, Map<String, Object>>>
           pair = representativeFinder
           .findRepresentativeFeaturesBased(
@@ -247,35 +254,49 @@ public class ClusteringPipeline {
 
       used.addAll(current);
 
-      SimhashDuplicates duplicates = new SimhashDuplicates();
+      // TODO: make distance parameter configurable
+      SimhashDuplicates duplicates = new SimhashDuplicates(10);
       Graph graph = duplicates.buildTweetsGraph(used);
       final List<Tweet> update = new ArrayList<>();
 
-      for (int index = 0; index < usedSize; index++) {
-        // TODO: suboptimal - don't process if there are self-duplicates.
-        // TODO: screw it for now.
-        // TODO: just shit-code it for now.
-        DepthFirstSearch dfs = new DepthFirstSearch(
-          graph,
-          index,
-          vertexId -> {
-            // if already excluded - don't add to excluded list
-            if (vertexId < usedSize) {
-              return;
-            }
-            Tweet tweet = used.get(vertexId);
-            tweet.setExcluded(true);
-            // TODO: specify exactly
-            tweet.setExcludedReason(
-              String.format(
-                "[Already published or rejected]%s",
-                tweet.getExcludedReason()
-              )
-            );
-            update.add(tweet);
+      // shared DFS object
+      final DepthFirstSearch dfs = new DepthFirstSearch(
+        graph,
+        vertexId -> {
+          // if already excluded - don't add to excluded list
+          if (vertexId < usedSize) {
+            return;
           }
-        );
+          Tweet tweet = used.get(vertexId);
+          tweet.setExcluded(true);
+          // TODO: specify exactly
+          tweet.setExcludedReason(
+            String.format(
+              "[Already published or rejected]%s",
+              tweet.getExcludedReason()
+            )
+          );
+          update.add(tweet);
+        }
+      );
+
+      for (int index = 0; index < usedSize; index++) {
+        // if there are self-duplicates - DFS will prevent 2nd time traversing same
+        // connected component. So this is optimized to be linear on the number of
+        // vertices in the graph.
+        dfs.dfs(index);
       }
+
+      // TODO: idea on how to speed up checking if new best representatives are
+      // TODO same tweets that were published previously:
+      // let first N tweets are existing tweets (published already or rejected
+      // already)
+      // build a graph and after it go through connected components starting from
+      // 1..N for each already twitted/rejected tweet.
+      // and mark all tweets in this CC as duplicates with corresponding reason
+      // to spidify the process - if CC was marked - don't repeat it
+      // if there are self-duplicates across 1..N by themselves.
+      // 1..N - to choose for latest 30 days to avoid huge number of messages.
 
       log.debug(
         String.format(
@@ -291,51 +312,6 @@ public class ClusteringPipeline {
         )
       );
       storage.saveTweetsCleanedBatch(update);
-
-      // TODO: we have pivoted and don't publish tweets as part of clustering
-      // job anymore
-      /**
-       Random r = new Random(System.currentTimeMillis());
-       boolean retweet = (r.nextInt(10) <= 2); // 20%
-       // TODO: this logic should be separated to special handler
-       // TODO: which chooses best tweet in cluster and re-tweet or
-       // TODO: creates new tweet based o  it.
-       int size = countId.size();
-       if (size <= 1) {
-       log.error(
-       String.format(
-       "Cannot find best from collection, too low number of elements: [%d]",
-       size
-       )
-       );
-       return;
-       }
-       // TODO: randomize slightly to minimize clashes.
-       // TODO: implement algorithm to eliminate posting what was already
-       posted before.
-       int choice = r.nextInt(Math.min(size - 1, 4)) + 1;
-       Object bestKey = countId.descendingMap().keySet().toArray()[choice];
-       long bestCluster = countId.get(bestKey);
-       Tweet tweet = bestTweetInCluster.get(bestCluster);
-       storage.savePublishedTweet(tweet, retweet);
-       if (retweet) {
-       log.warn(
-       String.format(
-       "Re-tweeting [%s]",
-       tweet
-       )
-       );
-       twitterClient.retweet(tweet.getId());
-       } else {
-       log.warn(
-       String.format(
-       "Straight tweet [%s]",
-       tweet
-       )
-       );
-       twitterClient.post(tweet);
-       }
-       */
 
     } catch (Exception e) {
       log.error("", e);

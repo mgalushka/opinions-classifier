@@ -37,6 +37,7 @@ public final class FeaturesExtractorPipeline
     }
   }
 
+  // NOTE! This method internally marks tweet as excluded if it violates the metric threshold
   @SuppressWarnings({"unchecked"})
   @Override
   public Map<String, Object> extract(Tweet input) {
@@ -49,11 +50,10 @@ public final class FeaturesExtractorPipeline
         metricName,
         extractor.metric(feature)
       );
-      // TODO: not sure if this is good design but let set excluded flags
-      // TODO: here as well
+      // TODO: not sure if this is good design but let set excluded flags here as well
+      // we need to look periodically to excluded reasons to understand trends and patterns there
       if (extractor.exclude(feature)) {
-        // TODO: change to trace
-        log.debug(
+        log.trace(
           String.format(
             "Excluding tweet: [%s], because of feature [%s]",
             input,

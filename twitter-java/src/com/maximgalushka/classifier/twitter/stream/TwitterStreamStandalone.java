@@ -77,7 +77,7 @@ public class TwitterStreamStandalone {
       }
     );
     int BATCH_SIZE = 1000;
-    // TODO: experiment to find better ratio
+    // experiment to find better ratio
     int STEP = BATCH_SIZE / 10;
 
     ArrayDeque<Tweet> batch = new ArrayDeque<>();

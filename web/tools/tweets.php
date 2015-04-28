@@ -150,7 +150,7 @@ $count_row= DB::queryFirstRow("
     ?>
 </div>
 <!-- Modal -->
-<div class="modal fade" id="edit-tweet-modal" tabindex="-1" role="dialog" aria-labelledby="edit-tweet-modal-label"
+<div class="modal-sm" id="edit-tweet-modal" tabindex="-1" role="dialog" aria-labelledby="edit-tweet-modal-label"
      aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">

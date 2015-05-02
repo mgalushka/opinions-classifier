@@ -125,8 +125,8 @@ $count_row= DB::queryFirstRow("
                         <?= $tweet_login ?> (<?= $tweet_author ?>)
                         (<?= $id ?>) (<?= $row['tweets_in_cluster'] ?>)
                     </div>
-                    <div id="text_<?= $id ?>" class="panel-body"><?= $row['tweet_cleaned'] ?>
-                        &nbsp;<a href="<?= $tweet_link ?>" target="_blank"><?= $tweet_link ?></a></div>
+                    <div id="text_<?= $id ?>" class="panel-body" style="word-wrap:break-word"><?= $row['tweet_cleaned'] ?> 
+                        <a href="<?= $tweet_link ?>" target="_blank" style="word-wrap:break-word"><?= $tweet_link ?></a></div>
                     <div class="panel-footer"><?= $row['created_timestamp'] ?></div>
                 </div>
             </div>

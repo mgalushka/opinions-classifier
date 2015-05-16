@@ -90,13 +90,16 @@ $count_row= DB::queryFirstRow("
             count(r.tweet_id) AS tweets_in_cluster
         FROM
             tweets_clusters c JOIN tweets_all t
-            ON c.best_tweet_id = t.id
+              ON c.best_tweet_id = t.id
             JOIN clusters_runs r
-            ON c.cluster_id = r.cluster_id
+              ON c.cluster_id = r.cluster_id
+            LEFT JOIN tweets_published p
+              ON t.id = p.id
         WHERE
             c.cluster_run_id = (SELECT max(cluster_run_id) FROM tweets_clusters) AND
             c.is_displayed = 1 AND
-            t.excluded = 0
+            t.excluded = 0 AND
+            p.id IS NULL
         GROUP BY
             1, 2, 3, 4, 5
         ORDER BY

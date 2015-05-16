@@ -30,7 +30,7 @@ public class BlacklistProcessor {
       String forbiddenToken = "";
       String forbiddenUser = "";
       for (String user : bannedUsers) {
-        if (tweet.getAuthor().getName().equals(user)) {
+        if (tweet.getAuthor().getScreenName().equals(user)) {
           excluded = true;
           forbiddenUser = tweet.getAuthor().getName();
           break;

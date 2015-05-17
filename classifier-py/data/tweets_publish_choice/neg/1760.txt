@@ -1,1 +1,1 @@
-#Sismo mb 5.1 SOUTH OF JAVA, INDONESIA: Magnitude  mb 5.1Region  SOUTH OF JAVA, INDONESIADate time ... #CSismica
+#Sismo mb 5.1 SOUTH OF JAVA, INDONESIA: MagnitudeÂ Â mb 5.1RegionÂ Â SOUTH OF JAVA, INDONESIADate timeÂ ... #CSismica

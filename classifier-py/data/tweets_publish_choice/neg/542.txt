@@ -1,1 +1,1 @@
-learned something today, don’t run a 32-bit java vm on a 64-bit machine…works but memory usage is insane!
+learned something today, donÂ’t run a 32-bit java vm on a 64-bit machineÂ…works but memory usage is insane!

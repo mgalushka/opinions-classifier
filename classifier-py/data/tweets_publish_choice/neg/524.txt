@@ -1,1 +1,1 @@
-Writing secure sever code is hard. With PHP it seems to be impossible. I’ll stick with Java, thanks.
+Writing secure sever code is hard. With PHP it seems to be impossible. IÂ’ll stick with Java, thanks.

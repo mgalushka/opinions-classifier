@@ -1,1 +1,1 @@
-java imap, performance issues, fetching all mails
+java imap, performance issues, fetching allÂ mails

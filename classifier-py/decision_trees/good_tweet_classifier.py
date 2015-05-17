@@ -6,10 +6,7 @@ from nltk.corpus.reader.plaintext import (
 )
 
 decisions = LazyCorpusLoader(
-    '{0}/projects/opinions-classifier/'
-    'classifier-py/data/tweets_publish_choice'.format(
-        os.getenv("HOME")
-    ),
+    'tweets_publish_choice',
     CategorizedPlaintextCorpusReader,
     r'.*\.txt',
     cat_pattern=r'(\w+)/*',

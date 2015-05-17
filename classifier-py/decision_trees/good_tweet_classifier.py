@@ -15,6 +15,7 @@ decisions = LazyCorpusLoader(
 size = 1979
 all_words = nltk.FreqDist(w.lower() for w in decisions.words() if not w.lower() in stopwords.words('english'))
 word_features = list(all_words)[:500]
+print(word_features)
 
 
 def text_features(txt):

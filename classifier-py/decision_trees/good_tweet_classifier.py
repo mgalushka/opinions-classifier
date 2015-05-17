@@ -25,7 +25,7 @@ def text_features(txt):
         features[u'contains({0})'.format(word)] = (word in document_words)
     return features
 
-
+print(decisions.categories())
 documents = [(list(decisions.words(fileid)), category)
              for category in decisions.categories()
              for fileid in decisions.fileids(category)]

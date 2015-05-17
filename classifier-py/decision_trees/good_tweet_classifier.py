@@ -31,6 +31,8 @@ documents = [(list(decisions.words(fileid)), category)
              for fileid in decisions.fileids(category)]
 
 random.shuffle(documents)
+print(type(documents))
+print(dir(documents))
 featuresets = [(text_features(d), c) for (d, c) in documents]
 
 train_set, test_set = featuresets[size / 2:], featuresets[:size / 2]

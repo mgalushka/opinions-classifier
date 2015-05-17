@@ -1,1 +1,1 @@
-Array
+Chances are your #poems will outlive your latest #Java program.

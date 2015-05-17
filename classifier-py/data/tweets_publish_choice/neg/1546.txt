@@ -1,1 +1,1 @@
-Array
+How display big text inside of div properly #java

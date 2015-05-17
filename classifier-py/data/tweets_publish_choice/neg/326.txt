@@ -1,1 +1,1 @@
-Array
+Given an array of N real numbers, design an N log N algorithm that determines whether any two of them sum to zero.

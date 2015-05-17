@@ -1,1 +1,1 @@
-Array
+magarena: Magarena is a single-player fantasy card game played against a computer opponent. #Java

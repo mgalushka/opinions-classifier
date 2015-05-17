@@ -1,1 +1,1 @@
-Array
+APIs will glue together the Internet of things #iot #java via @javaworldcom

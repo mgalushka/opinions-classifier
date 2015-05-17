@@ -1,1 +1,1 @@
-Array
+Answers to some questions surrounding the mobile algorithm filter that's being applied today:

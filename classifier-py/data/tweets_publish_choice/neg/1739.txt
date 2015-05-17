@@ -1,1 +1,1 @@
-Array
+Why is my header not aligned with my footer in bootstrap code? #java

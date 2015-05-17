@@ -1,1 +1,1 @@
-Array
+Java is dynamic, and ruby is static? Another hilarious DAS talk :)

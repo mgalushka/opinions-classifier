@@ -1,1 +1,1 @@
-Array
+How do you explain Machine Learning and Data Mining to a layman?

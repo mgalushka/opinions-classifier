@@ -1,1 +1,1 @@
-Array
+Facebook algorithm tweak to emphasize friends' posts

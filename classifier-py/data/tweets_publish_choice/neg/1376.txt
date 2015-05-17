@@ -1,1 +1,1 @@
-Array
+#Azure #MachineLearning Algorithm cheat sheet

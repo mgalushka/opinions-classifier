@@ -1,1 +1,1 @@
-Array
+#JavaScript is not Java – JavaScript is to Java as hamster is to ham.

@@ -1,1 +1,1 @@
-Array
+If I ask you how X is encrypted and you give me anything else other than an algorithm, I immediately assume base64. Haven't been wrong yet.

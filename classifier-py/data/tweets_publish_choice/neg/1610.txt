@@ -1,1 +1,1 @@
-Array
+Support tip of the day: #ToscaTestsuite extended #Support for actual #Java versions recently.

@@ -1,1 +1,1 @@
-Array
+Jquery executing/triggering same code on different events #java

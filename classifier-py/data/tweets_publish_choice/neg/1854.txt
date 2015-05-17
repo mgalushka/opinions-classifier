@@ -1,1 +1,1 @@
-Array
+OnCreate cannot be resolved in a Symbol: Android Studio #java

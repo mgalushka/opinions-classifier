@@ -1,1 +1,1 @@
-Array
+#Enterprise #security level three: Vulnerability Assessment (esp #Java), Patch Management

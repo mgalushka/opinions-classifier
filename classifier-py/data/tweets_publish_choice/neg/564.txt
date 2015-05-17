@@ -1,1 +1,1 @@
-Array
+Standing by for people to send a (short) list of client-side JVM exploits completely unrelated to Java web servers.

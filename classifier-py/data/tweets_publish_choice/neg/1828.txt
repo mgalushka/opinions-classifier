@@ -1,1 +1,1 @@
-Array
+JavaScript: global array variable returned undefined #java

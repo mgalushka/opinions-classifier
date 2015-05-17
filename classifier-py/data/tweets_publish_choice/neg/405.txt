@@ -1,1 +1,1 @@
-Array
+The newest cloud segment - my take on Machine Learning as a Service, where #BigData, #Analytics and #Cloud converge

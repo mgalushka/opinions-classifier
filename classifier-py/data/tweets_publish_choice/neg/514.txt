@@ -1,1 +1,1 @@
-Array
+On a Mac and still getting the annoying Java Runtime Environment pop-up? How to fix it: Finally fixed, yay! Haha!

@@ -1,1 +1,1 @@
-Array
+get value progress seek bar from String[] #java

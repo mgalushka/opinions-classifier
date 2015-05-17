@@ -1,1 +1,1 @@
-Array
+56% of performance problems are coming from slow DB queries while 39% from too many database queries invocations:

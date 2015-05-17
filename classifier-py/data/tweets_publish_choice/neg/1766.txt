@@ -1,1 +1,1 @@
-Array
+All about JASPIC, Java EE's hidden gem for portable authentication modules: submitted by johnwat... #Programming

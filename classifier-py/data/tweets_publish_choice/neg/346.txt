@@ -1,1 +1,1 @@
-Array
+The word algorithm comes from Al-Khawarzmi, meaning the sequence of steps followed to solve a type of problem

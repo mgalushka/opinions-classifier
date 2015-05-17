@@ -1,1 +1,1 @@
-Array
+Demo: Debug and publish Java applications to Liberty on Bluemix #java

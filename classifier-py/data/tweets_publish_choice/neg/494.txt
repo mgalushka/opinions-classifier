@@ -1,1 +1,1 @@
-Array
+Read about the 12-gene algorithm used to calculate our #DCIS Score™ result with the Oncotype DX® Breast Cancer Assay

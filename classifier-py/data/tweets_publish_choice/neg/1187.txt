@@ -1,1 +1,1 @@
-Array
+Yes — the non-dependence on Java is a big plus. That’s why I've been getting good use out of openxlsx; no dependencies.

@@ -1,1 +1,1 @@
-Array
+In Graphhopper, how can I retrieve the set of edges contained in a route? #Java via dv_geek

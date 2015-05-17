@@ -1,1 +1,1 @@
-Array
+Need to get up to speed quickly on Java Script advanced features then this is a good jumping off point

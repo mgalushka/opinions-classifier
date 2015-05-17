@@ -1,1 +1,1 @@
-Array
+Java EE Support Patterns Update: http://t.co/AjxmzbOEJ2 #devops #continuousdelivery

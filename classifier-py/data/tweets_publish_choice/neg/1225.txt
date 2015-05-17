@@ -1,1 +1,1 @@
-Array
+Google Online Security Blog: A Javascript-based DDoS Attack as seen by Safe Browsing via @google

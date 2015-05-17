@@ -1,1 +1,1 @@
-Array
+Thank you Java persistence API! #JavaEE

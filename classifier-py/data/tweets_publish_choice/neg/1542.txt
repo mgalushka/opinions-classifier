@@ -1,1 +1,1 @@
-Array
+Receiving the right data with datareader but the textfield isn't updating while it contains the right... #java

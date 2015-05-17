@@ -1,1 +1,1 @@
-Array
+Having trouble accessing Java using Google Chrome? Here is the fix for the problem

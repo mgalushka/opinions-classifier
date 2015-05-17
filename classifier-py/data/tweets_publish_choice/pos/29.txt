@@ -1,1 +1,1 @@
-Array
+An algorithm is a systematic procedure that produces - in a finite number of steps - the answer to a question or the solution of a problem

@@ -1,1 +1,1 @@
-Array
+Adding High Score to game JavaScript #java

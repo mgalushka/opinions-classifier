@@ -1,1 +1,1 @@
-Array
+11 years ago I released XStream for Java. Today it moved to GitHub! Still going strong.

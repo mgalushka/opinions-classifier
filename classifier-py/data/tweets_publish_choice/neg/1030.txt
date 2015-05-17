@@ -1,1 +1,1 @@
-Array
+How to use #JPA 2.1 (at)ConstructorResult to map a query result to an object #Java #JavaEE

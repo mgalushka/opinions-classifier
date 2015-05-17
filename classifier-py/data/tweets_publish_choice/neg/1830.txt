@@ -1,1 +1,1 @@
-Array
+Brainfuck. How check on palindrome? #java

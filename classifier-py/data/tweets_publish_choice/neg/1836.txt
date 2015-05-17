@@ -1,1 +1,1 @@
-Array
+How can I move my files from my directory to another directory without getting an exception #java

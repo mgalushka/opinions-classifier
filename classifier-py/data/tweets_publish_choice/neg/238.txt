@@ -1,1 +1,1 @@
-Array
+Java is disabled by default in Chrome now, so it's a good thing nobody in the world is using the old Domino Java applets!

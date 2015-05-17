@@ -1,1 +1,1 @@
-Array
+This is the true death of silverlight and java in the browser

@@ -1,1 +1,1 @@
-Array
+Android comparing String with EditText #java

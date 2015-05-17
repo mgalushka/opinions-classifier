@@ -1,1 +1,1 @@
-Array
+Issue at sorting and showing array in #AWT (#Java)

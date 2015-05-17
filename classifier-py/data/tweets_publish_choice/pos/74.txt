@@ -1,1 +1,1 @@
-Array
+"JAVA EE: Command Design pattern - Class Diagram" via @DZone

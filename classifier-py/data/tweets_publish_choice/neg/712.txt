@@ -1,1 +1,1 @@
-Array
+Fix a call bug on Samsung Galaxy S5 / Android Lollipop by nshikder: When dialling a phone numbe... #java #android

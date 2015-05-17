@@ -1,1 +1,1 @@
-Array
+Whereas, Smalltalk, Ruby, Python, Java, et al. enforce that only some objects are metaobjects.

@@ -1,1 +1,1 @@
-Array
+learned something today, don’t run a 32-bit java vm on a 64-bit machine…works but memory usage is insane!

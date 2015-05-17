@@ -1,1 +1,1 @@
-Array
+This works. Integer result = true ? null : 1; This throws NPE. Integer a = null; Integer result = true ? a : 1; #java #wtf #wat

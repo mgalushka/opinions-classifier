@@ -1,1 +1,1 @@
-Array
+the difference between java and javascript

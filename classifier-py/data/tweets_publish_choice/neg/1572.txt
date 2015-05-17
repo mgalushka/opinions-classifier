@@ -1,1 +1,1 @@
-Array
+How to text in JQuery #java

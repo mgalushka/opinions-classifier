@@ -1,1 +1,1 @@
-Array
+Java in browser is dead. Long live JavaScript.

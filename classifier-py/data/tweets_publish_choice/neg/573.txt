@@ -1,1 +1,1 @@
-Array
+Hi Ferris, it could be a java issue. Did it work ok with earlier versions of Acrobat? Try saving a copy of the PDF to see if that helps^SV

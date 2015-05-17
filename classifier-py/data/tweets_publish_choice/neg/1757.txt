@@ -1,1 +1,1 @@
-Array
+RT @LDShadowLady: @LDShadowLady fixed it! If anyone else is having this problem, install Java 7 instead of Java 8! :)

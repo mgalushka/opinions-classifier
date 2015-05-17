@@ -1,1 +1,1 @@
-Array
+Incrementation not showing in MessageBox and variable values being changed #java

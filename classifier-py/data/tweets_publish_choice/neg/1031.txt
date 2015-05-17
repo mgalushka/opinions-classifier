@@ -1,1 +1,1 @@
-Array
+We compared #php vs #javascript - see results:

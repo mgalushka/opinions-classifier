@@ -1,1 +1,1 @@
-Array
+Call function after $.each method #java

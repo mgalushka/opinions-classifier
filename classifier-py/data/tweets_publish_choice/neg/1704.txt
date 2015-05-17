@@ -1,1 +1,1 @@
-Array
+android: How to access UI objects from a user defined class #java

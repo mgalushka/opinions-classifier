@@ -1,1 +1,1 @@
-Array
+ListView does not update until keyboard is hidden #java

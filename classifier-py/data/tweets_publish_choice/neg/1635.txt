@@ -1,1 +1,1 @@
-Array
+It's official – Oracle will not post further updates of #Java SE 7 to its public download sites:

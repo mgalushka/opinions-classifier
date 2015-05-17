@@ -1,1 +1,1 @@
-Array
+Nice article about distributed #MachineLearning and the shift of #DeepLearning towards #HPC

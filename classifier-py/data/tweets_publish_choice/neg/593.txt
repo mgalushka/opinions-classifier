@@ -1,1 +1,1 @@
-Array
+Woah, reading more and NPAPI removal seems to have caused lots of trouble. No more Java or Silverlight in Chrome. Very bold move!

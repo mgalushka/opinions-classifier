@@ -1,1 +1,1 @@
-Array
+#DukeScript is a new technology for creating cross-platform mobile, desktop and web applications using #Java.

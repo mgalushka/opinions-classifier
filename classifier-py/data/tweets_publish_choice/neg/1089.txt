@@ -1,1 +1,1 @@
-Array
+Simple JavaScript OOP for C++, #Java and C# Developers

@@ -1,1 +1,1 @@
-Array
+We compared #lua vs #javascript - see results:

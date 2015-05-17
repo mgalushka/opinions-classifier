@@ -1,1 +1,1 @@
-Array
+java imap, performance issues, fetching all mails

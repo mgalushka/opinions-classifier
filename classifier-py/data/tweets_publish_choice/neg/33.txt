@@ -1,1 +1,1 @@
-Array
+TIBCO ActiveMatrix BusinessWorks 6 + Apache Hadoop = Big Data Integration - #BigData

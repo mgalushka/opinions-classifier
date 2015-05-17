@@ -1,1 +1,1 @@
-If Twitter's algorithm can search for content within a tweet regardless of prefixed characters, what is the utility of has
+Array

@@ -1,1 +1,1 @@
-New post: Where is the Essbase Java API method to build dimensions from a SQL source?
+Array

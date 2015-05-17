@@ -1,1 +1,1 @@
-.@AMDAPUs are gold for machine learning operations, appearently. Interested to see where this leads.
+Array

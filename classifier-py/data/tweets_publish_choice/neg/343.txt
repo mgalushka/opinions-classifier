@@ -1,1 +1,1 @@
-I have never used WinForms so cannot compare but WPF &gt; Java Swing.
+Array

@@ -1,1 +1,1 @@
-Can I write an essay describing what I need to do and the core concepts, but how I can't implement it because I don't know JAVA for my HW?
+Array

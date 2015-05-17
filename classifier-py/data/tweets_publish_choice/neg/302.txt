@@ -1,1 +1,1 @@
-If you want to continue using Chrome as browser while still retaining Java compatibility, use Legacy Browser Support
+Array

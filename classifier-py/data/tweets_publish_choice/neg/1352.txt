@@ -1,4 +1,1 @@
-Microsoft Azure Machine Learning 
-Project Oxford
-Face APIs http://t.co/zJJ6YdftI7
-#AzureML
+Array

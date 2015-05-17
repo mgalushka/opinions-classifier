@@ -1,1 +1,1 @@
-What about PPAPI? Can't Oracle opt to develop a PPAPI version of Java, or are there architecture limitations preventing it?
+Array

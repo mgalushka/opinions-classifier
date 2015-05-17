@@ -1,1 +1,1 @@
-Build a Hangman game with Java, Ajax, and Cloudant &amp; #Bluemix
+Array

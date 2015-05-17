@@ -1,1 +1,1 @@
-Storm comes with Clojure DSL and for spark you can simply use Scala. You can survive easily in big data space without java :)
+Array

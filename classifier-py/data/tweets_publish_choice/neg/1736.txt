@@ -1,1 +1,1 @@
-How do you correctly initialize a struct with a member that is a const pointer to a const value? #java
+Array

@@ -1,1 +1,1 @@
-All these Rails developers insisting JavaScript is just a fad remind me of the Java programmers who insisted Rails was a fad.
+Array

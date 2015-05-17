@@ -1,1 +1,1 @@
-Is there a Java Collection Framework class that doesn't allow null elements? - #Technical_hangover
+Array

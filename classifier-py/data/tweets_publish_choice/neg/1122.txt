@@ -1,1 +1,1 @@
-Elixir has ideas from Java, C#, Python, Ruby, Haskell, F#, etc. Never stop looking at what other communities are doing!
+Array

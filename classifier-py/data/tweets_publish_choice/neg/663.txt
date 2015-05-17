@@ -1,1 +1,1 @@
-Are Java entries accepted? I read the rules, but I'm unsure since it'd require Java to be installed.
+Array

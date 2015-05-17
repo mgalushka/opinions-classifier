@@ -20,7 +20,7 @@ def text_features(txt):
     document_words = set(txt)
     features = {}
     for word in word_features:
-        features['contains({})'.format(word)] = (word in document_words)
+        features['contains({0})'.format(word)] = (word in document_words)
     return features
 
 

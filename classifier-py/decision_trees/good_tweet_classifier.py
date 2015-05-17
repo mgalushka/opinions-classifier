@@ -1,10 +1,13 @@
 import nltk
 import os
+from nltk.corpus import LazyCorpusLoader
 from nltk.corpus.reader.plaintext import (
     CategorizedPlaintextCorpusReader,
 )
 
-decisions = CategorizedPlaintextCorpusReader(
+decisions = LazyCorpusLoader(
+    'tweets_publish_choice',
+    CategorizedPlaintextCorpusReader,
     '{0}/projects/opinions-classifier/'
     'classifier-py/data/tweets_publish_choice'.format(
         os.getenv("HOME")

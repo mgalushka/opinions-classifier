@@ -1,5 +1,4 @@
 import nltk
-import os
 from nltk.corpus import LazyCorpusLoader
 from nltk.corpus.reader.plaintext import (
     CategorizedPlaintextCorpusReader,
@@ -16,7 +15,6 @@ size = 1979
 all_words = nltk.FreqDist(w.lower() for w in decisions.words())
 word_features = list(all_words)[:2000]
 
-
 def text_features(txt):
     document_words = set(txt)
     features = {}
@@ -24,8 +22,9 @@ def text_features(txt):
         features['contains({})'.format(word)] = (word in document_words)
     return features
 
+featuresets = [(text_features(d), c) for (d, c) in decisions]
 
-train_set, test_set = decisions[size / 2:], decisions[:size / 2]
+train_set, test_set = featuresets[size / 2:], featuresets[:size / 2]
 classifier = nltk.DecisionTreeClassifier.train(train_set)
 print("Decision trees accuracy = [{0}]".format(
     nltk.classify.accuracy(classifier, test_set)

@@ -20,7 +20,7 @@ $dir = $ROOT . "neg\\";
 $counter = 0;
 foreach ($negative_samples as $sample) {
     print_r($sample);
-    file_put_contents($dir . $counter . '.txt', $sample['tweet_cleaned'] . "\n");
+    file_put_contents($dir . $counter . '.txt', utf8_encode($sample['tweet_cleaned'] . "\n"));
     $counter++;
 }
 
@@ -35,7 +35,7 @@ $positive_samples = DB::query("
 $dir = $ROOT . "pos\\";
 $counter = 0;
 foreach ($positive_samples as $sample) {
-    file_put_contents($dir . $counter . '.txt', $sample['tweet_cleaned'] . "\n");
+    file_put_contents($dir . $counter . '.txt', utf8_encode($sample['tweet_cleaned'] . "\n"));
     $counter++;
 }
 

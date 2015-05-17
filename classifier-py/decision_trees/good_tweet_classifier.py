@@ -33,7 +33,16 @@ documents = [(list(decisions.words(fileid)), category)
 random.shuffle(documents)
 print(type(documents))
 print(dir(documents))
-featuresets = [(text_features(d), c) for (d, c) in documents]
+pos_docs = [(text_features(d), c) for (d, c) in documents if c == 'pos']
+neg_docs = [(text_features(d), c) for (d, c) in documents if c == 'neg']
+
+random.shuffle(pos_docs)
+random.shuffle(neg_docs)
+
+chosen_docs_200 = pos_docs[:100] + neg_docs[:100]
+random.shuffle(chosen_docs_200)
+
+featuresets = [(text_features(d), c) for (d, c) in chosen_docs_200]
 
 train_set, test_set = featuresets[size / 2:], featuresets[:size / 2]
 classifier = nltk.DecisionTreeClassifier.train(train_set)

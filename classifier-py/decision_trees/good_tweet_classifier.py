@@ -12,11 +12,9 @@ decisions = LazyCorpusLoader(
     cat_pattern=r'(\w+)/*',
     encoding='utf8',
 )
-print(decisions.words())
+size = 1979
 all_words = nltk.FreqDist(w.lower() for w in decisions.words())
 word_features = list(all_words)[:2000]
-
-print(word_features)
 
 
 def text_features(txt):
@@ -27,6 +25,10 @@ def text_features(txt):
     return features
 
 
-def prepare_labeled_data():
-    pass
+train_set, test_set = decisions[size / 2:], decisions[:size / 2]
+classifier = nltk.DecisionTreeClassifier.train(train_set)
+print("Decision trees accuracy = [{0}]".format(
+    nltk.classify.accuracy(classifier, test_set)
+))
 
+print(classifier.pseudocode(depth=15))

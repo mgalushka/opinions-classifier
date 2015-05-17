@@ -1,0 +1,1 @@
+Azure Event Hub gets data, pushes to Azure stream analytics to database, machine learning for predictions #IoT #gids

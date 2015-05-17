@@ -1,0 +1,1 @@
+When I think of the number of developer hours lost to Java 8's draconian JavaDoc process failing their builds, my heart just sinks.

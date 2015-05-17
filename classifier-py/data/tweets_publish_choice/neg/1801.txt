@@ -1,0 +1,1 @@
+A smooth and simple way with #Java 8 to make lists do what you want them to do, logically:

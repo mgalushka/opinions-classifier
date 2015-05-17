@@ -1,0 +1,1 @@
+JDK8 Lambdas and Streams: Changing The Way You Think When Developing Java 18:15 #TLEvents

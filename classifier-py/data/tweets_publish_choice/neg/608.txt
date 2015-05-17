@@ -1,0 +1,1 @@
+[New Post] Result Set Mapping: Constructor Result Mappings Howto map a query result to an object #JPA #Java #JavaEE

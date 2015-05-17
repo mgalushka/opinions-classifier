@@ -1,0 +1,1 @@
+“CORS is a standardized way for browsers to request data from domains other…” —@internrocket

@@ -1,0 +1,1 @@
+See a benchmark comparing Stream performance of #Java, #Javaslang and #Scala.

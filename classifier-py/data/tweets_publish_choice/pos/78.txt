@@ -1,0 +1,1 @@
+Java 7 is EoL on Thursday. Does that mean bigcorps will finally upgrade from 6 to it?

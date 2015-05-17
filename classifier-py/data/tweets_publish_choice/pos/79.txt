@@ -1,0 +1,1 @@
+Microsoft will let Android Java/C++ apps to be quickly compiled for Windows 10

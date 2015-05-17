@@ -1,0 +1,1 @@
+How to remove the first and last character if it is 0 in SQL Server #java

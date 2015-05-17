@@ -1,10 +1,15 @@
 import nltk
-from nltk.corpus import movie_reviews
 import os
-from nltk.corpus.reader.plaintext import PlaintextCorpusReader
+from nltk.corpus.reader.plaintext import (
+    CategorizedPlaintextCorpusReader,
+)
 
-#decisions = PlaintextCorpusReader('', '');
-all_words = nltk.FreqDist(w.lower() for w in movie_reviews.words())
+decisions = CategorizedPlaintextCorpusReader(
+    '~/MainFolder/',
+    r'.*\.txt',
+    cat_pattern=r'[0-100]_(\w+)\.txt'
+)
+all_words = nltk.FreqDist(w.lower() for w in decisions.words())
 word_features = list(all_words)[:2000]
 
 def text_features(txt):

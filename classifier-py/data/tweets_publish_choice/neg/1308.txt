@@ -1,0 +1,1 @@
+LOL. Java is not interpreted. It's JIT compiled. And you call me ignorant? Argument over.

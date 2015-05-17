@@ -1,0 +1,1 @@
+#Java EE7 and #Maven project for newbies – part 1 – a simple #maven project structure – the parent pom

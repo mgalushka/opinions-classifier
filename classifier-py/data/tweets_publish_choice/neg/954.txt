@@ -1,0 +1,1 @@
+My custom PreferenceFragment is now deprecated. Use PreferenceActivity from the new samples instead. https://t.co/mS92ajjzeG #AndroidDev

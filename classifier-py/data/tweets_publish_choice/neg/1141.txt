@@ -1,0 +1,1 @@
+Nice step by step guide on predicting with BigML! (in Spanish). Good blog post @data_lytics

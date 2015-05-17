@@ -1,0 +1,1 @@
+#DevOpsRSAC: @NGalbreath: "chg in deployment patterns; Javascript: ops is not deploying it; dev is; Java WAR/JAR files: anyone pushes

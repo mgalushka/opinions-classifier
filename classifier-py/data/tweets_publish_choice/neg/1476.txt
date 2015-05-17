@@ -1,0 +1,1 @@
+SonarQube Java 3.2 adds a rule to detect unclosed resources as well as rules dedicated to test code.

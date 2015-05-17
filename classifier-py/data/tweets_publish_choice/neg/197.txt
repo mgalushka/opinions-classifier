@@ -1,0 +1,1 @@
+Used Java 8 streams today for the first time today (yes I know, they're hardly new). But found them v handy

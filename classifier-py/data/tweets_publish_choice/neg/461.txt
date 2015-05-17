@@ -1,0 +1,1 @@
+another week another wave of Java vulns. If you don't have latest JRE 8 you seem to be uncovered

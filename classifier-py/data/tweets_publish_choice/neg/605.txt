@@ -1,0 +1,1 @@
+"There is no compression algorithm for experience." @AndyJassy at Amazon AWS summit in SF today. "We started 11 years ago."

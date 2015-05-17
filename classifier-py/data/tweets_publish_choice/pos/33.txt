@@ -1,0 +1,1 @@
+Get a #scikitlearn cheat sheet and setup with #Python for #machinelearning in our 2nd tutorial

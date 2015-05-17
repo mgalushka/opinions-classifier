@@ -1,0 +1,1 @@
+New: Java script function not working in IE and Firefox

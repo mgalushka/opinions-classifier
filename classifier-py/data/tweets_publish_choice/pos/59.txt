@@ -1,0 +1,1 @@
+In a probabilistic programming language, the heavy lifting is done by the inference algorithm:

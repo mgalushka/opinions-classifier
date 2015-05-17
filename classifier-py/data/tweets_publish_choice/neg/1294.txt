@@ -1,0 +1,1 @@
+Improved #Solaris #ZFS L2ARC now encrypted and compressed with a better eligibility and feeding algorithm:

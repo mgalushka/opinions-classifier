@@ -1,0 +1,1 @@
+search algorithm now includes #mobile friendliness; websites without drop in rankings

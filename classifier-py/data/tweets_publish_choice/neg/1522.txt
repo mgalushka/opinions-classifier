@@ -1,0 +1,1 @@
+Setting up my new #FOSS #Java project on #CloudBees With #Maven repo ready to go, It just works!

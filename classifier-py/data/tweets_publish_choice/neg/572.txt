@@ -1,0 +1,1 @@
+Having to convert to firefox die to chrome dropping NPAPI plugin support, we kinda need java. @firefox @googlechrome @SiliconW0LF

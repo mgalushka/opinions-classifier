@@ -1,0 +1,1 @@
+Including php script result as pure html #java

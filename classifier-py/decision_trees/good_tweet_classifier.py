@@ -10,7 +10,7 @@ decisions = LazyCorpusLoader(
     CategorizedPlaintextCorpusReader,
     r'.*\.txt',
     cat_pattern=r'(\w+)/*',
-    encoding='ascii',
+    encoding='utf8',
 )
 print(decisions.words())
 all_words = nltk.FreqDist(w.lower() for w in decisions.words())

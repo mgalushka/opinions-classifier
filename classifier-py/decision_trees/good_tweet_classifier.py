@@ -29,6 +29,7 @@ def text_features(txt):
 documents = [(list(decisions.words(fileid)), category)
              for category in decisions.categories()
              for fileid in decisions.fileids(category)]
+
 random.shuffle(documents)
 featuresets = [(text_features(d), c) for (d, c) in documents]
 

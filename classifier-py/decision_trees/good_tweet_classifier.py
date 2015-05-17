@@ -1,3 +1,4 @@
+import random
 import nltk
 from nltk.corpus import LazyCorpusLoader
 from nltk.corpus.reader.plaintext import (
@@ -27,6 +28,7 @@ def text_features(txt):
 documents = [(list(decisions.words(fileid)), category)
              for category in decisions.categories()
              for fileid in decisions.fileids(category)]
+random.shuffle(documents)
 featuresets = [(text_features(d), c) for (d, c) in documents]
 
 train_set, test_set = featuresets[size / 2:], featuresets[:size / 2]

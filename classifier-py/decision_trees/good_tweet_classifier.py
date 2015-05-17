@@ -1,6 +1,6 @@
 import random
 import nltk
-from nltk.corpus import LazyCorpusLoader
+from nltk.corpus import LazyCorpusLoader, stopwords
 from nltk.corpus.reader.plaintext import (
     CategorizedPlaintextCorpusReader,
 )
@@ -13,7 +13,7 @@ decisions = LazyCorpusLoader(
     encoding='utf8',
 )
 size = 1979
-all_words = nltk.FreqDist(w.lower() for w in decisions.words())
+all_words = nltk.FreqDist(w.lower() for w in decisions.words() if not w.lower() in stopwords.words('english'))
 word_features = list(all_words)[:500]
 
 

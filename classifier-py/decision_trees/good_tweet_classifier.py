@@ -10,7 +10,8 @@ decisions = CategorizedPlaintextCorpusReader(
         os.getenv("HOME")
     ),
     r'.*\.txt',
-    cat_pattern=r'(\w+)/*'
+    cat_pattern=r'(\w+)/*',
+    encoding='ascii',
 )
 all_words = nltk.FreqDist(w.lower() for w in decisions.words())
 word_features = list(all_words)[:2000]

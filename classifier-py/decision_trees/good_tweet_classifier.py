@@ -1,3 +1,4 @@
+import features
 import random
 import nltk
 from nltk.corpus import LazyCorpusLoader, stopwords
@@ -13,17 +14,16 @@ decisions = LazyCorpusLoader(
     encoding='utf8',
 )
 
-all_words = nltk.FreqDist(w.lower() for w in decisions.words() if not w.lower() in stopwords.words('english'))
-word_features = list(all_words)[:500]
-nltk.FreqDist.pprint(all_words, 500)
+# returns all non-stop words from corpus
+def get_top_words():
+    all_words = nltk.FreqDist(
+        w.lower() for w in decisions.words()
+        if not w.lower() in stopwords.words('english')
+    )
+    word_features = list(all_words)[:500]
+    nltk.FreqDist.pprint(all_words, 500)
+    return word_features
 
-
-def text_features(txt):
-    document_words = set(txt)
-    features = {}
-    for word in word_features:
-        features[u'contains({0})'.format(word)] = (word in document_words)
-    return features
 
 print(decisions.categories())
 documents = [(list(decisions.words(fileid)), category)
@@ -32,17 +32,18 @@ documents = [(list(decisions.words(fileid)), category)
 
 random.shuffle(documents)
 print(type(documents))
+print(type(documents[0]))
 print(dir(documents))
-pos_docs = [(text_features(d), c) for (d, c) in documents if c == 'pos']
-neg_docs = [(text_features(d), c) for (d, c) in documents if c == 'neg']
+pos_features = [(features.tweet_to_words(d), c) for (d, c) in documents if c == 'pos']
+neg_features = [(features.tweet_to_words(d), c) for (d, c) in documents if c == 'neg']
 
-random.shuffle(pos_docs)
-random.shuffle(neg_docs)
+random.shuffle(pos_features)
+random.shuffle(neg_features)
 
-chosen_docs_200 = pos_docs[:100] + neg_docs[:100]
-random.shuffle(chosen_docs_200)
+chosen_features_200 = pos_features[:100] + neg_features[:100]
+random.shuffle(chosen_features_200)
 
-featuresets = [(text_features(d), c) for (d, c) in chosen_docs_200]
+featuresets = chosen_features_200
 
 size = 200
 

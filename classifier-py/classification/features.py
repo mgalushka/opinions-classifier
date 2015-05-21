@@ -1,6 +1,7 @@
 import re
 from bs4 import BeautifulSoup
 from nltk.corpus import stopwords
+from sklearn.feature_extraction.text import CountVectorizer
 
 def top_words_features(top_words, txt):
     document_words = set(txt)
@@ -39,5 +40,28 @@ def tweet_to_words(document):
     for word in meaningful_words:
         features[word] = True
     return features
+
+def bag_of_words(documents):
+    # Initialize the "CountVectorizer" object, which is scikit-learn's
+    # bag of words tool.
+    vectorizer = CountVectorizer(
+        analyzer = "word",
+        tokenizer = None,
+        preprocessor = None,
+        stop_words = None,
+        max_features = 5000
+    )
+
+    # fit_transform() does two functions: First, it fits the model
+    # and learns the vocabulary; second, it transforms our training data
+    # into feature vectors. The input to fit_transform should be a list of
+    # strings.
+    train_data_features = vectorizer.fit_transform(documents)
+
+    # Numpy arrays are easy to work with, so convert the result to an
+    # array
+    return train_data_features.toarray()
+
+
 
 #print(tweet_to_words('Let\'s try to test this. !What is this?@'))

@@ -8,4 +8,4 @@ DB::insert('subscribe', array(
   'email' => $email
 ));
 ;
-?>
+?>OK

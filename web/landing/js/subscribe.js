@@ -8,11 +8,6 @@ subscribe.core = function () {
         console.log("Success");
         alert("Thanks for registering!");
     };
-    
-    var showError = function () {
-        console.log("Error");
-        alert("Something went wrong. Please, try again later.");
-    };
 
     var subscribe = function (email) {
         $.ajax({
@@ -23,10 +18,6 @@ subscribe.core = function () {
             },
             success: function(){
                 showSuccess();
-            },
-            error: function(data){
-                alert(data);
-                showError();
             },
             dataType: "json"
         });

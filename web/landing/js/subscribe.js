@@ -5,9 +5,13 @@ subscribe.core = function () {
     var API = "http://lightbot.co/subscribe.php";
 
     var showSuccess = function () {
-        // TODO
         console.log("Success");
         alert("Thanks for registering!");
+    };
+    
+    var showError = function () {
+        console.log("Error");
+        alert("Something went wrong. Please, try again later.");
     };
 
     var subscribe = function (email) {
@@ -17,7 +21,8 @@ subscribe.core = function () {
             data: {
                 email: email
             },
-            success: showSuccess(),
+            success: showSuccess,
+            error: showError,
             dataType: "json"
         });
     };

@@ -24,7 +24,8 @@ subscribe.core = function () {
             success: function(){
                 showSuccess();
             },
-            error: function(){
+            error: function(data){
+                alert(data);
                 showError();
             },
             dataType: "json"

@@ -30,10 +30,9 @@ documents = [(list(decisions.words(fileid)), category)
              for category in decisions.categories()
              for fileid in decisions.fileids(category)]
 
-random.shuffle(documents)
-print(type(documents))
-print(type(documents[0]))
-print(dir(documents))
+#random.shuffle(documents)
+print (documents)
+
 pos_features = [(features.tweet_to_words(d), c) for (d, c) in documents if c == 'pos']
 neg_features = [(features.tweet_to_words(d), c) for (d, c) in documents if c == 'neg']
 

@@ -130,7 +130,17 @@ $count_row= DB::queryFirstRow("
                     </div>
                     <div id="text_<?= $id ?>" class="panel-body" style="word-wrap:break-word"><?= $row['tweet_cleaned'] ?> 
                         <a href="<?= $tweet_link ?>" target="_blank" style="word-wrap:break-word"><?= $tweet_link ?></a></div>
-                    <div class="panel-footer"><?= $row['created_timestamp'] ?></div>
+                    <div class="panel-footer">
+                        <?= $row['created_timestamp'] ?>
+                        <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#article_<?= $id ?>" aria-expanded="false" aria-controls="collapseExample">
+                            Content
+                        </button>
+                        <div class="collapse" id="article_<?= $id ?>" data-url="<?= $tweet_link ?>">
+                            <div class="well">
+                                Here is article
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="col-md-3 col-xs-3">

@@ -12,6 +12,7 @@ app = web.application(urls, globals())
 
 class retrieve:
     def GET(self, request):
+        web.header('Access-Control-Allow-Origin', '*')
         url = web.input()['text']
         print("Retrieving text for {0}".format(url))
         html = urllib.urlopen(url).read().decode('utf-8')

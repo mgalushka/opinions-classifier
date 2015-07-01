@@ -43,5 +43,13 @@ $(document).ready(function () {
         $('#row_' + tweetId).addClass('hide');
     });
 
+    $('.collapse').on('shown.bs.collapse', function (event) {
+        url = $(this).attr('data-url');
+        if(url) {
+            console.log("Retrieving content for " + url);
+            tt.retrieval.retrieveContent(url, $(this));
+        }
+    })
+
 
 });

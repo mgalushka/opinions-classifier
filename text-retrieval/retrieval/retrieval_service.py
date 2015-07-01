@@ -2,8 +2,6 @@ import web
 from readability.readability import Document
 import urllib
 
-if __name__ == "__main__":
-
 urls = (
     '/(.*)', 'text'
 )

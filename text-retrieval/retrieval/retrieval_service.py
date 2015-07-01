@@ -4,7 +4,7 @@ from readability.readability import Document
 
 
 urls = (
-    '/(.*)', 'retrieve'
+    '/retrieve(.*)', 'retrieve'
 )
 app = web.application(urls, globals())
 

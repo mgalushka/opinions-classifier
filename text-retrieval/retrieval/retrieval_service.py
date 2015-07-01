@@ -1,13 +1,14 @@
+import urllib
 import web
 from readability.readability import Document
-import urllib
+
 
 urls = (
-    '/(.*)', 'text'
+    '/(.*)', 'retrieve'
 )
 app = web.application(urls, globals())
 
-class text:
+class retrieve:
     def GET(self, url):
         print("Retrieving text for {0}".format(url))
         html = urllib.urlopen(url).read()

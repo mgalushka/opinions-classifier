@@ -11,8 +11,17 @@ $(document).ready(function () {
 
     $('.delete').on('click', function () {
         var tweetId = $(this).attr('data-id');
+        var action = $(this).attr('data-action');
         console.log("Deleting tweet: " + tweetId);
-        tt.core.statusUpdate(tweetId, '', 'delete', $(this));
+        tt.core.statusUpdate(tweetId, '', action, $(this));
+        $('#row_' + tweetId).addClass('hide');
+    });
+
+    $('.duplicate').on('click', function () {
+        var tweetId = $(this).attr('data-id');
+        var action = $(this).attr('data-action');
+        console.log("Marking tweet as diplicated: " + tweetId);
+        tt.core.statusUpdate(tweetId, '', action, $(this));
         $('#row_' + tweetId).addClass('hide');
     });
 
@@ -44,9 +53,11 @@ $(document).ready(function () {
     });
 
     $('.collapse').on('shown.bs.collapse', function (event) {
+        tweetId = $(this).attr('data-id');
         url = $(this).attr('data-url');
         if(url) {
             console.log("Retrieving content for " + url);
+            tt.core.statusUpdate(tweetId, '', 'interested', $(this));
             tt.retrieval.retrieveContent(url, $(this));
         }
     })

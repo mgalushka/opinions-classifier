@@ -1,5 +1,6 @@
 package com.maximgalushka.classifier.storage;
 
+import com.maximgalushka.classifier.clustering.model.TweetClass;
 import com.maximgalushka.classifier.storage.memcached.MemcachedService;
 import com.maximgalushka.classifier.storage.mysql.MysqlService;
 import com.maximgalushka.classifier.twitter.clusters.Clusters;
@@ -10,11 +11,7 @@ import org.apache.log4j.Logger;
 import org.carrot2.core.Cluster;
 
 import javax.annotation.Resource;
-import java.util.Date;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -145,9 +142,9 @@ public class StorageService {
   }
 
   /**
-   * @param hours period to return tweets for
+   * @param hours     period to return tweets for
    * @param published if return published
-   * @param rejected if return published
+   * @param rejected  if return published
    * @return latest published and/or rejected tweets for latest hours
    */
   public List<Tweet> getLatestUsedTweets(
@@ -231,6 +228,17 @@ public class StorageService {
 
   public void savePublishedTweet(Tweet tweet, boolean retweet) {
     mysql.savePublishedTweet(tweet, retweet);
+  }
+
+  public void updateTweetClass(Tweet tweet, TweetClass clazz) {
+    log.debug(
+      String.format(
+        "Updating tweet [%d] status to [%s]",
+        tweet.getId(),
+        clazz.getClazz()
+      )
+    );
+    mysql.updateTweetClass(tweet, clazz);
   }
 
   public void scheduleTweet(Tweet tweet, Tweet original, boolean retweet) {

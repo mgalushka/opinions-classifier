@@ -1,6 +1,7 @@
 package com.maximgalushka.classifier.twitter.service;
 
 import com.google.gson.Gson;
+import com.maximgalushka.classifier.clustering.model.TweetClass;
 import com.maximgalushka.classifier.storage.StorageService;
 import com.maximgalushka.classifier.twitter.LocalSettings;
 import com.maximgalushka.classifier.twitter.model.Tweet;
@@ -71,14 +72,26 @@ public class TwitterEasyApi implements Container {
       if("retweet".equals(action)){
         Tweet original = storage.getTweetById(tweetId);
         Tweet retweet = new Tweet(tweetId, original.getText());
+        storage.updateTweetClass(original, TweetClass.PUBLISHED);
         storage.scheduleTweet(retweet, original, true);
       }
       if("update".equals(action)){
         Tweet original = storage.getTweetById(tweetId);
         Tweet updated = new Tweet(tweetId, text);
+        storage.updateTweetClass(original, TweetClass.PUBLISHED);
         storage.scheduleTweet(updated, original, false);
       }
+      if("duplicate".equals(action)){
+        Tweet original = storage.getTweetById(tweetId);
+        storage.updateTweetClass(original, TweetClass.DUPLICATED);
+      }
+      if("interesting".equals(action)){
+        Tweet original = storage.getTweetById(tweetId);
+        storage.updateTweetClass(original, TweetClass.INTERESTED);
+      }
       if("delete".equals(action)){
+        Tweet original = storage.getTweetById(tweetId);
+        storage.updateTweetClass(original, TweetClass.IGNORED);
         storage.unpublishTweetCluster(tweetId);
       }
       body.println(gson.toJson("OK"));

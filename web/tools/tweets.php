@@ -137,9 +137,9 @@ $count_row= DB::queryFirstRow("
                         <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#article_<?= $id ?>" aria-expanded="false" aria-controls="collapseExample">
                             Content
                         </button>
-                        <div class="collapse" id="article_<?= $id ?>" data-url="<?= $tweet_link ?>">
+                        <div class="collapse" id="article_<?= $id ?>" data-id="<?= $id ?>" data-url="<?= $tweet_link ?>">
                             <div class="well">
-                                Here is article
+                                <img src="images/ajax-loader.gif" />
                             </div>
                         </div>
                     </div>
@@ -153,6 +153,9 @@ $count_row= DB::queryFirstRow("
                             data-target="#edit-tweet-modal"
                             type="button"
                             class="btn btn-lg">TW
+                    </button>
+                    <button data-id="<?= $id ?>" data-action="duplicate" type="button"
+                            class="btn btn-lg btn-standard duplicate">DUP
                     </button>
                     <button data-id="<?= $id ?>" data-action="delete" type="button"
                             class="btn btn-lg btn-danger delete">DEL

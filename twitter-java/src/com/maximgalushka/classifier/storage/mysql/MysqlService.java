@@ -1,6 +1,7 @@
 package com.maximgalushka.classifier.storage.mysql;
 
 import com.google.gson.Gson;
+import com.maximgalushka.classifier.clustering.model.TweetClass;
 import com.maximgalushka.classifier.twitter.clusters.Clusters;
 import com.maximgalushka.classifier.twitter.model.ScheduledTweet;
 import com.maximgalushka.classifier.twitter.model.Tweet;
@@ -210,6 +211,24 @@ public class MysqlService {
         return tweet;
       }
     );
+  }
+
+  public void updateTweetClass(Tweet tweet, TweetClass clazz) {
+    try (Connection conn = this.datasource.getConnection()) {
+      try (
+        PreparedStatement stmt = conn.prepareStatement(
+          "update tweets_all " +
+            "set classified = ? " +
+            "where id = ?"
+        )
+      ) {
+        stmt.setString(1, clazz.getClazz());
+        stmt.setLong(2, tweet.getId());
+        stmt.executeUpdate();
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
   }
 
   public void scheduleTweet(

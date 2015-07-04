@@ -84,6 +84,7 @@ public class TwitterEasyApi implements Container {
       if("duplicate".equals(action)){
         Tweet original = storage.getTweetById(tweetId);
         storage.updateTweetClass(original, TweetClass.DUPLICATED);
+        storage.unpublishTweetCluster(tweetId);
       }
       if("interesting".equals(action)){
         Tweet original = storage.getTweetById(tweetId);

@@ -57,7 +57,7 @@ $(document).ready(function () {
         url = $(this).attr('data-url');
         if(url) {
             console.log("Retrieving content for " + url);
-            tt.core.statusUpdate(tweetId, '', 'interested', $(this));
+            tt.core.statusUpdate(tweetId, '', 'interesting', $(this));
             tt.retrieval.retrieveContent(url, $(this));
         }
     })

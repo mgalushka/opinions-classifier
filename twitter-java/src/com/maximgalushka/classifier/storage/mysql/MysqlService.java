@@ -219,7 +219,7 @@ public class MysqlService {
         PreparedStatement stmt = conn.prepareStatement(
           "update tweets_all " +
             "set classified = ? " +
-            "where id = ?"
+            "where id = ? and classified is null"
         )
       ) {
         stmt.setString(1, clazz.getClazz());

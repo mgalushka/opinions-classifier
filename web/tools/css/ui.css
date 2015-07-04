@@ -1,0 +1,10 @@
+#status{
+    display: none;
+    visibility: visible;
+    position: fixed;
+    top: 0;
+    right: 20px;
+    z-index: 100;
+    background-color: red;
+    padding: 0 10px 0 10px;
+}

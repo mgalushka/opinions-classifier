@@ -4,29 +4,28 @@ tt.core = function () {
 
     var API = "http://warua.org:8092/easy";
 
-    var showSuccess = function (obj) {
-        obj.addClass('btn-success');
-    };
-
-    var showError = function () {
-        $('.error').removeClass('hide');
+    var showStatus = function (data, status) {
+        console.log("Status: " + status);
+        console.log("Status data: " + data);
+        if (status === 'success'){
+            $('#status').text('success').show().fadeOut(2000);
+        }
+        else{
+            $('#status').text('failed').show().fadeOut(2000);
+        }
     };
 
     var statusUpdate = function (tweetId, text, command, obj) {
-        $.ajax({
+        var request = $.ajax({
             url: API + "/" + command,
             method: 'POST',
             data: {
                 tweetId: tweetId,
                 text: text
             },
-            success: showSuccess(obj),
-            error: function (data) {
-                console.log("Error during remote call to: " + API);
-                showError();
-            },
             dataType: "json"
         });
+        request.done(showStatus);
     };
 
     return {

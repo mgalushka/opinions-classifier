@@ -9,6 +9,8 @@ from sklearn.svm import LinearSVC
 from nltk.classify.scikitlearn import SklearnClassifier
 from sklearn.metrics import classification_report
 
+from sklearn.externals import joblib
+
 decisions = LazyCorpusLoader(
     'tweets_publish_choice',
     CategorizedPlaintextCorpusReader,
@@ -26,7 +28,7 @@ pos_features = [(features.tweet_to_words(d), c) for (d, c) in documents if c == 
 neg_features = [(features.tweet_to_words(d), c) for (d, c) in documents if c == 'neg']
 
 # random.shuffle(pos_features)
-#random.shuffle(neg_features)
+# random.shuffle(neg_features)
 
 chosen_features_200 = pos_features[:100] + neg_features[:100]
 random.shuffle(chosen_features_200)
@@ -39,6 +41,8 @@ train_set, test_set = featuresets[size / 2:], featuresets[:size / 2]
 
 svm = SklearnClassifier(LinearSVC())
 svm.train(train_set)
+
+joblib.dump(svm, '../model/svm/0.1/svm.pkl')
 
 test_skl = []
 t_test_skl = []

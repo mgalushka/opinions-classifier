@@ -88,6 +88,7 @@ $count_row= DB::queryFirstRow("
             t.content_json,
             t.tweet_cleaned,
             t.features,
+            t.label,
             DATE_FORMAT(t.created_timestamp, "%%Y-%%m-%%d %%H:%%i") AS created_timestamp,
             count(r.tweet_id) AS tweets_in_cluster
         FROM
@@ -103,7 +104,7 @@ $count_row= DB::queryFirstRow("
             t.excluded = 0 AND
             s.id IS NULL
         GROUP BY
-            1, 2, 3, 4, 5
+            1, 2, 3, 4, 5, 6
         ORDER BY
             ABS(count(r.tweet_id) - %f) ASC
         ',
@@ -112,6 +113,14 @@ $count_row= DB::queryFirstRow("
     $result = mysqli_query($link, $sql);
     while ($row = mysqli_fetch_assoc($result)) {
         $id = $row['id'];
+        $label = $row['label'];
+        $label_class = 'label';
+        if($label === 'pos'){
+            $label_class .= ' label-success';
+        }
+        if($label === 'neg'){
+            $label_class .= ' label-danger';
+        }
         $tweet_json = preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $row['content_json']);
         $tweet_json_read = preg_replace('/,/', ', ', $tweet_json);
         $features = preg_replace('/,/', ', ', $row['features']);
@@ -129,6 +138,7 @@ $count_row= DB::queryFirstRow("
                     <div class="panel-heading">
                         <?= $tweet_login ?> (<?= $tweet_author ?>)
                         (<?= $id ?>) (<?= $row['tweets_in_cluster'] ?>)
+                        <span class="<?= $label_class ?>"><?= $label ?></span>
                     </div>
                     <div id="text_<?= $id ?>" class="panel-body" style="word-wrap:break-word"><?= $row['tweet_cleaned'] ?> 
                         <a href="<?= $tweet_link ?>" target="_blank" style="word-wrap:break-word"><?= $tweet_link ?></a></div>

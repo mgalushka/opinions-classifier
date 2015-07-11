@@ -28,7 +28,7 @@ public class ClassifierClient {
       HttpGet httpGet = new HttpGet(
         String.format(
           CLASSIFIER_API,
-          URLEncoder.encode(tweet, "UTF-8")
+          URLEncoder.encode(tweet.replaceAll("\\p{C}", ""), "UTF-8")
         )
       );
       CloseableHttpResponse response = httpclient.execute(httpGet);

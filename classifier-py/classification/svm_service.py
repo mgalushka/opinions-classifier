@@ -26,7 +26,7 @@ class classify(object):
     def GET(self, request):
         web.header('Access-Control-Allow-Origin', '*')
         text = web.input()['text']
-        print("Classifying text [{0}]".format(text))
+        print(u"Classifying text [{0}]".format(text))
         return web.svm.classify_many([features.tweet_to_words(text)])[0]
 
 if __name__ == "__main__":

@@ -45,7 +45,7 @@ svm.train(train_set)
 
 version = sys.argv[1]
 path = '../model/svm/{0}/svm.pkl'.format(version)
-print("Saving model to {0}".format(path))
+print(u'Saving model to {0}'.format(path))
 joblib.dump(svm, path)
 
 test_skl = []

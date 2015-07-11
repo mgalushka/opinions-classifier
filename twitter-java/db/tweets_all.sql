@@ -6,6 +6,7 @@ CREATE TABLE `tweets_all` (
 	`classified` VARCHAR(100) NULL DEFAULT NULL,
 	`excluded` TINYINT(4) NOT NULL DEFAULT '0',
 	`excluded_reason` VARCHAR(256) NULL DEFAULT '0',
+	`label` VARCHAR(50) NULL DEFAULT NULL,
 	`created_timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	PRIMARY KEY (`id`),
 	INDEX `created_timestamp_index` (`created_timestamp`),

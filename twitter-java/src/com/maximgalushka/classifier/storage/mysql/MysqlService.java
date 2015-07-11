@@ -552,6 +552,24 @@ public class MysqlService {
     }
   }
 
+  public void saveTweetLabel(Tweet tweet, String label) {
+    try (Connection conn = this.datasource.getConnection()) {
+      try (
+        PreparedStatement stmt = conn.prepareStatement(
+          "update tweets_all " +
+            "set label=? " +
+            "where id=?"
+        )
+      ) {
+        stmt.setString(1, label);
+        stmt.setLong(2, tweet.getId());
+        stmt.execute();
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+  }
+
   /**
    * Latest tweets for latest frame in hours
    *

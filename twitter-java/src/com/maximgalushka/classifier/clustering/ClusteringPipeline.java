@@ -1,5 +1,6 @@
 package com.maximgalushka.classifier.clustering;
 
+import com.maximgalushka.classifier.clustering.client.ClassifierClient;
 import com.maximgalushka.classifier.clustering.graphs.DepthFirstSearch;
 import com.maximgalushka.classifier.clustering.graphs.Graph;
 import com.maximgalushka.classifier.clustering.lsh.simhash.SimhashDuplicates;
@@ -313,6 +314,25 @@ public class ClusteringPipeline {
       );
       storage.saveTweetsCleanedBatch(update);
 
+      // Now we are calling classifier web service for each best tweet to get
+      // label (pos/neg) and in future - probability score that this tweet is
+      // good for publishing
+      List<Tweet> best = storage.getBestTweetsForRun(nextRunId);
+      ClassifierClient clClient = new ClassifierClient();
+      for(Tweet tweet : best){
+        String label = clClient.getLabel(tweet.getText());
+        if(label != null) {
+          storage.saveTweetLabel(tweet, label);
+        }
+        else{
+          log.warn(
+            String.format(
+              "Labelling failed and returned null for tweet: [%s]",
+              tweet
+            )
+          );
+        }
+      }
     } catch (Exception e) {
       log.error("", e);
       e.printStackTrace();

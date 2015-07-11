@@ -1,6 +1,7 @@
 package com.maximgalushka.classifier.clustering.client;
 
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -30,12 +31,11 @@ public class ClassifierClient {
           URLEncoder.encode(tweet, "UTF-8")
         )
       );
-      CloseableHttpResponse response1 = httpclient.execute(httpGet);
-      System.out.println(response1.getStatusLine());
-      HttpEntity entity1 = response1.getEntity();
-      // do something useful with the response body
-      // and ensure it is fully consumed
-      return IOUtils.toString(entity1.getContent(), "UTF-8");
+      CloseableHttpResponse response = httpclient.execute(httpGet);
+      if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+        HttpEntity entity = response.getEntity();
+        return IOUtils.toString(entity.getContent(), "UTF-8");
+      }
     } catch (IOException e) {
       e.printStackTrace();
     }

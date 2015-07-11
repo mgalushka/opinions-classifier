@@ -1,5 +1,6 @@
 import random
 import features
+import sys
 
 from nltk.corpus import (
     LazyCorpusLoader,
@@ -42,7 +43,10 @@ train_set, test_set = featuresets[size / 2:], featuresets[:size / 2]
 svm = SklearnClassifier(LinearSVC())
 svm.train(train_set)
 
-joblib.dump(svm, '../model/svm/0.1/svm.pkl')
+version = sys.argv[1]
+path = '../model/svm/{0}/svm.pkl'.format(version)
+print("Saving model to {0}".format(path))
+joblib.dump(svm, path)
 
 test_skl = []
 t_test_skl = []

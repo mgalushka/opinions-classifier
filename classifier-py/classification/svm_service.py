@@ -2,22 +2,35 @@
 
 import web
 import features
+import sys
 from sklearn.externals import joblib
 
 urls = (
     '/(.*)', 'classify'
 )
 app = web.application(urls, globals())
+web.svm = None
 
-svm = joblib.load('../model/svm/0.1/svm.pkl')
 
-class classify:
+def load_svm(handler):
+    if not web.svm:
+        version = sys.argv[2]
+        print("Loading SVM model, version {0}".format(version))
+        web.svm = joblib.load('../model/svm/{0}/svm.pkl'.format(version))
+        print("Loaded SVM")
+    return handler()
+
+
+class classify(object):
+
     def GET(self, request):
         web.header('Access-Control-Allow-Origin', '*')
         text = web.input()['text']
         print("Classifying text [{0}]".format(text))
-        return svm.classify_many([features.tweet_to_words(text)])[0]
+        return web.svm.classify_many([features.tweet_to_words(text)])[0]
 
 if __name__ == "__main__":
+    app.add_processor(load_svm)
     app.run()
+
 

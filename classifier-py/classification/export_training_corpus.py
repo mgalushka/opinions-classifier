@@ -51,7 +51,9 @@ cursor = cnx.cursor()
 cursor.execute(query(limit, ['interested', 'published']))
 counter = 1
 for tweet_text in cursor:
-    with open(os.path.join(pos_dir, '{0}.txt'.format(counter)), 'w') as f:
+    path = os.path.join(pos_dir, '{0}.txt'.format(counter))
+    print("Exporting positive sample: {0}".format(path))
+    with open(path, 'w') as f:
         f.write(tweet_text)
     counter += 1
 print("Exported {c} positive examples to {out}".format(
@@ -64,7 +66,9 @@ cursor = cnx.cursor()
 cursor.execute(query(limit, ['ignored']))
 counter = 1
 for tweet_text in cursor:
-    with open(os.path.join(neg_dir, '{0}.txt'.format(counter)), 'w') as f:
+    path = os.path.join(neg_dir, '{0}.txt'.format(counter))
+    print("Exporting negative sample: {0}".format(path))
+    with open(path, 'w') as f:
         f.write(tweet_text)
     counter += 1
 print("Exported {c} negative examples to {out}".format(

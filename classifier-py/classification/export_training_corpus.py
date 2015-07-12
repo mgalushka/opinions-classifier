@@ -8,7 +8,9 @@ def query(limit, classes):
     return """
         SELECT tweet_cleaned
         FROM tweets_all
-        WHERE classified IN ({classes})
+        WHERE
+            classified IN ({classes}) AND
+            tweet_cleaned IS NOT NULL
         ORDER BY RAND()
         LIMIT {limit}
     """.format(

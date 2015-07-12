@@ -1,16 +1,17 @@
-import random
 import features
+import os
+import random
 import sys
 
 from nltk.corpus import (
     LazyCorpusLoader,
     CategorizedPlaintextCorpusReader,
 )
-from sklearn.svm import LinearSVC
 from nltk.classify.scikitlearn import SklearnClassifier
-from sklearn.metrics import classification_report
 
 from sklearn.externals import joblib
+from sklearn.metrics import classification_report
+from sklearn.svm import LinearSVC
 
 version = sys.argv[1]
 limit = int(sys.argv[2])
@@ -26,7 +27,8 @@ decisions = LazyCorpusLoader(
 print(decisions.categories())
 documents = [(list(decisions.words(fileid)), category)
              for category in decisions.categories()
-             for fileid in decisions.fileids(category)]
+             for fileid in decisions.fileids(category)
+             if os.path.getsize(fileid) > 0]
 
 pos_features = [(features.tweet_to_words(d), c) for (d, c) in documents if c == 'pos']
 neg_features = [(features.tweet_to_words(d), c) for (d, c) in documents if c == 'neg']

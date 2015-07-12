@@ -106,7 +106,8 @@ $count_row= DB::queryFirstRow("
         GROUP BY
             1, 2, 3, 4, 5, 6
         ORDER BY
-            ABS(count(r.tweet_id) - %f) ASC
+            t.label DESC,
+            count(r.tweet_id) DESC
         ',
         $average
     );

@@ -46,10 +46,11 @@ cnx = mysql.connector.connect(
 # positive examples
 cursor = cnx.cursor()
 cursor.execute(query(limit, ['interested', 'published']))
-counter = 0
+counter = 1
 for tweet_text in cursor:
     with open(os.path.join(pos_dir, '{0}.txt'.format(counter)), 'w') as f:
         f.write(tweet_text)
+    counter += 1
 print("Exported {c} positive examples to {out}".format(
     c=counter,
     out=pos_dir,
@@ -58,10 +59,11 @@ print("Exported {c} positive examples to {out}".format(
 # negative examples
 cursor = cnx.cursor()
 cursor.execute(query(limit, ['ignored']))
-counter = 0
+counter = 1
 for tweet_text in cursor:
     with open(os.path.join(neg_dir, '{0}.txt'.format(counter)), 'w') as f:
         f.write(tweet_text)
+    counter += 1
 print("Exported {c} negative examples to {out}".format(
     c=counter,
     out=neg_dir,

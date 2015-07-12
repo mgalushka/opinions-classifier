@@ -13,6 +13,7 @@ from sklearn.metrics import classification_report
 from sklearn.externals import joblib
 
 version = sys.argv[1]
+limit = int(sys.argv[2])
 
 decisions = LazyCorpusLoader(
     'tweets_publish_choice_{version}'.format(version=version),
@@ -30,14 +31,12 @@ documents = [(list(decisions.words(fileid)), category)
 pos_features = [(features.tweet_to_words(d), c) for (d, c) in documents if c == 'pos']
 neg_features = [(features.tweet_to_words(d), c) for (d, c) in documents if c == 'neg']
 
-chosen_features_200 = pos_features[:100] + neg_features[:100]
-random.shuffle(chosen_features_200)
+chosen_features_limit = pos_features[:limit / 2] + neg_features[:limit / 2]
+random.shuffle(chosen_features_limit)
 
-featuresets = chosen_features_200
+featuresets = chosen_features_limit
 
-size = 200
-
-train_set, test_set = featuresets[size / 2:], featuresets[:size / 2]
+train_set, test_set = featuresets[limit / 2:], featuresets[:limit / 2]
 
 svm = SklearnClassifier(LinearSVC())
 svm.train(train_set)

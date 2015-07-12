@@ -12,8 +12,10 @@ from sklearn.metrics import classification_report
 
 from sklearn.externals import joblib
 
+version = sys.argv[1]
+
 decisions = LazyCorpusLoader(
-    'tweets_publish_choice',
+    'tweets_publish_choice_{version}'.format(version=version),
     CategorizedPlaintextCorpusReader,
     r'.*\.txt',
     cat_pattern=r'(\w+)/*',
@@ -28,9 +30,6 @@ documents = [(list(decisions.words(fileid)), category)
 pos_features = [(features.tweet_to_words(d), c) for (d, c) in documents if c == 'pos']
 neg_features = [(features.tweet_to_words(d), c) for (d, c) in documents if c == 'neg']
 
-# random.shuffle(pos_features)
-# random.shuffle(neg_features)
-
 chosen_features_200 = pos_features[:100] + neg_features[:100]
 random.shuffle(chosen_features_200)
 
@@ -43,7 +42,6 @@ train_set, test_set = featuresets[size / 2:], featuresets[:size / 2]
 svm = SklearnClassifier(LinearSVC())
 svm.train(train_set)
 
-version = sys.argv[1]
 path = '../model/svm/{0}/svm.pkl'.format(version)
 print(u'Saving model to {0}'.format(path))
 joblib.dump(svm, path)

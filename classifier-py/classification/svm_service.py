@@ -28,8 +28,8 @@ class classify(object):
         if not web.svm:
             return 'error'
 
-        text = web.input(_unicode=False)['text']
-        print("Classifying text [{0}]".format(text))
+        text = web.input(_unicode=False)['text'].decode('utf-8', 'ignore')
+        print(u"Classifying text [{0}]".format(text))
         features_list = [features.tweet_to_words(text)]
         if features_list and len(features_list) > 0:
             try:

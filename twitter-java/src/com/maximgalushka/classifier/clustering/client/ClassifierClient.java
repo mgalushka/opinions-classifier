@@ -1,5 +1,6 @@
 package com.maximgalushka.classifier.clustering.client;
 
+import com.maximgalushka.classifier.storage.StorageService;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -8,6 +9,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.log4j.Logger;
 import org.apache.tika.io.IOUtils;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -43,13 +46,29 @@ public class ClassifierClient {
   }
 
   public static void main(String[] args) {
+    ApplicationContext ac =
+      new ClassPathXmlApplicationContext(
+        "spring/classifier-services.xml"
+      );
+    StorageService storage = (StorageService) ac.getBean("storage");
+
     ClassifierClient client = new ClassifierClient();
-    String l1 = client.getLabel("machine learning");
+    String text = storage.getTweetById(620224355285499904L).getText();
+    log.debug(
+      String.format(
+        "CLassifiying text: %s",
+        text
+      )
+    );
+    String l1 = client.getLabel(
+      text
+    );
     log.debug(
       String.format(
         "Classified: [%s]",
         l1
       )
     );
+    System.exit(0);
   }
 }

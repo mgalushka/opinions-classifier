@@ -24,11 +24,20 @@ decisions = LazyCorpusLoader(
     encoding='utf8',
 )
 
+home = os.path.expanduser("~")
+path = os.path.join(
+    home,
+    'nltk_data{s}corpora{s}tweets_publish_choice_{version}'.format(
+        version=version,
+        s=os.sep,
+    )
+)
+
 print(decisions.categories())
 documents = [(list(decisions.words(fileid)), category)
              for category in decisions.categories()
              for fileid in decisions.fileids(category)
-             if os.path.getsize(fileid) > 0]
+             if os.path.getsize(os.path.join(path, fileid)) > 0]
 
 pos_features = [(features.tweet_to_words(d), c) for (d, c) in documents if c == 'pos']
 neg_features = [(features.tweet_to_words(d), c) for (d, c) in documents if c == 'neg']

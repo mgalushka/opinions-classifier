@@ -21,8 +21,8 @@ def query(limit, classes):
 
 version = sys.argv[1]
 limit = int(sys.argv[2])
-home = os.path.expanduser("~")
 
+home = os.path.expanduser("~")
 path = os.path.join(
     home,
     'nltk_data{s}corpora{s}tweets_publish_choice_{version}'.format(

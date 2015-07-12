@@ -32,8 +32,11 @@ path = os.path.join(
 pos_dir = os.path.join(path, 'pos')
 neg_dir = os.path.join(path, 'neg')
 
-os.makedirs(pos_dir)
-os.makedirs(neg_dir)
+try:
+    os.makedirs(pos_dir)
+    os.makedirs(neg_dir)
+except Exception, e:
+    print("Already existed")
 
 cnx = mysql.connector.connect(
     user=dbconfig.MYSQL_USER,

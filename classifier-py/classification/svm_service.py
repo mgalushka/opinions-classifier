@@ -29,7 +29,7 @@ class classify(object):
             return 'error'
 
         text = web.input(_unicode=False)['text']
-        print(u"Classifying text [{0}]".format(text))
+        print("Classifying text [{0}]".format(text))
         features_list = [features.tweet_to_words(text)]
         if features_list and len(features_list) > 0:
             try:

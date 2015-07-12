@@ -52,9 +52,12 @@ train_set, test_set = featuresets[limit / 2:], featuresets[:limit / 2]
 svm = SklearnClassifier(LinearSVC())
 svm.train(train_set)
 
-path = '../model/svm/{0}/svm.pkl'.format(version)
+path = os.path.normpath('../model/svm/{0}/'.format(version))
+if not os.path.exists(path):
+    os.makedirs(path)
+
 print(u'Saving model to {0}'.format(path))
-joblib.dump(svm, path)
+joblib.dump(svm, os.path.join(path, 'svm.pkl'))
 
 test_skl = []
 t_test_skl = []

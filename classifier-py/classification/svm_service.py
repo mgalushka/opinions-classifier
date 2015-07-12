@@ -28,7 +28,7 @@ class classify(object):
         if not web.svm:
             return 'error'
 
-        text = web.input()['text'].encode('utf-8', 'ignore')
+        text = web.input(_unicode=False)['text'].encode('utf-8', 'ignore')
         print(u"Classifying text [{0}]".format(text))
         features_list = [features.tweet_to_words(text)]
         if features_list and len(features_list) > 0:

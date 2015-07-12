@@ -164,6 +164,9 @@ $count_row= DB::queryFirstRow("
                             type="button"
                             class="btn btn-lg">TW
                     </button>
+                    <button data-id="<?= $id ?>" data-action="interested" type="button"
+                            class="btn btn-lg btn-info interested-not-now">NN
+                    </button>
                     <button data-id="<?= $id ?>" data-action="duplicate" type="button"
                             class="btn btn-lg btn-standard duplicate">DUP
                     </button>

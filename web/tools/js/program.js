@@ -20,8 +20,16 @@ $(document).ready(function () {
     $('.duplicate').on('click', function () {
         var tweetId = $(this).attr('data-id');
         var action = $(this).attr('data-action');
-        console.log("Marking tweet as diplicated: " + tweetId);
+        console.log("Marking tweet as duplicated: " + tweetId);
         tt.core.statusUpdate(tweetId, '', action, $(this));
+        $('#row_' + tweetId).addClass('hide');
+    });
+
+    $('.interested-not-now').on('click', function () {
+        var tweetId = $(this).attr('data-id');
+        var action = $(this).attr('data-action');
+        console.log("Marking tweet as interested: " + tweetId);
+        tt.core.statusUpdate(tweetId, '', 'interesting', $(this));
         $('#row_' + tweetId).addClass('hide');
     });
 

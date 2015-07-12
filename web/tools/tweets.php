@@ -157,18 +157,22 @@ $count_row= DB::queryFirstRow("
             </div>
             <div class="col-md-3 col-xs-3">
                 <div class="btn-group-vertical" role="group" aria-label="...">
-                    <button data-id="<?= $id ?>" data-action="retweet" type="button" class="btn btn-lg retweet">RT
+                    <button data-id="<?= $id ?>" data-action="retweet" type="button" class="btn btn-lg retweet">
+                        <span class="glyphicon glyphicon-send" aria-hidden="true"></span>&nbsp;RT
                     </button>
                     <button data-id="<?= $id ?>" data-action="update" data-toggle="modal"
                             data-target="#edit-tweet-modal"
                             type="button"
-                            class="btn btn-lg">TW
+                            class="btn btn-lg btn-success">
+                        <span class="glyphicon glyphicon glyphicon-ok" aria-hidden="true"></span>&nbsp;TW
                     </button>
                     <button data-id="<?= $id ?>" data-action="interested" type="button"
-                            class="btn btn-lg btn-info interested-not-now">NN
+                            class="btn btn-lg btn-info interested-not-now">
+                        <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span>&nbsp;NN
                     </button>
                     <button data-id="<?= $id ?>" data-action="delete" type="button"
-                            class="btn btn-lg btn-danger delete">DEL
+                            class="btn btn-lg btn-danger delete">
+                        <span class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></span>&nbsp;DEL
                     </button>
                 </div>
             </div>

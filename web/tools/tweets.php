@@ -65,7 +65,7 @@ $count_row = DB::queryFirstRow(
 );
 ?>
 <div class="page-header">
-    <h3>Cleaned tweets: <b><?= $count_row['clusters_count'] ?></b>
+    <h3>Cleaned tweets [<?= $account_id; ?>]: <b><?= $count_row['clusters_count'] ?></b>
         <!--small>Subtext for header</small-->
     </h3>
 </div>

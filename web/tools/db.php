@@ -1,6 +1,6 @@
 <?php
-require_once 'db.class.php';
-include '/config.php';
+require_once 'db/db.class.php';
+include 'config.php';
 
 DB::$host = $MYSQL_SERVER;
 DB::$port = $MYSQL_PORT;

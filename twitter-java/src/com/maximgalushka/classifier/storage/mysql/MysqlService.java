@@ -136,7 +136,7 @@ public class MysqlService {
 
   public List<TwitterAccount> getActiveAccounts() {
     return query(
-      "select account, consumer_key, consumer_secret, " +
+      "select account_id, account, consumer_key, consumer_secret, " +
         "access_token, access_token_secret, terms, lang, term_black_list," +
         "users_black_list " +
         "from accounts " +
@@ -147,6 +147,7 @@ public class MysqlService {
         try {
           if (set.next()) {
             TwitterAccount account = new TwitterAccount();
+            account.setId(set.getLong("account_id"));
             account.setAccount(set.getString("account"));
             account.setConsumerKey(set.getString("consumer_key"));
             account.setConsumerSecret(set.getString("consumer_secret"));

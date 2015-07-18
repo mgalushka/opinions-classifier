@@ -213,7 +213,7 @@ public class TwitterStandardClient implements StreamClient {
     // Optional: set up some followings and track terms
     //List<Long> followings = Lists.newArrayList(1234L, 566788L);
     List<String> terms = Arrays.asList(term.split(","));
-    List<String> languages = Lists.newArrayList("en");
+    List<String> languages = Lists.newArrayList(account.getLanguage());
     //hosebirdEndpoint.followings(followings);
     hosebirdEndpoint.trackTerms(terms);
     hosebirdEndpoint.languages(languages);
@@ -228,7 +228,7 @@ public class TwitterStandardClient implements StreamClient {
     );
 
     com.twitter.hbc.ClientBuilder builder = new com.twitter.hbc.ClientBuilder()
-      .name("Hosebird-Client-01")                              // optional:
+      .name(String.format("Hosebird-Client-%d", account.getId()))                              // optional:
         // mainly for the logs
       .hosts(hosebirdHosts)
 

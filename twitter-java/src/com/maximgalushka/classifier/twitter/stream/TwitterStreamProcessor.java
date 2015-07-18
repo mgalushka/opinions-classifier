@@ -88,7 +88,7 @@ public class TwitterStreamProcessor implements Runnable {
 
     log.debug(
       String.format(
-        "Extracted %d accounts from DB. ",
+        "Extracted %d accounts from DB.",
         accounts.size()
       )
     );
@@ -103,9 +103,7 @@ public class TwitterStreamProcessor implements Runnable {
       // in separate thread and we will read from it and process
       streamClient.stream(
         account,
-        settings.value(
-          LocalSettings.TWITTER_KEYWORDS
-        ),
+        account.getTerms(),
         q
       );
     }

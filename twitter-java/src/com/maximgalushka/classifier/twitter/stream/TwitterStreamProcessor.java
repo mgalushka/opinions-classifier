@@ -88,7 +88,7 @@ public class TwitterStreamProcessor implements Runnable {
 
     log.debug(
       String.format(
-        "Extracted %d accounts from DB.",
+        "Extracted %d accounts from DB. ",
         accounts.size()
       )
     );

@@ -121,9 +121,7 @@ public class ClusteringPipeline {
 
   public void clusterAllAccounts() {
     List<TwitterAccount> accounts = storage.getActiveAccounts();
-    for (TwitterAccount account : accounts) {
-      clusterFromStorage(account);
-    }
+    accounts.forEach(this::clusterFromStorage);
   }
 
   /**

@@ -83,12 +83,14 @@ $count_row = DB::queryFirstRow(
             count(r.tweet_id) AS tweets_in_cluster
         FROM
             tweets_clusters c JOIN tweets_all t
-              ON c.best_tweet_id = t.id
+              ON c.best_tweet_id = t.id AND
+                c.account_id = t.account_id
             JOIN clusters_runs r
               ON c.cluster_id = r.cluster_id
             LEFT JOIN tweets_scheduled s
               ON t.id = s.id
         WHERE
+            t.account_id = %d AND
             c.cluster_run_id = %d AND
             c.is_displayed = 1 AND
             t.excluded = 0 AND
@@ -99,6 +101,7 @@ $count_row = DB::queryFirstRow(
             t.label DESC,
             count(r.tweet_id) DESC
         ',
+        $account_id,
         $max_run
     );
     $result = mysqli_query($link, $sql);

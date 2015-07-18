@@ -2,6 +2,7 @@ package com.maximgalushka.classifier.twitter.service;
 
 import com.maximgalushka.classifier.storage.StorageService;
 import com.maximgalushka.classifier.twitter.LocalSettings;
+import com.maximgalushka.classifier.twitter.account.TwitterAccount;
 import com.maximgalushka.classifier.twitter.client.TwitterStandardClient;
 import com.maximgalushka.classifier.twitter.model.ScheduledTweet;
 import org.apache.log4j.Logger;
@@ -60,43 +61,75 @@ public class TweetPublishScheduler implements Runnable {
   // working hours in UTC tomezone - should I post in US zone?
   private static final int[] WORKING_HOURS = {7, 22};
 
+  @Override
+  public void run() {
+    List<TwitterAccount> accounts = this.storage.getActiveAccounts();
+    for (TwitterAccount account : accounts) {
+      scheduleForAccount(account.getId());
+    }
+  }
+
   /**
    * Gets unscheduled tweets from storage.
    * Schedule them based on caps.
    */
-  public void run() {
-    log.debug("Picking scheduled but unpublished tweets");
-    List<ScheduledTweet> unpublished = storage.getScheduledUnpublishedTweets();
+  public void scheduleForAccount(long accountId) {
     log.debug(
       String.format(
-        "Scheduled but unpublished tweets:\n%s",
+        "Picking scheduled but unpublished tweets for account %d,",
+        accountId
+      )
+    );
+    List<ScheduledTweet> unpublished = storage.getScheduledUnpublishedTweets(
+      accountId
+    );
+    log.debug(
+      String.format(
+        "Scheduled but unpublished tweets for account [%d]:\n%s",
+        accountId,
         unpublished.size() == 0 ? "[none]" : unpublished
       )
     );
     unpublished.forEach(this::schedule);
 
-    log.debug("Getting unscheduled tweets");
-    List<ScheduledTweet> tweets = storage.getUnscheduledTweets();
     log.debug(
       String.format(
-        "Unscheduled tweets:\n%s",
+        "Getting unscheduled tweets for account [%d]",
+        accountId
+      )
+    );
+    List<ScheduledTweet> tweets = storage.getUnscheduledTweets(accountId);
+    log.debug(
+      String.format(
+        "Unscheduled tweets for account [%d]:\n%s",
+        accountId,
         tweets.size() == 0 ? "[none]" : tweets
       )
     );
-    Date latestNew = storage.getLatestPublishedOrScheduledTimestamp(false);
-    Date latestRT = storage.getLatestPublishedOrScheduledTimestamp(true);
+    Date latestNew = storage.getLatestPublishedOrScheduledTimestamp(
+      accountId,
+      false
+    );
+    Date latestRT = storage.getLatestPublishedOrScheduledTimestamp(
+      accountId,
+      true
+    );
 
     Calendar latestNewCalendar = fromDate(latestNew);
     Calendar latestRTCalendar = fromDate(latestRT);
 
     log.debug(
       String.format(
-        "Latest new tweet timestamp: [%s]", SDF.format(latestNew)
+        "Latest new tweet timestamp for account [%d]: [%s]",
+        accountId,
+        SDF.format(latestNew)
       )
     );
     log.debug(
       String.format(
-        "Latest re-tweet timestamp: [%s]", SDF.format(latestRT)
+        "Latest re-tweet timestamp for account [%d]: [%s]",
+        accountId,
+        SDF.format(latestRT)
       )
     );
 
@@ -118,7 +151,8 @@ public class TweetPublishScheduler implements Runnable {
       schedule(tweet);
       log.debug(
         String.format(
-          "Scheduled: %s",
+          "Scheduled for account [%d]: %s",
+          accountId,
           tweet
         )
       );
@@ -199,7 +233,11 @@ public class TweetPublishScheduler implements Runnable {
           if (status != null) {
             long publishedId = status.getId();
             //noinspection ConstantConditions
-            storage.updatePublished(tweet.getData().getId(), publishedId, success);
+            storage.updatePublished(
+              tweet.getData().getId(),
+              publishedId,
+              success
+            );
           }
         } catch (Exception e) {
           log.error(e);

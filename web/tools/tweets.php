@@ -1,7 +1,12 @@
 <?php
 header('Content-type: text/html; charset=utf-8');
-include 'db.php';
+include 'db/db.php';
 include 'header.php';
+
+$account_id = 1;
+if (array_key_exists("id", $_GET)) {
+    $account_id = intval($_GET['id']);
+}
 
 $link = connect();
 ?>
@@ -33,17 +38,30 @@ $link = connect();
     <!-- /.container-fluid -->
 </nav>
 <?
-$count_row= DB::queryFirstRow("
-    SELECT
-         count(c.best_tweet_id) AS clusters_count
-    FROM
-         tweets_clusters c JOIN tweets_all t
-         ON c.best_tweet_id = t.id
-    WHERE
-         c.cluster_run_id = (SELECT max(cluster_run_id) FROM tweets_clusters) AND
-         c.is_displayed = 1 AND
-         t.excluded = 0
-    "
+$max_run = intval(DB::queryFirstRow(
+    sprintf("
+            SELECT max(cluster_run_id) AS max_run
+            FROM tweets_clusters
+            WHERE account_id = %d
+        ",
+        $account_id
+    )
+)['max_run']);
+
+$count_row = DB::queryFirstRow(
+    sprintf("
+        SELECT
+             count(c.best_tweet_id) AS clusters_count
+        FROM
+             tweets_clusters c JOIN tweets_all t
+             ON c.best_tweet_id = t.id
+        WHERE
+             c.cluster_run_id = %d AND
+             c.is_displayed = 1 AND
+             t.excluded = 0
+        ",
+        $max_run
+    )
 );
 ?>
 <div class="page-header">
@@ -54,34 +72,6 @@ $count_row= DB::queryFirstRow("
 
 <div class="container-fluid">
     <?
-    // ide here is to calculate average and then show tweets in order 
-    // of how far they are from average cluster size
-    $sql_average = sprintf('
-        SELECT
-          SUM(cnt) AS cnt,
-          AVG(cnt) AS avg_count
-        FROM(
-            SELECT
-                count(DISTINCT r.tweet_id) AS cnt
-            FROM
-                tweets_clusters c JOIN tweets_all t
-                ON c.best_tweet_id = t.id
-                JOIN clusters_runs r
-                ON c.cluster_id = r.cluster_id
-            WHERE
-                c.cluster_run_id = (SELECT max(cluster_run_id) FROM tweets_clusters) AND
-                c.is_displayed = 1 AND
-                t.excluded = 0
-            GROUP BY 
-                r.cluster_id
-        ) t
-    ');
-    $average = 0;
-    $result_average = mysqli_query($link, $sql_average);
-    while ($row = mysqli_fetch_assoc($result_average)) {
-        $average = $row['avg_count'];
-    }
-
     $sql = sprintf('
         SELECT
             t.id,
@@ -99,7 +89,7 @@ $count_row= DB::queryFirstRow("
             LEFT JOIN tweets_scheduled s
               ON t.id = s.id
         WHERE
-            c.cluster_run_id = (SELECT max(cluster_run_id) FROM tweets_clusters) AND
+            c.cluster_run_id = %d AND
             c.is_displayed = 1 AND
             t.excluded = 0 AND
             s.id IS NULL
@@ -109,17 +99,17 @@ $count_row= DB::queryFirstRow("
             t.label DESC,
             count(r.tweet_id) DESC
         ',
-        $average
+        $max_run
     );
     $result = mysqli_query($link, $sql);
     while ($row = mysqli_fetch_assoc($result)) {
         $id = $row['id'];
         $label = $row['label'];
         $label_class = 'label';
-        if($label === 'pos'){
+        if ($label === 'pos') {
             $label_class .= ' label-success';
         }
-        if($label === 'neg'){
+        if ($label === 'neg') {
             $label_class .= ' label-danger';
         }
         $tweet_json = preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $row['content_json']);
@@ -129,7 +119,7 @@ $count_row= DB::queryFirstRow("
         $tweet_login = htmlentities(json_decode($tweet_json, true)['user']['screen_name']);
         $urls = json_decode($tweet_json, true)['entities']['urls'];
         $tweet_link = '';
-        if($urls){
+        if ($urls) {
             $tweet_link = $urls[0]['expanded_url'];
         }
         ?>
@@ -141,16 +131,20 @@ $count_row= DB::queryFirstRow("
                         (<?= $id ?>) (<?= $row['tweets_in_cluster'] ?>)
                         <span class="<?= $label_class ?>"><?= $label ?></span>
                     </div>
-                    <div id="text_<?= $id ?>" class="panel-body" style="word-wrap:break-word"><?= $row['tweet_cleaned'] ?> 
-                        <a href="<?= $tweet_link ?>" target="_blank" style="word-wrap:break-word"><?= $tweet_link ?></a></div>
+                    <div id="text_<?= $id ?>" class="panel-body"
+                         style="word-wrap:break-word"><?= $row['tweet_cleaned'] ?>
+                        <a href="<?= $tweet_link ?>" target="_blank" style="word-wrap:break-word"><?= $tweet_link ?></a>
+                    </div>
                     <div class="panel-footer">
                         <?= $row['created_timestamp'] ?>
-                        <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#article_<?= $id ?>" aria-expanded="false" aria-controls="collapseExample">
+                        <button class="btn btn-primary" type="button" data-toggle="collapse"
+                                data-target="#article_<?= $id ?>" aria-expanded="false" aria-controls="collapseExample">
                             Content
                         </button>
-                        <div class="collapse" id="article_<?= $id ?>" data-id="<?= $id ?>" data-url="<?= $tweet_link ?>">
+                        <div class="collapse" id="article_<?= $id ?>" data-id="<?= $id ?>"
+                             data-url="<?= $tweet_link ?>">
                             <div class="well">
-                                <img src="images/ajax-loader.gif" />
+                                <img src="images/ajax-loader.gif"/>
                             </div>
                         </div>
                     </div>
@@ -209,7 +203,6 @@ $count_row= DB::queryFirstRow("
 
 <?php
 
-mysqli_free_result($result_average);
 mysqli_free_result($result);
 mysqli_close($link);
 

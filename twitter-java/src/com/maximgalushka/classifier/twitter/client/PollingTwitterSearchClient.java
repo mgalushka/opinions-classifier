@@ -1,5 +1,6 @@
 package com.maximgalushka.classifier.twitter.client;
 
+import com.maximgalushka.classifier.twitter.account.TwitterAccount;
 import com.maximgalushka.classifier.twitter.model.Statuses;
 import com.maximgalushka.classifier.twitter.model.Tweet;
 import org.apache.log4j.Logger;
@@ -12,16 +13,16 @@ import java.util.concurrent.*;
  * We need this class to poll twitter with search requests
  * for different keywords and publish responses to blocking queue
  * to emulate publish/subscribe API.
- * <p/>
+ * <p>
  * Why we added this - if we need to monitor a few topics simultaneously -
  * we cannot use twitter stream API as only 1 streaming process is allowed
  * to be run at a time.
- * <p/>
+ * <p>
  * To overcome this - proposed interface allows to poll twitter
  * (within its search query limitations 450 queries per 15 min)
  * And post to blocking queue for processing which is compatible to existing
  * stream API interface.
- * <p/>
+ * <p>
  *
  * @author Maxim Galushka
  * @see <a href="https://dev.twitter.com/rest/public/rate-limiting">
@@ -68,7 +69,12 @@ public class PollingTwitterSearchClient implements StreamClient {
    * @param output blocking queue where service will send tweets
    */
   @Override
-  public void stream(String term, BlockingQueue<Tweet> output) {
+  @Deprecated
+  public void stream(
+    TwitterAccount account,
+    String term,
+    BlockingQueue<Tweet> output
+  ) {
     results.put(term, output);
     pendingQueries.add(term);
   }
@@ -81,11 +87,7 @@ public class PollingTwitterSearchClient implements StreamClient {
     // thus - the scheduling on this method here
     executor.scheduleWithFixedDelay(
       () -> {
-        log.trace(
-          String.format(
-            "Starting scheduled execution."
-          )
-        );
+        log.trace("Starting scheduled execution.");
         try {
           String query = pendingQueries.takeFirst();
           String token = this.getTwitterClient().bearer();
@@ -98,10 +100,9 @@ public class PollingTwitterSearchClient implements StreamClient {
 
           BlockingQueue<Tweet> result = results.get(query);
           if (result == null) {
-            String error = String.format(
+            String error =
               "Result queue is not found. Where should I post results? " +
-                "Exit now."
-            );
+                "Exit now.";
             log.error(error);
             return;
           }

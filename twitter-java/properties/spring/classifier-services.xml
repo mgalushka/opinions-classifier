@@ -113,7 +113,6 @@
 
     <bean id="blacklist-processor"
           class="com.maximgalushka.classifier.twitter.cleanup.BlacklistProcessor">
-        <property name="settings" ref="settings"/>
     </bean>
 
     <bean id="tweet-features-pipeline"

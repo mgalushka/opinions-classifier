@@ -30,9 +30,14 @@ public class TweetStringDelimeterProcessor extends AbstractProcessor<Tweet> {
 
   private DelimitedStreamReader reader;
   private Gson gson = new Gson();
+  long twitterAccountId;
 
-  public TweetStringDelimeterProcessor(BlockingQueue<Tweet> queue) {
+  public TweetStringDelimeterProcessor(
+    long twitterAccountId,
+    BlockingQueue<Tweet> queue
+  ) {
     super(queue);
+    this.twitterAccountId = twitterAccountId;
   }
 
   @Override
@@ -75,6 +80,9 @@ public class TweetStringDelimeterProcessor extends AbstractProcessor<Tweet> {
       throw new IOException("Unreasonable message size " + delimitedCount);
     }
     String message = reader.read(delimitedCount);
-    return gson.fromJson(message, Tweet.class);
+    Tweet tweet = gson.fromJson(message, Tweet.class);
+
+    tweet.setAccountId(twitterAccountId);
+    return tweet;
   }
 }

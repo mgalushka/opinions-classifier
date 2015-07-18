@@ -2,6 +2,7 @@ package com.maximgalushka.classifier.twitter.stream;
 
 import com.maximgalushka.classifier.storage.StorageService;
 import com.maximgalushka.classifier.twitter.LocalSettings;
+import com.maximgalushka.classifier.twitter.account.TwitterAccount;
 import com.maximgalushka.classifier.twitter.classify.carrot
   .ClusteringTweetsListAlgorithm;
 import com.maximgalushka.classifier.twitter.client.StreamClient;
@@ -10,6 +11,7 @@ import com.maximgalushka.classifier.twitter.model.Tweet;
 import org.apache.log4j.Logger;
 
 import java.util.ArrayDeque;
+import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -19,8 +21,7 @@ import java.util.concurrent.BlockingQueue;
 @SuppressWarnings({"FieldCanBeLocal", "unused"})
 public class TwitterStreamProcessor implements Runnable {
   public static final Logger log = Logger.getLogger(
-    TwitterStreamProcessor
-      .class
+    TwitterStreamProcessor.class
   );
 
   private Clusters model;
@@ -82,20 +83,22 @@ public class TwitterStreamProcessor implements Runnable {
       System.setProperty("http.proxyPort", "4545");
     }
 
+    List<TwitterAccount> accounts = storage.getActiveAccounts();
     BlockingQueue<Tweet> q = new ArrayBlockingQueue<>(1000);
-    // twitter steam client is infinitely sends messages to this queue
-    // in separate thread and we will read from it and process
-    streamClient.stream(
-      settings.value(
-        LocalSettings.TWITTER_KEYWORDS
-      ),
-      q
-    );
 
-    int BATCH_SIZE = 20; // much slow for ML domain
+    for (TwitterAccount account : accounts) {
+      // twitter steam client is infinitely sends messages to this queue
+      // in separate thread and we will read from it and process
+      streamClient.stream(
+        account,
+        settings.value(
+          LocalSettings.TWITTER_KEYWORDS
+        ),
+        q
+      );
+    }
 
-    // experiment to find better ratio
-    //int STEP = BATCH_SIZE / 20;
+    int BATCH_SIZE = Math.min(100, 20 * accounts.size());
 
     ArrayDeque<Tweet> batch = new ArrayDeque<>();
     long messageCount = 0;
@@ -109,54 +112,6 @@ public class TwitterStreamProcessor implements Runnable {
         } else {
           batch.add(tweet);
         }
-        // final step - we turn off old way of processing tweets. This is just for legacy reasons.
-        // to remember how this product was grown.
-        /*
-        try {
-          if (batch.size() < (BATCH_SIZE + STEP) &&
-            (batch.size() % STEP) == 0) {
-            // saving current batch to database
-            log.debug("Saving current tweets batch to database");
-            storage.saveTweetsBatch(batch);
-
-            log.debug("Pre-batch cluster estimation.");
-            clustering.classify(
-              slice(batch, batch.size() - STEP, batch.size()),
-              model
-            );
-          }
-          // we need to collect full batch of elements and then classify the
-          // whole batch
-          if (batch.size() == (BATCH_SIZE + STEP)) {
-            // saving current batch to database
-            log.debug("Saving current tweets batch to database");
-            storage.saveTweetsBatch(batch);
-
-            log.debug("Clean model. We start full scale clustering.");
-            model.cleanClusters();
-
-            log.debug("Start batch processing");
-            clustering.classify(slice(batch, BATCH_SIZE), model);
-
-            // remove first STEP elements from start
-            cleanFromStart(batch, STEP);
-          } else {
-            log.trace(String.format("[%d] %s", messageCount++, tweet));
-            if(messageCount % 100 == 0){
-              log.debug("Receiving twitter messages...");
-            }
-            batch.addLast(tweet);
-          }
-        } catch (IOException e) {
-          log.error(e);
-          e.printStackTrace();
-        }
-      } catch (InterruptedException e) {
-        log.error(e);
-        e.printStackTrace();
-      }
-    }
-    */
       } catch (InterruptedException e) {
         e.printStackTrace();
       }

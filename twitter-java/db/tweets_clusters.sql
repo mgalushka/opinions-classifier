@@ -1,15 +1,17 @@
 CREATE TABLE `tweets_clusters` (
-	`cluster_id` BIGINT(20) NOT NULL AUTO_INCREMENT,
-	`name` VARCHAR(255) NULL DEFAULT NULL,
-	`best_tweet_id` BIGINT(20) NULL DEFAULT NULL,
-	`is_displayed` TINYINT(4) NOT NULL DEFAULT '1',
-	`cluster_run_id` BIGINT(20) NOT NULL DEFAULT '0',
-	`cluster_run_timestamp` TIMESTAMP NULL DEFAULT NULL,
-	`created_timestamp` TIMESTAMP NULL DEFAULT NULL,
-	`updated_timestamp` TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-	PRIMARY KEY (`cluster_id`),
-	INDEX `latest_clusters_index` (`is_displayed`, `updated_timestamp`),
-	INDEX `luster_run_index` (`cluster_run_id`)
+  `cluster_id` BIGINT(20) NOT NULL AUTO_INCREMENT,
+  `account_id` BIGINT(20) NOT NULL,
+  `name` VARCHAR(255) NULL DEFAULT NULL,
+  `best_tweet_id` BIGINT(20) NULL DEFAULT NULL,
+  `is_displayed` TINYINT(4) NOT NULL DEFAULT '1',
+  `cluster_run_id` BIGINT(20) NOT NULL DEFAULT '0',
+  `cluster_run_timestamp` TIMESTAMP NULL DEFAULT NULL,
+  `created_timestamp` TIMESTAMP NULL DEFAULT NULL,
+  `updated_timestamp` TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`cluster_id`),
+  INDEX `latest_clusters_index` (`is_displayed`, `updated_timestamp`),
+  INDEX `luster_run_index` (`cluster_run_id`),
+  INDEX `best_tweet_id_ind` (`best_tweet_id`, `account_id`)
 )
 COLLATE='utf8_general_ci'
 ENGINE=InnoDB

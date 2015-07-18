@@ -27,6 +27,7 @@ public class Tweet {
 
   private transient boolean excluded;
   private transient String excludedReason;
+  private transient long accountId;
 
   public Tweet() {
   }
@@ -110,6 +111,14 @@ public class Tweet {
 
   public void setEntities(Entities entities) {
     this.entities = entities;
+  }
+
+  public void setAccountId(long accountId) {
+    this.accountId = accountId;
+  }
+
+  public long getAccountId() {
+    return accountId;
   }
 
   @Override

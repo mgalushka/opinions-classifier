@@ -5,6 +5,7 @@ import com.maximgalushka.classifier.clustering.graphs.DepthFirstSearch;
 import com.maximgalushka.classifier.clustering.graphs.Graph;
 import com.maximgalushka.classifier.clustering.lsh.simhash.SimhashDuplicates;
 import com.maximgalushka.classifier.storage.StorageService;
+import com.maximgalushka.classifier.twitter.account.TwitterAccount;
 import com.maximgalushka.classifier.twitter.best.ClusterRepresentativeFinder;
 import com.maximgalushka.classifier.twitter.best.FeaturesExtractorPipeline;
 import com.maximgalushka.classifier.twitter.cleanup.BlacklistProcessor;
@@ -19,17 +20,22 @@ import java.util.*;
 
 /**
  * Performs logic for full end-to-end clustering process:
- * 1. Retrieves potential tweets from db and clean-up according to black-listed rules.
+ * 1. Retrieves potential tweets from db and clean-up according to
+ * black-listed rules.
  * 2. Do cleanup according to features (if thresholds are violated)
- * 3. Cleans tweet texts to remove training links from text, "RT" from start etc...
+ * 3. Cleans tweet texts to remove training links from text, "RT" from start
+ * etc...
  * 4. Saves everything in database and performs clustering
  * 5. Chooses best representative from each cluster
- * 6. Retrieves from db all tweets previously published or rejected for latest X days
- * 7. De-duplicates with simhash against already published or rejected tweets to avoid multiple
+ * 6. Retrieves from db all tweets previously published or rejected for
+ * latest X days
+ * 7. De-duplicates with simhash against already published or rejected tweets
+ * to avoid multiple
  * duplicates to be displayed to user.
  * 8. Saves everything back to db.
  * <p>
- * This process is run periodically and stores each subsequent run under incremented run id.
+ * This process is run periodically and stores each subsequent run under
+ * incremented run id.
  *
  * @author Maxim Galushka
  */
@@ -113,25 +119,37 @@ public class ClusteringPipeline {
 
   private static final double LATEST_HOURS = 0.5D;
 
+  public void clusterAllAccounts() {
+    List<TwitterAccount> accounts = storage.getActiveAccounts();
+    for (TwitterAccount account : accounts) {
+      clusterFromStorage(account);
+    }
+  }
+
   /**
    * Business method:
    * retrieved tweets for latest X hours and apply
    * clustering algorithm to them, then store clusters back to
    * database.
    */
-  public void clusterFromStorage() {
+  public void clusterFromStorage(TwitterAccount account) {
     log.info(
       String.format(
-        "Starting tweets classifier for latest %f hours",
+        "Starting tweets classifier for account [%d] for latest %f hours",
+        account.getId(),
         LATEST_HOURS
       )
     );
-    List<Tweet> latestHoursTweets = storage.getLatestTweets(LATEST_HOURS);
+    List<Tweet> latestHoursTweets = storage.getLatestTweets(
+      account.getId(),
+      LATEST_HOURS
+    );
     if (latestHoursTweets.isEmpty()) {
       log.error(
         String.format(
-          "Could not find any clusters for latest %f hours. Check if twitter " +
-            "stream is running.",
+          "Could not find any clusters for account %d for latest %f hours. " +
+            "Check if twitter stream is running.",
+          account.getId(),
           LATEST_HOURS
         )
       );
@@ -139,16 +157,18 @@ public class ClusteringPipeline {
     } else {
       log.info(
         String.format(
-          "Found [%d] clusters in database for latest %f hours, starting " +
-            "clustering.",
+          "Found [%d] clusters in database for latest %f hours for account " +
+            "%d," +
+            "starting clustering.",
           latestHoursTweets.size(),
-          LATEST_HOURS
+          LATEST_HOURS,
+          account.getId()
         )
       );
     }
 
     List<Tweet> cleaned4Clustering =
-      blacklistProcessor.clean(latestHoursTweets);
+      blacklistProcessor.clean(account, latestHoursTweets);
 
     log.info(
       String.format(
@@ -162,7 +182,8 @@ public class ClusteringPipeline {
     // TODO: in current design we are extracting features twice:
     // 1 - pre-cleaning
     // 2 - choosing best representative tweet from cluster.
-    // this is not an issue if number of clusters is small as we anyway are doing everything in
+    // this is not an issue if number of clusters is small as we anyway are
+    // doing everything in
     // memory
     featuresExtractor.processBatch(latestHoursTweets);
 
@@ -193,10 +214,11 @@ public class ClusteringPipeline {
     );
     try {
       // next run id is just incremented max run id
-      long nextRunId = storage.getMaxRunId() + 1;
+      long nextRunId = storage.getMaxRunId(account.getId()) + 1;
       log.debug(
         String.format(
-          "Next run ID: [%d]",
+          "Next run ID for account [%d]: [%d]",
+          account.getId(),
           nextRunId
         )
       );
@@ -217,14 +239,17 @@ public class ClusteringPipeline {
         );
         // creates new cluster in database and associates all tweets with it
         long clusterId = storage.saveTweetsClustersBatch(
+          account.getId(),
           cluster,
           nextRunId,
           tweetsInCluster
         );
         //countId.put(tweetsInCluster.size(), clusterId);
 
-        // NOTE: this method internally exclude tweets based on same metrics
-        // this is not clear from code that this will be done
+        // NOTE: this method internally exclude tweets (mark them as excluded
+        // - and this will be store in database after this call!)
+        // based on same metrics
+        // NOT: this is not clear from code that this will be done
         ClusterRepresentativeFinder.Pair<Tweet, Map<Tweet, Map<String, Object>>>
           pair = representativeFinder
           .findRepresentativeFeaturesBased(
@@ -241,16 +266,23 @@ public class ClusteringPipeline {
           clusterId,
           representative.getId()
         );
-        //bestTweetInCluster.put(clusterId, representative);
       }
 
       // retrieve current clusters for run
       // get used tweets
       // re-cluster
       // go BFS and mark de-duplicated clusters as needed.
-      List<Tweet> current = storage.getBestTweetsForRun(nextRunId);
+      List<Tweet> current = storage.getBestTweetsForRun(
+        account.getId(),
+        nextRunId
+      );
       // TODO: make configurable
-      final List<Tweet> used = storage.getLatestUsedTweets(7 * 24D, true, true);
+      final List<Tweet> used = storage.getLatestUsedTweets(
+        account.getId(),
+        7 * 24D,
+        true,
+        true
+      );
       final int usedSize = used.size();
 
       used.addAll(current);
@@ -282,8 +314,10 @@ public class ClusteringPipeline {
       );
 
       for (int index = 0; index < usedSize; index++) {
-        // if there are self-duplicates - DFS will prevent 2nd time traversing same
-        // connected component. So this is optimized to be linear on the number of
+        // if there are self-duplicates - DFS will prevent 2nd time
+        // traversing same
+        // connected component. So this is optimized to be linear on the
+        // number of
         // vertices in the graph.
         dfs.dfs(index);
       }
@@ -292,7 +326,8 @@ public class ClusteringPipeline {
       // TODO same tweets that were published previously:
       // let first N tweets are existing tweets (published already or rejected
       // already)
-      // build a graph and after it go through connected components starting from
+      // build a graph and after it go through connected components starting
+      // from
       // 1..N for each already twitted/rejected tweet.
       // and mark all tweets in this CC as duplicates with corresponding reason
       // to spidify the process - if CC was marked - don't repeat it
@@ -317,14 +352,16 @@ public class ClusteringPipeline {
       // Now we are calling classifier web service for each best tweet to get
       // label (pos/neg) and in future - probability score that this tweet is
       // good for publishing
-      List<Tweet> best = storage.getBestTweetsForRun(nextRunId);
+      List<Tweet> best = storage.getBestTweetsForRun(
+        account.getId(),
+        nextRunId
+      );
       ClassifierClient clClient = new ClassifierClient();
-      for(Tweet tweet : best){
+      for (Tweet tweet : best) {
         String label = clClient.getLabel(tweet.getText());
-        if(label != null) {
+        if (label != null) {
           storage.saveTweetLabel(tweet, label);
-        }
-        else{
+        } else {
           log.warn(
             String.format(
               "Labelling failed and returned null for tweet: [%s]",

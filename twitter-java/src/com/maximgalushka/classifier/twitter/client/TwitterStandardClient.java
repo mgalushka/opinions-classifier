@@ -3,6 +3,7 @@ package com.maximgalushka.classifier.twitter.client;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.maximgalushka.classifier.twitter.LocalSettings;
+import com.maximgalushka.classifier.twitter.account.TwitterAccount;
 import com.maximgalushka.classifier.twitter.model.Media;
 import com.maximgalushka.classifier.twitter.model.Statuses;
 import com.maximgalushka.classifier.twitter.model.Tweet;
@@ -189,7 +190,11 @@ public class TwitterStandardClient implements StreamClient {
    * Based on https://github.com/twitter/hbc project
    */
   @Override
-  public void stream(String term, BlockingQueue<Tweet> output) {
+  public void stream(
+    TwitterAccount account,
+    String term,
+    BlockingQueue<Tweet> output
+  ) {
     if (underTest) {
       return;
     }
@@ -212,10 +217,10 @@ public class TwitterStandardClient implements StreamClient {
 
     // These secrets should be read from a config file
     Authentication hosebirdAuth = new OAuth1(
-      settings.value(LocalSettings.CONSUMER_KEY),
-      settings.value(LocalSettings.CONSUMER_SECRET),
-      settings.value(LocalSettings.ACCESS_TOKEN),
-      settings.value(LocalSettings.ACCESS_TOKEN_SECRET)
+      account.getConsumerKey(),
+      account.getConsumerSecret(),
+      account.getAccessToken(),
+      account.getAccessTokenSecret()
     );
 
     com.twitter.hbc.ClientBuilder builder = new com.twitter.hbc.ClientBuilder()
@@ -225,7 +230,7 @@ public class TwitterStandardClient implements StreamClient {
 
       .authentication(hosebirdAuth)
       .endpoint(hosebirdEndpoint)
-      .processor(new TweetStringDelimeterProcessor(output))
+      .processor(new TweetStringDelimeterProcessor(account.getId(), output))
       .eventMessageQueue(eventQueue);                          // optional:
     // use this if you want to process client events
 
@@ -253,7 +258,7 @@ public class TwitterStandardClient implements StreamClient {
       hosebirdEndpoint,
       hosebirdAuth,
       true,
-      new TweetStringDelimeterProcessor(output),
+      new TweetStringDelimeterProcessor(account.getId(), output),
       reconnectionManager,
       rateTracker,
       executorService,

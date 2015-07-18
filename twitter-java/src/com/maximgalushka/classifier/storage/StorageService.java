@@ -3,6 +3,7 @@ package com.maximgalushka.classifier.storage;
 import com.maximgalushka.classifier.clustering.model.TweetClass;
 import com.maximgalushka.classifier.storage.memcached.MemcachedService;
 import com.maximgalushka.classifier.storage.mysql.MysqlService;
+import com.maximgalushka.classifier.twitter.account.TwitterAccount;
 import com.maximgalushka.classifier.twitter.clusters.Clusters;
 import com.maximgalushka.classifier.twitter.clusters.TweetsCluster;
 import com.maximgalushka.classifier.twitter.model.ScheduledTweet;
@@ -127,18 +128,20 @@ public class StorageService {
           mysql.saveNewClustersGroup(finalTimestamp, group);
         } else {
           log.error(
-            String.format(
-              "Error happened during saving in group memcached, timestamp " +
-                "== 0. Skipping mysql save."
-            )
+            "Error happened during saving in group memcached, timestamp " +
+              "== 0. Skipping mysql save."
           );
         }
       }
     );
   }
 
-  public List<Tweet> getLatestTweets(double hours) {
-    return mysql.getLatestTweets(hours);
+  public List<TwitterAccount> getActiveAccounts() {
+    return mysql.getActiveAccounts();
+  }
+
+  public List<Tweet> getLatestTweets(long accountId, double hours) {
+    return mysql.getLatestTweets(accountId, hours);
   }
 
   /**
@@ -148,11 +151,12 @@ public class StorageService {
    * @return latest published and/or rejected tweets for latest hours
    */
   public List<Tweet> getLatestUsedTweets(
+    long accountId,
     double hours,
     boolean published,
     boolean rejected
   ) {
-    return mysql.getLatestUsedTweets(hours, published, rejected);
+    return mysql.getLatestUsedTweets(accountId, hours, published, rejected);
   }
 
   public Tweet getTweetById(long tweetId) {
@@ -167,26 +171,32 @@ public class StorageService {
     mysql.saveTweetsCleanedBatch(tweets);
   }
 
-  public Long getMaxRunId() throws Exception {
-    return mysql.getMaxRunId();
+  public Long getMaxRunId(long accountId) throws Exception {
+    return mysql.getMaxRunId(accountId);
   }
 
-  public Long createNewCluster(Cluster cluster, long maxRunId)
+  public Long createNewCluster(long accountId, Cluster cluster, long maxRunId)
   throws Exception {
-    return mysql.createNewCluster(cluster, maxRunId);
+    return mysql.createNewCluster(accountId, cluster, maxRunId);
   }
 
   /**
    * @return newly created cluster id
    */
   public Long saveTweetsClustersBatch(
+    long accountId,
     Cluster cluster,
     long nextRunId,
     List<Tweet> tweetsInCluster
   ) {
     try {
-      long clusterId = createNewCluster(cluster, nextRunId);
-      mysql.saveTweetsClustersBatch(nextRunId, clusterId, tweetsInCluster);
+      long clusterId = createNewCluster(accountId, cluster, nextRunId);
+      mysql.saveTweetsClustersBatch(
+        nextRunId,
+        accountId,
+        clusterId,
+        tweetsInCluster
+      );
       return clusterId;
     } catch (Exception e) {
       log.error("", e);
@@ -208,12 +218,12 @@ public class StorageService {
     }
   }
 
-  public List<Tweet> getTweetsForRun(long runId) {
-    return mysql.getTweetsForRun(runId);
+  public List<Tweet> getTweetsForRun(long accountId, long runId) {
+    return mysql.getTweetsForRun(accountId, runId);
   }
 
-  public List<Tweet> getBestTweetsForRun(long runId) {
-    return mysql.getBestTweetsForRun(runId);
+  public List<Tweet> getBestTweetsForRun(long accountId, long runId) {
+    return mysql.getBestTweetsForRun(accountId, runId);
   }
 
   public void saveTweetLabel(Tweet tweet, String label) {
@@ -230,10 +240,6 @@ public class StorageService {
     mysql.updateTweetsFeaturesBatch(features);
   }
 
-  public void savePublishedTweet(Tweet tweet, boolean retweet) {
-    mysql.savePublishedTweet(tweet, retweet);
-  }
-
   public void updateTweetClass(Tweet tweet, TweetClass clazz) {
     log.debug(
       String.format(
@@ -245,7 +251,12 @@ public class StorageService {
     mysql.updateTweetClass(tweet, clazz);
   }
 
-  public void scheduleTweet(Tweet tweet, Tweet original, boolean retweet) {
+  public void scheduleTweet(
+    long accountId,
+    Tweet tweet,
+    Tweet original,
+    boolean retweet
+  ) {
     if (retweet) {
       if (!tweet.getText().equals(original.getText())) {
         throw new IllegalArgumentException(
@@ -258,23 +269,26 @@ public class StorageService {
         );
       }
     }
-    mysql.scheduleTweet(tweet, original, retweet);
+    mysql.scheduleTweet(accountId, tweet, original, retweet);
   }
 
   public void unpublishTweetCluster(long tweetId) {
     mysql.unpublishTweetCluster(tweetId);
   }
 
-  public List<ScheduledTweet> getUnscheduledTweets() {
-    return mysql.getUnscheduledTweets();
+  public List<ScheduledTweet> getUnscheduledTweets(long accountId) {
+    return mysql.getUnscheduledTweets(accountId);
   }
 
-  public List<ScheduledTweet> getScheduledUnpublishedTweets() {
-    return mysql.getScheduledUnpublishedTweets();
+  public List<ScheduledTweet> getScheduledUnpublishedTweets(long accountId) {
+    return mysql.getScheduledUnpublishedTweets(accountId);
   }
 
-  public Date getLatestPublishedOrScheduledTimestamp(boolean retweet) {
-    return mysql.getLatestPublishedOrScheduledTimestamp(retweet);
+  public Date getLatestPublishedOrScheduledTimestamp(
+    long accountId,
+    boolean retweet
+  ) {
+    return mysql.getLatestPublishedOrScheduledTimestamp(accountId, retweet);
   }
 
   public void updateScheduled(long id, Date scheduled) {

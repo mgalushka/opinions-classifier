@@ -5,6 +5,7 @@ import com.maximgalushka.classifier.clustering.model.TweetClass;
 import com.maximgalushka.classifier.storage.StorageService;
 import com.maximgalushka.classifier.twitter.LocalSettings;
 import com.maximgalushka.classifier.twitter.model.Tweet;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.simpleframework.http.Request;
 import org.simpleframework.http.Response;
@@ -68,18 +69,27 @@ public class TwitterEasyApi implements Container {
 
       String action = request.getPath().getName();
       Long tweetId = Long.parseLong(request.getParameter("tweetId"));
+      String accountIdStr = request.getParameter("id");
+      long accountId = 1L;
+      if(StringUtils.isNotBlank(accountIdStr)){
+        try {
+          accountId = Long.parseLong(accountIdStr);
+        } catch (NumberFormatException e) {
+          accountId = 1L;
+        }
+      }
       String text = request.getParameter("text");
       if("retweet".equals(action)){
         Tweet original = storage.getTweetById(tweetId);
         Tweet retweet = new Tweet(tweetId, original.getText());
         storage.updateTweetClass(original, TweetClass.PUBLISHED);
-        storage.scheduleTweet(retweet, original, true);
+        storage.scheduleTweet(accountId, retweet, original, true);
       }
       if("update".equals(action)){
         Tweet original = storage.getTweetById(tweetId);
         Tweet updated = new Tweet(tweetId, text);
         storage.updateTweetClass(original, TweetClass.PUBLISHED);
-        storage.scheduleTweet(updated, original, false);
+        storage.scheduleTweet(accountId, updated, original, false);
       }
       if("duplicate".equals(action)){
         Tweet original = storage.getTweetById(tweetId);

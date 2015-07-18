@@ -1,5 +1,6 @@
 CREATE TABLE `tweets_scheduled` (
 	`id` BIGINT(20) NOT NULL,
+	`account_id` BIGINT(20) NOT NULL,
 	`published_id` BIGINT(20) NULL DEFAULT NULL,
 	`text` TEXT NULL,
 	`media` TEXT NULL,

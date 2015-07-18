@@ -102,19 +102,6 @@ public class MainServiceStart implements Container {
       );
 
     ScheduledExecutorService pool = Executors.newScheduledThreadPool(4);
-    // TODO: disable web-site as we pivoted to publish to twitter only for now.
-    /*
-    MainServiceStart container = (MainServiceStart) ac.getBean("main");
-    Server server = new ContainerServer(container);
-    Connection connection = new SocketConnection(server);
-
-    int port = Integer.valueOf(
-      container.settings.value(LocalSettings.WEB_PORT)
-    );
-    SocketAddress address = new InetSocketAddress(port);
-    connection.connect(address);
-    log.debug(String.format("Server started on port [%d]", port));
-    */
 
     TwitterEasyApi container = (TwitterEasyApi) ac.getBean("easy-api");
     Server server = new ContainerServer(container);
@@ -137,7 +124,7 @@ public class MainServiceStart implements Container {
       "twitter-classifier-pipeline"
     );
     pool.scheduleAtFixedRate(
-      pipeline::clusterFromStorage,
+      pipeline::clusterAllAccounts,
       0, 30, TimeUnit.MINUTES
     );
 

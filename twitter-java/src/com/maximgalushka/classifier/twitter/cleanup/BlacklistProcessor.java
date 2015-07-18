@@ -1,6 +1,6 @@
 package com.maximgalushka.classifier.twitter.cleanup;
 
-import com.maximgalushka.classifier.twitter.LocalSettings;
+import com.maximgalushka.classifier.twitter.account.TwitterAccount;
 import com.maximgalushka.classifier.twitter.model.Tweet;
 import org.apache.commons.lang.StringUtils;
 
@@ -13,18 +13,19 @@ import java.util.List;
  */
 public class BlacklistProcessor {
 
-  private LocalSettings settings;
-
-  public void setSettings(LocalSettings settings) {
-    this.settings = settings;
-  }
-
-  public List<Tweet> clean(List<Tweet> tweets) {
+  public List<Tweet> clean(
+    TwitterAccount account,
+    List<Tweet> tweets
+  ) {
     List<Tweet> cleaned = new ArrayList<>();
-    String black = settings.value(LocalSettings.TWITTER_BLACKLIST);
-    String from = settings.value(LocalSettings.TWITTER_FROM_BLACKLIST);
+    //String black = settings.value(LocalSettings.TWITTER_BLACKLIST);
+    //String blackFrom = settings.value(LocalSettings.TWITTER_FROM_BLACKLIST);
+    String black = account.getBlacklist();
+    String blackFrom = account.getUsersBlacklist();
     List<String> banned = Arrays.asList(black.toLowerCase().split(","));
-    List<String> bannedUsers = Arrays.asList(from.toLowerCase().split(","));
+    List<String> bannedUsers = Arrays.asList(
+      blackFrom.toLowerCase().split(",")
+    );
     for (Tweet tweet : tweets) {
       boolean excluded = false;
       String forbiddenToken = "";

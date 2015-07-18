@@ -86,7 +86,19 @@ public class TwitterStreamProcessor implements Runnable {
     List<TwitterAccount> accounts = storage.getActiveAccounts();
     BlockingQueue<Tweet> q = new ArrayBlockingQueue<>(1000);
 
+    log.debug(
+      String.format(
+        "Extracted %d accounts from DB.",
+        accounts.size()
+      )
+    );
     for (TwitterAccount account : accounts) {
+      log.debug(
+        String.format(
+          "Starting stream for account [%d]",
+          account.getId()
+        )
+      );
       // twitter steam client is infinitely sends messages to this queue
       // in separate thread and we will read from it and process
       streamClient.stream(

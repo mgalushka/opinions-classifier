@@ -63,7 +63,10 @@ public class CleanPipeline implements Cleaner {
     );
 
     // some small cluster from history...
-    List<Tweet> tweets = storage.getTweetsForRun(1L, 29);
+    List<Tweet> tweets = storage.getTweetsForRun(
+      storage.getActiveAccounts().get(0).getId(),
+      29
+    );
     log.debug(String.format("Found [%d] tweets, cleaning...", tweets.size()));
     cleanPipeline.batchClean(tweets);
     storage.saveTweetsCleanedBatch(tweets);

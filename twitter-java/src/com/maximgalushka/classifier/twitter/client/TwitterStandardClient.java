@@ -52,6 +52,8 @@ public class TwitterStandardClient implements StreamClient {
 
   public static final String PROXY_ADDRESS = "http://localhost:4545";
   private Gson gson;
+  private ExecutorService executorService;
+  private ScheduledExecutorService scheduled;
   private LocalSettings settings;
   private Driller driller;
 
@@ -60,6 +62,8 @@ public class TwitterStandardClient implements StreamClient {
 
   public TwitterStandardClient() {
     this.gson = new Gson();
+    this.executorService = Executors.newFixedThreadPool(2);
+    this.scheduled = Executors.newScheduledThreadPool(2);
   }
 
   @PostConstruct
@@ -241,8 +245,6 @@ public class TwitterStandardClient implements StreamClient {
       params.setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
     }
 
-    ExecutorService executorService = Executors.newSingleThreadExecutor();
-    ScheduledExecutorService scheduled = Executors.newScheduledThreadPool(1);
     SchemeRegistry schemeRegistry = SchemeRegistryFactory.createDefault();
     BasicReconnectionManager reconnectionManager =
       new BasicReconnectionManager(5);
@@ -250,7 +252,7 @@ public class TwitterStandardClient implements StreamClient {
       30000,
       100,
       true,
-      scheduled
+      this.scheduled
     );
     BasicClient client = new BasicClient(
       "TwitterStreamClient",

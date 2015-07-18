@@ -136,7 +136,7 @@ public class MysqlService {
 
   public List<TwitterAccount> getActiveAccounts() {
     return query(
-      "select account_id, account, consumer_key, consumer_secret, " +
+      "select id, account, consumer_key, consumer_secret, " +
         "access_token, access_token_secret, terms, lang, term_black_list," +
         "users_black_list " +
         "from accounts " +

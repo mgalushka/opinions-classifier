@@ -1,5 +1,7 @@
 package com.maximgalushka.classifier.twitter.stream;
 
+import com.maximgalushka.classifier.storage.StorageService;
+import com.maximgalushka.classifier.twitter.account.TwitterAccount;
 import com.maximgalushka.classifier.twitter.client.PollingTwitterSearchClient;
 import com.maximgalushka.classifier.twitter.classify.carrot
   .ClusteringTweetsListAlgorithm;
@@ -55,17 +57,13 @@ public class TwitterStreamStandalone {
     PollingTwitterSearchClient client = (PollingTwitterSearchClient) ac.getBean(
       "twitter-stream-client"
     );
+    StorageService storage = (StorageService) ac.getBean("storage");
 
     final PrintWriter pw = new PrintWriter(args[0]);
 
-    /*
-    BlockingQueue<String> q = new ArrayBlockingQueue<>(100);
-    final Client hosebirdClient = client.stream(q);
-    hosebirdClient.connect();
-    */
-
     BlockingQueue<Tweet> q = new ArrayBlockingQueue<>(100);
-    client.stream("rembrandt", q);
+    TwitterAccount account = storage.getActiveAccounts().get(0);
+    client.stream(account, "rembrandt", q);
 
     Runtime.getRuntime().addShutdownHook(
       new Thread() {

@@ -147,7 +147,7 @@ public class MysqlService {
         try {
           if (set.next()) {
             TwitterAccount account = new TwitterAccount();
-            account.setId(set.getLong("account_id"));
+            account.setId(set.getLong("id"));
             account.setAccount(set.getString("account"));
             account.setConsumerKey(set.getString("consumer_key"));
             account.setConsumerSecret(set.getString("consumer_secret"));

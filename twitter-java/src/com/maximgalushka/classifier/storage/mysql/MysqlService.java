@@ -145,7 +145,7 @@ public class MysqlService {
       set -> {
         List<TwitterAccount> accounts = new ArrayList<>();
         try {
-          if (set.next()) {
+          while (set.next()) {
             TwitterAccount account = new TwitterAccount();
             account.setId(set.getLong("id"));
             account.setAccount(set.getString("account"));

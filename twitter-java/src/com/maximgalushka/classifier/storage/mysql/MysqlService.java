@@ -719,7 +719,7 @@ public class MysqlService {
         "select t.id, t.content_json, t.tweet_cleaned, " +
           "t.created_timestamp " +
           "from tweets_clusters c join tweets_all t " +
-          "on c.best_tweet_id = t.id AND c.account_id = t.account_id" +
+          "on c.best_tweet_id = t.id AND c.account_id = t.account_id " +
           "where c.account_id = %d AND c.cluster_run_id = %d", accountId, runId
       ),
       set -> {

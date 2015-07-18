@@ -454,8 +454,8 @@ public class MysqlService {
         )
       ) {
         stmt.setString(1, cluster.getLabel());
-        stmt.setLong(2, clusterRunId);
-        stmt.setLong(3, accountId);
+        stmt.setLong(2, accountId);
+        stmt.setLong(3, clusterRunId);
         stmt.executeUpdate();
         ResultSet rs = stmt.getGeneratedKeys();
         if (rs.next()) {

@@ -218,10 +218,13 @@ public class TweetPublishScheduler implements Runnable {
           Status status = null;
           boolean success = true;
           try {
+            TwitterAccount account = storage.getAccountById(
+              tweet.getData().getAccountId()
+            );
             if (retweet) {
-              status = twitter.retweet(tweet.getData().getId());
+              status = twitter.retweet(account, tweet.getData().getId());
             } else {
-              status = twitter.post(tweet.getData(), false, false);
+              status = twitter.post(account, tweet.getData(), false, false);
             }
           } catch (TwitterException ex) {
             success = false;

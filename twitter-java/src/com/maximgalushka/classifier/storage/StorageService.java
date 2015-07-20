@@ -140,6 +140,22 @@ public class StorageService {
     return mysql.getActiveAccounts();
   }
 
+  public TwitterAccount getAccountById(long accountId) {
+    return mysql.getAccountById(accountId);
+  }
+
+  public void updateUserAccountToken(
+    long accountId,
+    String userAccessToken,
+    String userAccessTokenSecret
+  ) {
+    mysql.updateUserAccountToken(
+      accountId,
+      userAccessToken,
+      userAccessTokenSecret
+    );
+  }
+
   public List<Tweet> getLatestTweets(long accountId, double hours) {
     return mysql.getLatestTweets(accountId, hours);
   }

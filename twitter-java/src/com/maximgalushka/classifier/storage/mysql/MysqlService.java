@@ -135,13 +135,36 @@ public class MysqlService {
   }
 
   public List<TwitterAccount> getActiveAccounts() {
-    return query(
+    return accountsQuery(
       "select id, account, consumer_key, consumer_secret, " +
         "access_token, access_token_secret, terms, lang, term_black_list," +
         "users_black_list " +
         "from accounts " +
         "where is_active = 1"
-      ,
+    );
+  }
+
+  public TwitterAccount getAccountById(long accountId) {
+    List<TwitterAccount> wrapped = accountsQuery(
+      String.format(
+        "select id, account, consumer_key, consumer_secret, " +
+          "access_token, access_token_secret, terms, lang, term_black_list," +
+          "users_black_list, user_access_token, user_access_token_secret " +
+          "from accounts " +
+          "where id = %d AND is_active = 1",
+        accountId
+      )
+    );
+    if (wrapped == null || wrapped.isEmpty()) {
+      return null;
+    } else {
+      return wrapped.get(0);
+    }
+  }
+
+  private List<TwitterAccount> accountsQuery(String query) {
+    return query(
+      query,
       set -> {
         List<TwitterAccount> accounts = new ArrayList<>();
         try {
@@ -157,6 +180,12 @@ public class MysqlService {
             account.setTerms(set.getString("terms"));
             account.setBlacklist(set.getString("term_black_list"));
             account.setUsersBlacklist(set.getString("users_black_list"));
+            account.setUserAccessToken(set.getString("user_access_token"));
+            account.setUserAccessTokenSecret(
+              set.getString(
+                "user_access_token_secret"
+              )
+            );
             accounts.add(account);
           }
         } catch (Exception e) {
@@ -166,6 +195,27 @@ public class MysqlService {
         return accounts;
       }
     );
+  }
+
+  public void updateUserAccountToken(
+    long accountId,
+    String userAccessToken,
+    String userAccessTokenSecret
+  ) {
+    try (Connection conn = this.datasource.getConnection()) {
+      PreparedStatement stmt = conn.prepareStatement(
+        "update accounts " +
+          "set user_access_token = ?, " +
+          "user_access_token_secret = ? " +
+          "where id = ?"
+      );
+      stmt.setString(1, userAccessToken);
+      stmt.setString(2, userAccessTokenSecret);
+      stmt.setLong(3, accountId);
+      stmt.executeUpdate();
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
   }
 
   public void saveTweetsBatch(Collection<Tweet> tweets) {

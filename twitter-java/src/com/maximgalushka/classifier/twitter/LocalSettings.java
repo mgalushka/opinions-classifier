@@ -12,6 +12,9 @@ import java.util.Properties;
 @Resource(name = "settings")
 public class LocalSettings {
 
+  public static final String OAUTH_CONSUMER_KEY = "oauth.consumerKey";
+  public static final String OAUTH_CONSUMER_SECRET = "oauth.consumerSecret";
+
   public static final String CONSUMER_KEY = "consumer.key";
   public static final String CONSUMER_SECRET = "consumer.secret";
   public static final String ACCESS_TOKEN = "access.token";

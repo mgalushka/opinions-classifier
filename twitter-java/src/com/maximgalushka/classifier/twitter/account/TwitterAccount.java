@@ -11,6 +11,8 @@ public class TwitterAccount {
   private String consumerSecret;
   private String accessToken;
   private String accessTokenSecret;
+  private String userAccessToken;
+  private String userAccessTokenSecret;
 
   String language;
   String terms;
@@ -67,6 +69,22 @@ public class TwitterAccount {
 
   public void setAccessTokenSecret(String accessTokenSecret) {
     this.accessTokenSecret = accessTokenSecret;
+  }
+
+  public String getUserAccessToken() {
+    return userAccessToken;
+  }
+
+  public void setUserAccessToken(String userAccessToken) {
+    this.userAccessToken = userAccessToken;
+  }
+
+  public String getUserAccessTokenSecret() {
+    return userAccessTokenSecret;
+  }
+
+  public void setUserAccessTokenSecret(String userAccessTokenSecret) {
+    this.userAccessTokenSecret = userAccessTokenSecret;
   }
 
   public String getBlacklist() {

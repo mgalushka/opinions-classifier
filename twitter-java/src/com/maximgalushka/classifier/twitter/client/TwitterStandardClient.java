@@ -34,6 +34,8 @@ import org.glassfish.jersey.apache.connector.ApacheConnectorProvider;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
 import twitter4j.*;
+import twitter4j.auth.AccessToken;
+import twitter4j.conf.PropertyConfiguration;
 
 import javax.annotation.PostConstruct;
 import javax.ws.rs.client.*;
@@ -42,6 +44,7 @@ import javax.ws.rs.core.Response;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.*;
 
 /**
@@ -228,7 +231,12 @@ public class TwitterStandardClient implements StreamClient {
     );
 
     com.twitter.hbc.ClientBuilder builder = new com.twitter.hbc.ClientBuilder()
-      .name(String.format("Hosebird-Client-%d", account.getId()))                              // optional:
+      .name(
+        String.format(
+          "Hosebird-Client-%d",
+          account.getId()
+        )
+      )                              // optional:
         // mainly for the logs
       .hosts(hosebirdHosts)
 
@@ -276,16 +284,34 @@ public class TwitterStandardClient implements StreamClient {
   /**
    * @param tweetId tweet to re-tweet from user account
    */
-  public Status retweet(long tweetId) throws TwitterException {
+  public Status retweet(
+    TwitterAccount account,
+    long tweetId
+  ) throws TwitterException {
     if (underTest) {
       return testingStub(null);
     }
+    if (account == null) {
+      throw new NullPointerException(
+        "Account passed cannot be null"
+      );
+    }
+    Properties props = new Properties();
+    props.put(LocalSettings.OAUTH_CONSUMER_KEY, account.getConsumerKey());
+    props.put(LocalSettings.OAUTH_CONSUMER_SECRET, account.getConsumerSecret());
 
-    Twitter twitter = TwitterFactory.getSingleton();
+    TwitterFactory tf = new TwitterFactory(new PropertyConfiguration(props));
+    Twitter twitter = tf.getInstance(
+      new AccessToken(
+        account.getUserAccessToken(),
+        account.getUserAccessTokenSecret()
+      )
+    );
     return twitter.retweetStatus(tweetId);
   }
 
   public Status post(
+    TwitterAccount account,
     Tweet tweet,
     boolean attachUrl,
     boolean attachImage
@@ -297,7 +323,18 @@ public class TwitterStandardClient implements StreamClient {
 
     CloseableHttpClient httpclient = HttpClients.createDefault();
     HttpHelper helper = new HttpHelper(httpclient);
-    Twitter twitter = TwitterFactory.getSingleton();
+
+    Properties props = new Properties();
+    props.put(LocalSettings.OAUTH_CONSUMER_KEY, account.getConsumerKey());
+    props.put(LocalSettings.OAUTH_CONSUMER_SECRET, account.getConsumerSecret());
+
+    TwitterFactory tf = new TwitterFactory(new PropertyConfiguration(props));
+    Twitter twitter = tf.getInstance(
+      new AccessToken(
+        account.getUserAccessToken(),
+        account.getUserAccessTokenSecret()
+      )
+    );
 
     String updateText = tweet.getText();
     if (attachUrl) {

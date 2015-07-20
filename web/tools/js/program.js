@@ -1,11 +1,21 @@
+function getParameterByName(name) {
+    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+        results = regex.exec(location.search);
+    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+}
+
 $(document).ready(function () {
+
+    var ACCOUNT_ID = getParameterByName('id');
+    console.log("Account id: " + ACCOUNT_ID);
 
     var lastEditedText = '';
 
     $('.retweet').on('click', function () {
         var tweetId = $(this).attr('data-id');
         var action = $(this).attr('data-action');
-        tt.core.statusUpdate(tweetId, '', action, $(this));
+        tt.core.statusUpdate(tweetId, '', action, ACCOUNT_ID, $(this));
         $('#row_' + tweetId).addClass('hide');
     });
 
@@ -13,7 +23,7 @@ $(document).ready(function () {
         var tweetId = $(this).attr('data-id');
         var action = $(this).attr('data-action');
         console.log("Deleting tweet: " + tweetId);
-        tt.core.statusUpdate(tweetId, '', action, $(this));
+        tt.core.statusUpdate(tweetId, '', action, ACCOUNT_ID, $(this));
         $('#row_' + tweetId).addClass('hide');
     });
 
@@ -21,7 +31,7 @@ $(document).ready(function () {
         var tweetId = $(this).attr('data-id');
         var action = $(this).attr('data-action');
         console.log("Marking tweet as duplicated: " + tweetId);
-        tt.core.statusUpdate(tweetId, '', action, $(this));
+        tt.core.statusUpdate(tweetId, '', action, ACCOUNT_ID, $(this));
         $('#row_' + tweetId).addClass('hide');
     });
 
@@ -29,7 +39,7 @@ $(document).ready(function () {
         var tweetId = $(this).attr('data-id');
         var action = $(this).attr('data-action');
         console.log("Marking tweet as interested: " + tweetId);
-        tt.core.statusUpdate(tweetId, '', 'interesting', $(this));
+        tt.core.statusUpdate(tweetId, '', 'interesting', ACCOUNT_ID, $(this));
         $('#row_' + tweetId).addClass('hide');
     });
 
@@ -56,16 +66,16 @@ $(document).ready(function () {
         var editedText = $('#original-tweet').val().trim();
         console.log("Going to save tweet: " + tweetId + ' ' + editedText);
 
-        tt.core.statusUpdate(tweetId, editedText, 'update', $(this));
+        tt.core.statusUpdate(tweetId, editedText, 'update', ACCOUNT_ID, $(this));
         $('#row_' + tweetId).addClass('hide');
     });
 
     $('.collapse').on('shown.bs.collapse', function (event) {
         tweetId = $(this).attr('data-id');
         url = $(this).attr('data-url');
-        if(url) {
+        if (url) {
             console.log("Retrieving content for " + url);
-            tt.core.statusUpdate(tweetId, '', 'interesting', $(this));
+            tt.core.statusUpdate(tweetId, '', 'interesting', ACCOUNT_ID, $(this));
             tt.retrieval.retrieveContent(url, $(this));
         }
     })

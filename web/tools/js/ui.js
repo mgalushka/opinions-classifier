@@ -16,13 +16,14 @@ tt.core = function () {
         }
     };
 
-    var statusUpdate = function (tweetId, text, command, obj) {
+    var statusUpdate = function (tweetId, text, command, accountId, obj) {
         var request = $.ajax({
             url: API + "/" + command,
             method: 'POST',
             data: {
                 tweetId: tweetId,
-                text: text
+                text: text,
+                id: accountId
             },
             dataType: "json"
         });

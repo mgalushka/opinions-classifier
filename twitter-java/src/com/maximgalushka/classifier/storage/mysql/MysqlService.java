@@ -137,8 +137,8 @@ public class MysqlService {
   public List<TwitterAccount> getActiveAccounts() {
     return accountsQuery(
       "select id, account, consumer_key, consumer_secret, " +
-        "access_token, access_token_secret, terms, lang, term_black_list," +
-        "users_black_list " +
+        "access_token, access_token_secret, terms, lang, term_black_list, " +
+        "users_black_lis, user_access_token, user_access_token_secret " +
         "from accounts " +
         "where is_active = 1"
     );
@@ -148,7 +148,7 @@ public class MysqlService {
     List<TwitterAccount> wrapped = accountsQuery(
       String.format(
         "select id, account, consumer_key, consumer_secret, " +
-          "access_token, access_token_secret, terms, lang, term_black_list," +
+          "access_token, access_token_secret, terms, lang, term_black_list, " +
           "users_black_list, user_access_token, user_access_token_secret " +
           "from accounts " +
           "where id = %d AND is_active = 1",

@@ -356,7 +356,7 @@ public class ClusteringPipeline {
       );
       ClassifierClient clClient = new ClassifierClient();
       for (Tweet tweet : best) {
-        String label = clClient.getLabel(tweet.getText());
+        String label = clClient.getLabel(account.getId(), tweet.getText());
         if (label != null) {
           storage.saveTweetLabel(tweet, label);
         } else {

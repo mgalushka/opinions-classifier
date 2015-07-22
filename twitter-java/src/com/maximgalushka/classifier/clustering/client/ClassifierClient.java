@@ -23,14 +23,15 @@ public class ClassifierClient {
   public static final Logger log = Logger.getLogger(ClassifierClient.class);
 
   private static final String CLASSIFIER_API =
-    "http://warua.org:8077/classify?text=%s";
+    "http://warua.org:8077/classify?id=%d&text=%s";
 
-  public String getLabel(String tweet) {
+  public String getLabel(long accountId, String tweet) {
     try {
       CloseableHttpClient httpclient = HttpClients.createDefault();
       HttpGet httpGet = new HttpGet(
         String.format(
           CLASSIFIER_API,
+          accountId,
           URLEncoder.encode(tweet.replaceAll("\\p{C}", ""), "UTF-8")
         )
       );
@@ -61,6 +62,7 @@ public class ClassifierClient {
       )
     );
     String l1 = client.getLabel(
+      1,
       text
     );
     log.debug(

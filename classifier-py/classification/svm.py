@@ -13,11 +13,16 @@ from sklearn.externals import joblib
 from sklearn.metrics import classification_report
 from sklearn.svm import LinearSVC
 
-version = sys.argv[1]
-limit = int(sys.argv[2])
+account_id = sys.argv[1]
+version = sys.argv[2]
+limit = int(sys.argv[3])
 
 decisions = LazyCorpusLoader(
-    'tweets_publish_choice_{version}'.format(version=version),
+    'tweets_publish_choice_{account}{s}{version}'.format(
+        account=account_id,
+        version=version,
+        s=os.sep,
+    ),
     CategorizedPlaintextCorpusReader,
     r'.*\.txt',
     cat_pattern=r'(\w+)/*',
@@ -27,7 +32,8 @@ decisions = LazyCorpusLoader(
 home = os.path.expanduser("~")
 path = os.path.join(
     home,
-    'nltk_data{s}corpora{s}tweets_publish_choice_{version}'.format(
+    'nltk_data{s}corpora{s}tweets_publish_choice_{account}{s}{version}'.format(
+        account=account_id,
         version=version,
         s=os.sep,
     )
@@ -52,7 +58,7 @@ train_set, test_set = featuresets[limit / 2:], featuresets[:limit / 2]
 svm = SklearnClassifier(LinearSVC())
 svm.train(train_set)
 
-path = os.path.normpath('../model/svm/{0}/'.format(version))
+path = os.path.normpath('../model/svm/account_{0}/{1}/'.format(account_id, version))
 if not os.path.exists(path):
     os.makedirs(path)
 

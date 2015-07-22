@@ -4,28 +4,48 @@ import dbconfig
 import mysql.connector
 
 
-def query(limit, classes):
+def min_query(account_id):
+    return """
+    SELECT
+        LEAST(
+            SUM(if(classified IN ('interested', 'published'), 1, 0)),
+            SUM(if(classified IN ('ignored'), 1, 0))
+        ) as max_max
+    FROM tweets_all
+    WHERE
+       account_id = {account_id} AND
+       classified IS NOT NULL AND
+       tweet_cleaned IS NOT NULL
+    """.format(
+        account_id=account_id,
+    )
+
+
+def query(account_id, limit, classes):
     return """
         SELECT tweet_cleaned
         FROM tweets_all
         WHERE
+            account_id = {account_id} AND
             classified IN ({classes}) AND
             tweet_cleaned IS NOT NULL
         ORDER BY RAND()
         LIMIT {limit}
     """.format(
+        account_id=account_id,
         limit=limit,
         classes="'{all}'".format(all="','".join(classes)),
     )
 
 
-version = sys.argv[1]
-limit = int(sys.argv[2])
+account_id = sys.argv[1]
+version = sys.argv[2]
 
 home = os.path.expanduser("~")
 path = os.path.join(
     home,
-    'nltk_data{s}corpora{s}tweets_publish_choice_{version}'.format(
+    'nltk_data{s}corpora{s}tweets_publish_choice_{account}{s}{version}'.format(
+        account=account_id,
         version=version,
         s=os.sep,
     )
@@ -47,9 +67,18 @@ cnx = mysql.connector.connect(
     port=dbconfig.MYSQL_PORT,
 )
 
+# number of samples
+cursor = cnx.cursor()
+cursor.execute(min_query(account_id))
+limit = 0
+for (min_value,) in cursor:
+    limit = int(min_value)
+
+print('Exporting {0} samples'.format(limit))
+
 # positive examples
 cursor = cnx.cursor()
-cursor.execute(query(limit, ['interested', 'published']))
+cursor.execute(query(account_id, limit, ['interested', 'published']))
 counter = 1
 for (tweet_text,) in cursor:
     path = os.path.join(pos_dir, '{0}.txt'.format(counter))
@@ -58,13 +87,13 @@ for (tweet_text,) in cursor:
         f.write(tweet_text.encode('utf-8', 'ignore'))
     counter += 1
 print("Exported {c} positive examples to {out}".format(
-    c=counter,
+    c=counter - 1,
     out=pos_dir,
 ))
 
 # negative examples
 cursor = cnx.cursor()
-cursor.execute(query(limit, ['ignored']))
+cursor.execute(query(account_id, limit, ['ignored']))
 counter = 1
 for (tweet_text,) in cursor:
     path = os.path.join(neg_dir, '{0}.txt'.format(counter))
@@ -73,6 +102,6 @@ for (tweet_text,) in cursor:
         f.write(tweet_text.encode('utf-8', 'ignore'))
     counter += 1
 print("Exported {c} negative examples to {out}".format(
-    c=counter,
+    c=counter - 1,
     out=neg_dir,
 ))

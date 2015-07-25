@@ -144,7 +144,7 @@ $count_row = DB::queryFirstRow(
                                 data-target="#article_<?= $id ?>" aria-expanded="false" aria-controls="collapseExample">
                             Content
                         </button>
-                        <div class="collapse" id="article_<?= $id ?>" data-id="<?= $id ?>"
+                        <div class="collapse external" id="article_<?= $id ?>" data-id="<?= $id ?>"
                              data-url="<?= $tweet_link ?>">
                             <div class="well">
                                 <img src="images/ajax-loader.gif"/>

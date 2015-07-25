@@ -1,4 +1,4 @@
-#status{
+#status {
     display: none;
     visibility: visible;
     position: fixed;
@@ -7,4 +7,10 @@
     z-index: 100;
     background-color: red;
     padding: 0 10px 0 10px;
+}
+
+.external {
+    width: 100%;
+    word-wrap: break-word;
+    overflow: auto;
 }

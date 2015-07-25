@@ -20,6 +20,6 @@ public class HasUrlFeature implements Feature<Boolean, Tweet> {
   // TODO: putting experiment - let's exclude all clusters without links
   @Override
   public boolean exclude(Boolean feature) {
-    return true;
+    return !feature;
   }
 }

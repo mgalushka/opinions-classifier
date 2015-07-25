@@ -308,7 +308,11 @@ public class TwitterStandardClient implements StreamClient {
         account.getUserAccessTokenSecret()
       )
     );
-    OEmbed oembed = twitter.getOEmbed(new OEmbedRequest(tweetId, tweetUrl));
+    OEmbedRequest embedRequest = new OEmbedRequest(tweetId, tweetUrl);
+    embedRequest.setHideMedia(false);
+    embedRequest.setMaxWidth(550);
+    embedRequest.setHideThread(false);
+    OEmbed oembed = twitter.getOEmbed(embedRequest);
     return oembed.getHtml();
   }
 

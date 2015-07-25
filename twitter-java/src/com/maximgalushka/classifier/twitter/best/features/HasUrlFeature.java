@@ -17,8 +17,9 @@ public class HasUrlFeature implements Feature<Boolean, Tweet> {
     return feature ? 0 : 5;
   }
 
+  // TODO: putting experiment - let's exclude all clusters without links
   @Override
   public boolean exclude(Boolean feature) {
-    return false;
+    return true;
   }
 }

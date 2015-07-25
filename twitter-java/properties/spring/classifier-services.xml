@@ -159,6 +159,7 @@
           class="com.maximgalushka.classifier.twitter.service.TwitterEasyApi">
         <property name="settings" ref="settings"/>
         <property name="storage" ref="storage"/>
+        <property name="twitter" ref="twitter-stream-client"/>
     </bean>
 
     <bean id="stop-service"

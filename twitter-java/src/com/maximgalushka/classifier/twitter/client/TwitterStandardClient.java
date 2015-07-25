@@ -282,6 +282,37 @@ public class TwitterStandardClient implements StreamClient {
   }
 
   /**
+   * Returns HTML representation of embedded tweet
+   */
+  public String embedded(
+    TwitterAccount account,
+    long tweetId,
+    String tweetUrl
+  ) throws TwitterException {
+    if (underTest) {
+      return testingStub(null);
+    }
+    if (account == null) {
+      throw new NullPointerException(
+        "Account passed cannot be null"
+      );
+    }
+    Properties props = new Properties();
+    props.put(LocalSettings.OAUTH_CONSUMER_KEY, account.getConsumerKey());
+    props.put(LocalSettings.OAUTH_CONSUMER_SECRET, account.getConsumerSecret());
+
+    TwitterFactory tf = new TwitterFactory(new PropertyConfiguration(props));
+    Twitter twitter = tf.getInstance(
+      new AccessToken(
+        account.getUserAccessToken(),
+        account.getUserAccessTokenSecret()
+      )
+    );
+    OEmbed oembed = twitter.getOEmbed(new OEmbedRequest(tweetId, tweetUrl));
+    return oembed.getHtml();
+  }
+
+  /**
    * @param tweetId tweet to re-tweet from user account
    */
   public Status retweet(

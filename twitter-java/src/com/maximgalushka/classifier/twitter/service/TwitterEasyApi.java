@@ -4,6 +4,8 @@ import com.google.gson.Gson;
 import com.maximgalushka.classifier.clustering.model.TweetClass;
 import com.maximgalushka.classifier.storage.StorageService;
 import com.maximgalushka.classifier.twitter.LocalSettings;
+import com.maximgalushka.classifier.twitter.account.TwitterAccount;
+import com.maximgalushka.classifier.twitter.client.TwitterStandardClient;
 import com.maximgalushka.classifier.twitter.model.Tweet;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -25,6 +27,7 @@ public class TwitterEasyApi implements Container {
 
   protected LocalSettings settings;
   private StorageService storage;
+  private TwitterStandardClient twitter;
 
   public void setStorage(StorageService storage) {
     this.storage = storage;
@@ -33,6 +36,10 @@ public class TwitterEasyApi implements Container {
   @SuppressWarnings("UnusedDeclaration")
   public void setSettings(LocalSettings settings) {
     this.settings = settings;
+  }
+
+  public void setTwitter(TwitterStandardClient twitter) {
+    this.twitter = twitter;
   }
 
   public TwitterEasyApi() {
@@ -104,6 +111,14 @@ public class TwitterEasyApi implements Container {
         Tweet original = storage.getTweetById(tweetId);
         storage.updateTweetClass(original, TweetClass.IGNORED);
         storage.unpublishTweetCluster(tweetId);
+      }
+      if("embed".equals(action)){
+        TwitterAccount account = storage.getAccountById(accountId);
+        String twitterUrl = request.getParameter("url");
+        String html = twitter.embedded(account, tweetId, twitterUrl);
+        body.println(html);
+        body.close();
+        return;
       }
       body.println(gson.toJson("OK"));
       body.close();

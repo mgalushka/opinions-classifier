@@ -46,7 +46,8 @@ $(document).ready(function () {
     $('#edit-tweet-modal').on('show.bs.modal', function (event) {
         var button = $(event.relatedTarget); // Button that triggered the modal
         var tweetId = button.attr('data-id');
-        var originalTweet = $('#text_' + tweetId).text().replace(/\s+/g, " ").trim();
+        var originalTweet = $('#text_' + tweetId).text().replace(/\s+/g, " ").trim().toLowerCase();
+        originalTweet = originalTweet[0].toUpperCase() + originalTweet.slice(1);
         console.log("Original tweet: " + originalTweet);
 
         var modal = $(this);
@@ -76,7 +77,7 @@ $(document).ready(function () {
         if (url) {
             console.log("Retrieving content for " + url);
             tt.core.statusUpdate(tweetId, '', 'interesting', ACCOUNT_ID, $(this));
-            tt.retrieval.retrieveContent(url, $(this));
+            tt.retrieval.retrieveContent(ACCOUNT_ID, url, $(this));
         }
     })
 

@@ -246,6 +246,10 @@ public class StorageService {
     mysql.saveTweetLabel(tweet, label);
   }
 
+  public void saveTweetArticle(Tweet tweet, String article) {
+    mysql.saveTweetArticle(tweet, article);
+  }
+
   public void saveBestTweetInCluster(long clusterId, long tweetId) {
     mysql.saveBestTweetInCluster(clusterId, tweetId);
   }

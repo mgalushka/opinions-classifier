@@ -1,6 +1,7 @@
 package com.maximgalushka.classifier.clustering;
 
 import com.maximgalushka.classifier.clustering.client.ClassifierClient;
+import com.maximgalushka.classifier.clustering.client.TextExtractorClient;
 import com.maximgalushka.classifier.clustering.graphs.DepthFirstSearch;
 import com.maximgalushka.classifier.clustering.graphs.Graph;
 import com.maximgalushka.classifier.clustering.lsh.simhash.SimhashDuplicates;
@@ -12,6 +13,7 @@ import com.maximgalushka.classifier.twitter.cleanup.BlacklistProcessor;
 import com.maximgalushka.classifier.twitter.cleanup.CleanPipeline;
 import com.maximgalushka.classifier.twitter.client.TwitterStandardClient;
 import com.maximgalushka.classifier.twitter.model.Tweet;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.carrot2.clustering.lingo.LingoClusteringAlgorithm;
 import org.carrot2.core.*;
@@ -355,6 +357,7 @@ public class ClusteringPipeline {
         nextRunId
       );
       ClassifierClient clClient = new ClassifierClient();
+      TextExtractorClient exClient = new TextExtractorClient();
       for (Tweet tweet : best) {
         String label = clClient.getLabel(account.getId(), tweet.getText());
         if (label != null) {
@@ -366,6 +369,22 @@ public class ClusteringPipeline {
               tweet
             )
           );
+        }
+        if (tweet.getEntities().getUrls() != null &&
+          tweet.getEntities().getUrls().isEmpty()
+          ) {
+          String url = tweet.getEntities().getUrls().get(0).getUrl();
+          String article = exClient.getArticle(url);
+          if (StringUtils.isNotBlank(article)) {
+            storage.saveTweetArticle(tweet, article);
+          } else {
+            log.warn(
+              String.format(
+                "Extracted empty article for url: [%s]",
+                article
+              )
+            );
+          }
         }
       }
     } catch (Exception e) {

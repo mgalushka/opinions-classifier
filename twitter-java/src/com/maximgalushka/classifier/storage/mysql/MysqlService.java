@@ -6,6 +6,7 @@ import com.maximgalushka.classifier.twitter.account.TwitterAccount;
 import com.maximgalushka.classifier.twitter.clusters.Clusters;
 import com.maximgalushka.classifier.twitter.model.ScheduledTweet;
 import com.maximgalushka.classifier.twitter.model.Tweet;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.carrot2.core.Cluster;
 
@@ -654,6 +655,25 @@ public class MysqlService {
       ) {
         stmt.setString(1, label);
         stmt.setLong(2, tweet.getId());
+        stmt.execute();
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+  }
+
+  public void saveTweetArticle(Tweet tweet, String article) {
+    try (Connection conn = this.datasource.getConnection()) {
+      try (
+        PreparedStatement stmt = conn.prepareStatement(
+          "update tweets_all " +
+            "set article_extracted = ?, article = ? " +
+            "where id = ?"
+        )
+      ) {
+        stmt.setInt(1, StringUtils.isBlank(article) ? 0 : 1);
+        stmt.setString(2, article);
+        stmt.setLong(3, tweet.getId());
         stmt.execute();
       }
     } catch (SQLException e) {

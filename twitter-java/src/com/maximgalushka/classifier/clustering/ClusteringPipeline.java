@@ -371,7 +371,7 @@ public class ClusteringPipeline {
           );
         }
         if (tweet.getEntities().getUrls() != null &&
-          tweet.getEntities().getUrls().isEmpty()
+          !tweet.getEntities().getUrls().isEmpty()
           ) {
           String url = tweet.getEntities().getUrls().get(0).getUrl();
           String article = exClient.getArticle(url);

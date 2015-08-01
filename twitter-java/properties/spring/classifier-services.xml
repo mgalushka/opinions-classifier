@@ -139,6 +139,7 @@
         <property name="twitterClient" ref="twitter-stream-client"/>
         <property name="blacklistProcessor" ref="blacklist-processor"/>
         <property name="featuresExtractor" ref="tweet-features-pipeline"/>
+        <property name="driller" ref="driller"/>
     </bean>
 
     <bean id="main"

@@ -13,6 +13,7 @@ import com.maximgalushka.classifier.twitter.cleanup.BlacklistProcessor;
 import com.maximgalushka.classifier.twitter.cleanup.CleanPipeline;
 import com.maximgalushka.classifier.twitter.client.TwitterStandardClient;
 import com.maximgalushka.classifier.twitter.model.Tweet;
+import com.maximgalushka.driller.Driller;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.carrot2.clustering.lingo.LingoClusteringAlgorithm;
@@ -53,6 +54,7 @@ public class ClusteringPipeline {
   private TwitterStandardClient twitterClient;
   private BlacklistProcessor blacklistProcessor;
   private FeaturesExtractorPipeline featuresExtractor;
+  private Driller driller;
 
   public ClusteringPipeline() {
   }
@@ -117,6 +119,10 @@ public class ClusteringPipeline {
       featuresExtractor
   ) {
     this.featuresExtractor = featuresExtractor;
+  }
+
+  public void setDriller(Driller driller) {
+    this.driller = driller;
   }
 
   private static final double LATEST_HOURS = 0.5D;
@@ -374,9 +380,19 @@ public class ClusteringPipeline {
           !tweet.getEntities().getUrls().isEmpty()
           ) {
           String url = tweet.getEntities().getUrls().get(0).getUrl();
+          try {
+            url = this.driller.resolve(url);
+          } catch (Exception e) {
+            log.error(
+              String.format(
+                "Cannot resolve URL: %s",
+                e.getMessage()
+              )
+            );
+          }
           String article = exClient.getArticle(url);
           if (StringUtils.isNotBlank(article)) {
-            storage.saveTweetArticle(tweet, article);
+            storage.saveTweetArticle(tweet, article, url);
           } else {
             log.warn(
               String.format(

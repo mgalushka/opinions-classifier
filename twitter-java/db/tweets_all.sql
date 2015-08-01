@@ -8,6 +8,7 @@ CREATE TABLE `tweets_all` (
 	`excluded` TINYINT(4) NOT NULL DEFAULT '0',
 	`excluded_reason` VARCHAR(256) NULL DEFAULT '0',
 	`label` VARCHAR(50) NULL DEFAULT NULL,
+	`article_url` VARCHAR(2048) NULL DEFAULT NULL,
 	`article_extracted` TINYINT(4) NULL DEFAULT NULL,
 	`article` LONGTEXT NULL,
 	`created_timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,

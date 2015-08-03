@@ -1,6 +1,6 @@
 <?php
 
-include 'db.php';
+include '../db.php';
 
 $scale = 'DAY';
 if (isset($_REQUEST['scale'])) {

@@ -4,9 +4,10 @@ import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.HttpCoreContext;
@@ -25,10 +26,21 @@ import java.io.IOException;
 public class DrillerImpl implements Driller {
 
   private static final Logger log = Logger.getLogger(DrillerImpl.class);
+  private static final int DRILLER_TIMEOUT = 5000;
 
   @Override
   public String resolve(String url) throws IOException {
-    HttpClient httpClient = HttpClientBuilder.create().build();
+    RequestConfig config = RequestConfig
+      .custom()
+      .setSocketTimeout(DRILLER_TIMEOUT)
+      .setConnectTimeout(DRILLER_TIMEOUT)
+      .build();
+
+    HttpClient httpClient = HttpClients
+      .custom()
+      .setDefaultRequestConfig(config)
+      .build();
+
     HttpGet httpget = new HttpGet(url);
     HttpContext context = new BasicHttpContext();
     HttpResponse response = httpClient.execute(httpget, context);

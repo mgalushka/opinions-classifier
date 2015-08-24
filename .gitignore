@@ -11,3 +11,7 @@
 /web/tools/config.php
 /web/.idea
 /text-retrieval/.idea
+/www/.idea
+/www/_/js
+/www/_/css
+/www/node_modules

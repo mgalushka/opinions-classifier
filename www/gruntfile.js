@@ -2,9 +2,13 @@ module.exports = function (grunt) {
     grunt.initConfig({
         // define source files and their destinations
         uglify: {
-            files: { 
-                src: '_/components/**/*.js',  // source files mask
+            bootstrap: { 
+                src: '_/components/js/bootstrap/*.js',  // source files mask
                 dest: '_/js/bootstrap.js',    // destination file
+            },
+            jquery: { 
+                src: '_/components/js/jquery/*.js',
+                dest: '_/js/jquery.js',
             }
         },
         less: {
@@ -21,7 +25,7 @@ module.exports = function (grunt) {
           }
         },
         watch: {
-            js:  { files: '_/components/js/*.js', tasks: [ 'uglify' ] },
+            js:  { files: '_/components/js/**/*.js', tasks: [ 'uglify' ] },
             css:  { files: '_/components/less/*.less', tasks: [ 'less' ] },
         }
     });

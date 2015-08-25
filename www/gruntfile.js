@@ -2,12 +2,26 @@ module.exports = function (grunt) {
     grunt.initConfig({
         // define source files and their destinations
         uglify: {
-            bootstrap: { 
-                src: '_/components/js/bootstrap/*.js',  // source files mask
-                dest: '_/js/bootstrap.js'               // destination file
+            bootstrap: {
+                files: {
+                    '_/js/bootstrap.js': [
+                        '_/components/js/bootstrap/affix.js',
+                        '_/components/js/bootstrap/alert.js',
+                        '_/components/js/bootstrap/button.js',
+                        '_/components/js/bootstrap/carousel.js',
+                        '_/components/js/bootstrap/collapse.js',
+                        '_/components/js/bootstrap/dropdown.js',
+                        '_/components/js/bootstrap/modal.js',
+                        '_/components/js/bootstrap/tooltip.js',
+                        '_/components/js/bootstrap/popover.js',
+                        '_/components/js/bootstrap/scrollspy.js',
+                        '_/components/js/bootstrap/tab.js',
+                        '_/components/js/bootstrap/transition.js'
+                    ]
+                }
             },
             jquery: { 
-                src: '_/components/js/jquery/*.js',
+                src: '_/components/js/jquery/jquery.js',
                 dest: '_/js/jquery.js'
             }
         },

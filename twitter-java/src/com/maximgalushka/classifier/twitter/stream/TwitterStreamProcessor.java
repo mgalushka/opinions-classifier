@@ -99,7 +99,7 @@ public class TwitterStreamProcessor implements Runnable {
           account.getId()
         )
       );
-      // twitter steam client is infinitely sends messages to this queue
+      // twitter stream client infinitely sends messages to this queue
       // in separate thread and we will read from it and process
       streamClient.stream(
         account,

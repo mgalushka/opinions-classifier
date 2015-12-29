@@ -207,7 +207,7 @@ public class TwitterStandardClient implements StreamClient {
     }
     // Set up your blocking queues: Be sure to size these properly based on
     // expected TPS of your stream
-    BlockingQueue<Event> eventQueue = new LinkedBlockingQueue<Event>(1000);
+    BlockingQueue<Event> eventQueue = new LinkedBlockingQueue<>(1000);
 
     // Declare the host you want to connect to, the endpoint, and
     // authentication (basic auth or oauth)
@@ -236,8 +236,8 @@ public class TwitterStandardClient implements StreamClient {
           "Hosebird-Client-%d",
           account.getId()
         )
-      )                              // optional:
-        // mainly for the logs
+      )
+      // optional: mainly for the logs
       .hosts(hosebirdHosts)
 
       .authentication(hosebirdAuth)
@@ -351,7 +351,7 @@ public class TwitterStandardClient implements StreamClient {
     boolean attachUrl,
     boolean attachImage
   )
-  throws Exception {
+    throws Exception {
     if (underTest) {
       return testingStub(null);
     }

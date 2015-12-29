@@ -9,6 +9,8 @@ CREATE TABLE `accounts` (
 	`lang` VARCHAR(2) NULL DEFAULT NULL,
 	`term_black_list` TEXT NULL DEFAULT NULL,
 	`users_black_list` TEXT NULL DEFAULT NULL,
+	`user_access_token` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+    `user_access_token_secret` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
 	`is_active` TINYINT(1) NULL DEFAULT NULL,
 	PRIMARY KEY (`id`),
 	UNIQUE INDEX `account_ind` (`account`)
@@ -16,4 +18,3 @@ CREATE TABLE `accounts` (
 COLLATE='utf8_general_ci'
 ENGINE=InnoDB
 ;
-

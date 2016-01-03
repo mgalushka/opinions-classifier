@@ -23,7 +23,7 @@ public class ClassifierClient {
   public static final Logger log = Logger.getLogger(ClassifierClient.class);
 
   private static final String CLASSIFIER_API =
-    "http://warua.org:8077/classify?id=%d&text=%s";
+    "http://127.0.0.1:8077/classify?id=%d&text=%s";
 
   public String getLabel(long accountId, String tweet) {
     try {

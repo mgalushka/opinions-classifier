@@ -19,7 +19,7 @@ public class TextExtractorClient {
   public static final Logger log = Logger.getLogger(ClassifierClient.class);
 
   private static final String EXTRACTOR_API =
-    "http://warua.org:8080/retrieve?text=%s";
+    "http://127.0.0.1:8080/retrieve?text=%s";
 
   public String getArticle(String url) {
     try {

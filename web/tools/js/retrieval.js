@@ -2,8 +2,8 @@ var tt = tt || {};
 
 tt.retrieval = function () {
 
-    var API = "http://warua.org:8080/retrieve?text=";
-    var TWITTER_EMBED = "http://warua.org:8092/easy/embed?";
+    var API = "http://localhost:8080/retrieve?text=";
+    var TWITTER_EMBED = "http://localhost:8092/easy/embed?";
 
     var retrieveContent = function (accountId, url, obj) {
         // for twitter links - just use service to get embedded representation

@@ -4,10 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.maximgalushka.classifier.twitter.LocalSettings;
 import com.maximgalushka.classifier.twitter.account.TwitterAccount;
-import com.maximgalushka.classifier.twitter.model.Media;
-import com.maximgalushka.classifier.twitter.model.Statuses;
-import com.maximgalushka.classifier.twitter.model.Tweet;
-import com.maximgalushka.classifier.twitter.model.TwitterOAuthToken;
+import com.maximgalushka.classifier.twitter.model.*;
 import com.maximgalushka.driller.Driller;
 import com.maximgalushka.http.HttpHelper;
 import com.sun.scenario.Settings;
@@ -30,6 +27,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.SchemeRegistryFactory;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpParams;
+import org.apache.log4j.Logger;
 import org.glassfish.jersey.apache.connector.ApacheConnectorProvider;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
@@ -53,6 +51,10 @@ import java.util.concurrent.*;
 @SuppressWarnings("ALL")
 public class TwitterStandardClient implements StreamClient {
 
+  public static final Logger log = Logger.getLogger(
+      TwitterStandardClient.class
+  );
+
   public static final String PROXY_ADDRESS = "http://localhost:4545";
   private Gson gson;
   private ExecutorService executorService;
@@ -62,6 +64,8 @@ public class TwitterStandardClient implements StreamClient {
 
   private boolean underTest = false;
   private boolean useProxy = false;
+
+  private BasicClient basicStreamClient;
 
   public TwitterStandardClient() {
     this.gson = new Gson();
@@ -74,9 +78,9 @@ public class TwitterStandardClient implements StreamClient {
     String ut = settings.value(LocalSettings.INTEGRATION_TESTING);
     if (ut != null) {
       this.underTest =
-        Boolean.valueOf(settings.value(LocalSettings.INTEGRATION_TESTING));
+          Boolean.valueOf(settings.value(LocalSettings.INTEGRATION_TESTING));
       this.useProxy =
-        Boolean.parseBoolean(settings.value(LocalSettings.USE_PROXY));
+          Boolean.parseBoolean(settings.value(LocalSettings.USE_PROXY));
     }
   }
 
@@ -99,35 +103,35 @@ public class TwitterStandardClient implements StreamClient {
 
     WebTarget target = client.target("https://api.twitter.com/oauth2/token");
     WebTarget callTarget = target.queryParam(
-      "grant_type",
-      "client_credentials"
+        "grant_type",
+        "client_credentials"
     );
 
     Invocation.Builder invocationBuilder = callTarget.request();
 
     invocationBuilder.header(
-      "Content-Type",
-      "application/x-www-form-urlencoded;charset=UTF-8"
+        "Content-Type",
+        "application/x-www-form-urlencoded;charset=UTF-8"
     );
 
     String secret = String.format(
-      "%s:%s",
-      tokenKey,
-      tokenSecret
+        "%s:%s",
+        tokenKey,
+        tokenSecret
     );
     String encoded = new String(Base64.encodeBase64(secret.getBytes()));
     invocationBuilder.header(
-      "Authorization", String.format(
-        "Basic %s",
-        encoded
-      )
+        "Authorization", String.format(
+            "Basic %s",
+            encoded
+        )
     );
 
     Response response = invocationBuilder.post(
-      Entity.entity(
-        null,
-        MediaType.TEXT_PLAIN_TYPE
-      )
+        Entity.entity(
+            null,
+            MediaType.TEXT_PLAIN_TYPE
+        )
     );
     String json = response.readEntity(String.class);
 
@@ -143,8 +147,8 @@ public class TwitterStandardClient implements StreamClient {
    */
   public String bearer() {
     return bearer(
-      Settings.get(LocalSettings.CONSUMER_KEY),
-      Settings.get(LocalSettings.CONSUMER_SECRET)
+        Settings.get(LocalSettings.CONSUMER_KEY),
+        Settings.get(LocalSettings.CONSUMER_SECRET)
     );
   }
 
@@ -162,28 +166,28 @@ public class TwitterStandardClient implements StreamClient {
     }
     Client client = proxyHttpClient();
     WebTarget search = client.target(
-      "https://api.twitter.com/1.1/search/tweets.json"
+        "https://api.twitter.com/1.1/search/tweets.json"
     );
     WebTarget callTarget = search
-      .queryParam("q", query)               // maximum length = 500
-      .queryParam("count", 100)             // maximum = 100
-      .queryParam("since_id", sinceId)
-      .queryParam("result_type", "recent")
-      .queryParam("include_entities", 1)
-      .queryParam("lang", "en");
+        .queryParam("q", query)               // maximum length = 500
+        .queryParam("count", 100)             // maximum = 100
+        .queryParam("since_id", sinceId)
+        .queryParam("result_type", "recent")
+        .queryParam("include_entities", 1)
+        .queryParam("lang", "en");
 
     Invocation.Builder invocationBuilder = callTarget.request();
 
     invocationBuilder.header(
-      "Content-Type",
-      "application/x-www-form-urlencoded;charset=UTF-8"
+        "Content-Type",
+        "application/x-www-form-urlencoded;charset=UTF-8"
     );
     invocationBuilder.header(
-      "Authorization",
-      String.format(
-        "Bearer %s",
-        token
-      )
+        "Authorization",
+        String.format(
+            "Bearer %s",
+            token
+        )
     );
 
     Response response = invocationBuilder.get();
@@ -198,9 +202,9 @@ public class TwitterStandardClient implements StreamClient {
    */
   @Override
   public void stream(
-    TwitterAccount account,
-    String term,
-    BlockingQueue<Tweet> output
+      TwitterAccount account,
+      String term,
+      BlockingQueue<Tweet> output
   ) {
     if (underTest) {
       return;
@@ -212,39 +216,47 @@ public class TwitterStandardClient implements StreamClient {
     // Declare the host you want to connect to, the endpoint, and
     // authentication (basic auth or oauth)
     Hosts hosebirdHosts = new HttpHosts(Constants.STREAM_HOST);
-    StatusesFilterEndpoint hosebirdEndpoint = new StatusesFilterEndpoint();
+    StatusesFilterEndpoint statusFilterEndpoint = new StatusesFilterEndpoint();
     // Optional: set up some followings and track terms
     //List<Long> followings = Lists.newArrayList(1234L, 566788L);
     List<String> terms = Arrays.asList(term.split(","));
     List<String> languages = Lists.newArrayList(account.getLanguage());
-    //hosebirdEndpoint.followings(followings);
-    hosebirdEndpoint.trackTerms(terms);
-    hosebirdEndpoint.languages(languages);
-    hosebirdEndpoint.delimited(true);
+    //statusFilterEndpoint.followings(followings);
+    statusFilterEndpoint.trackTerms(terms);
+    statusFilterEndpoint.languages(languages);
+    //statusFilterEndpoint.filterLevel(Constants.FilterLevel.None);
+    statusFilterEndpoint.delimited(true);
 
     // These secrets should be read from a config file
     Authentication hosebirdAuth = new OAuth1(
-      account.getConsumerKey(),
-      account.getConsumerSecret(),
-      account.getAccessToken(),
-      account.getAccessTokenSecret()
+        account.getConsumerKey(),
+        account.getConsumerSecret(),
+        account.getAccessToken(),
+        account.getAccessTokenSecret()
+    );
+
+    SchemeRegistry schemeRegistry = SchemeRegistryFactory.createDefault();
+    BasicReconnectionManager reconnectionManager =
+        new BasicReconnectionManager(5);
+    BasicRateTracker rateTracker = new BasicRateTracker(
+        30000,
+        100,
+        true,
+        this.scheduled
     );
 
     com.twitter.hbc.ClientBuilder builder = new com.twitter.hbc.ClientBuilder()
-      .name(
-        String.format(
-          "Hosebird-Client-%d",
-          account.getId()
-        )
-      )
+      .name(String.format("Hosebird-Client-%d", account.getId()))
       // optional: mainly for the logs
       .hosts(hosebirdHosts)
-
+      .gzipEnabled(true)
       .authentication(hosebirdAuth)
-      .endpoint(hosebirdEndpoint)
+      .endpoint(statusFilterEndpoint)
       .processor(new TweetStringDelimeterProcessor(account.getId(), output))
-      .eventMessageQueue(eventQueue);                          // optional:
-    // use this if you want to process client events
+      .rateTracker(rateTracker)
+      .reconnectionManager(reconnectionManager)
+      .eventMessageQueue(eventQueue)
+      .schemeRegistry(schemeRegistry);
 
     HttpParams params = new BasicHttpParams();
 
@@ -253,48 +265,48 @@ public class TwitterStandardClient implements StreamClient {
       params.setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
     }
 
-    SchemeRegistry schemeRegistry = SchemeRegistryFactory.createDefault();
-    BasicReconnectionManager reconnectionManager =
-      new BasicReconnectionManager(5);
-    BasicRateTracker rateTracker = new BasicRateTracker(
-      30000,
-      100,
-      true,
-      this.scheduled
+    this.basicStreamClient = builder.build();
+
+    /*
+    this.basicStreamClient = new BasicClient(
+        "TwitterStreamClient",
+        hosebirdHosts,
+        statusFilterEndpoint,
+        hosebirdAuth,
+        true,
+        new TweetStringDelimeterProcessor(account.getId(), output),
+        reconnectionManager,
+        rateTracker,
+        executorService,
+        eventQueue,
+        params,
+        schemeRegistry
     );
-    BasicClient client = new BasicClient(
-      "TwitterStreamClient",
-      hosebirdHosts,
-      hosebirdEndpoint,
-      hosebirdAuth,
-      true,
-      new TweetStringDelimeterProcessor(account.getId(), output),
-      reconnectionManager,
-      rateTracker,
-      executorService,
-      eventQueue,
-      params,
-      schemeRegistry
-    );
+    */
+
 
     // start streaming
-    client.connect();
+    this.basicStreamClient.connect();
+  }
+
+  public void stopHosebird() {
+    this.basicStreamClient.stop();
   }
 
   /**
    * Returns HTML representation of embedded tweet
    */
   public String embedded(
-    TwitterAccount account,
-    long tweetId,
-    String tweetUrl
+      TwitterAccount account,
+      long tweetId,
+      String tweetUrl
   ) throws TwitterException {
     if (underTest) {
       return testingStub(null);
     }
     if (account == null) {
       throw new NullPointerException(
-        "Account passed cannot be null"
+          "Account passed cannot be null"
       );
     }
     Properties props = new Properties();
@@ -303,10 +315,10 @@ public class TwitterStandardClient implements StreamClient {
 
     TwitterFactory tf = new TwitterFactory(new PropertyConfiguration(props));
     Twitter twitter = tf.getInstance(
-      new AccessToken(
-        account.getUserAccessToken(),
-        account.getUserAccessTokenSecret()
-      )
+        new AccessToken(
+            account.getUserAccessToken(),
+            account.getUserAccessTokenSecret()
+        )
     );
     OEmbedRequest embedRequest = new OEmbedRequest(tweetId, tweetUrl);
     embedRequest.setHideMedia(false);
@@ -320,15 +332,15 @@ public class TwitterStandardClient implements StreamClient {
    * @param tweetId tweet to re-tweet from user account
    */
   public Status retweet(
-    TwitterAccount account,
-    long tweetId
+      TwitterAccount account,
+      long tweetId
   ) throws TwitterException {
     if (underTest) {
       return testingStub(null);
     }
     if (account == null) {
       throw new NullPointerException(
-        "Account passed cannot be null"
+          "Account passed cannot be null"
       );
     }
     Properties props = new Properties();
@@ -337,21 +349,21 @@ public class TwitterStandardClient implements StreamClient {
 
     TwitterFactory tf = new TwitterFactory(new PropertyConfiguration(props));
     Twitter twitter = tf.getInstance(
-      new AccessToken(
-        account.getUserAccessToken(),
-        account.getUserAccessTokenSecret()
-      )
+        new AccessToken(
+            account.getUserAccessToken(),
+            account.getUserAccessTokenSecret()
+        )
     );
     return twitter.retweetStatus(tweetId);
   }
 
   public Status post(
-    TwitterAccount account,
-    Tweet tweet,
-    boolean attachUrl,
-    boolean attachImage
+      TwitterAccount account,
+      Tweet tweet,
+      boolean attachUrl,
+      boolean attachImage
   )
-    throws Exception {
+      throws Exception {
     if (underTest) {
       return testingStub(null);
     }
@@ -365,24 +377,24 @@ public class TwitterStandardClient implements StreamClient {
 
     TwitterFactory tf = new TwitterFactory(new PropertyConfiguration(props));
     Twitter twitter = tf.getInstance(
-      new AccessToken(
-        account.getUserAccessToken(),
-        account.getUserAccessTokenSecret()
-      )
+        new AccessToken(
+            account.getUserAccessToken(),
+            account.getUserAccessTokenSecret()
+        )
     );
 
     String updateText = tweet.getText();
     if (attachUrl) {
       // TODO: hard-coded max URL length.
       if (updateText.length() <= (140 - 24) &&
-        tweet.getEntities().getUrls() != null &&
-        !tweet.getEntities().getUrls().isEmpty()) {
+          tweet.getEntities().getUrls() != null &&
+          !tweet.getEntities().getUrls().isEmpty()) {
         String firstUrl = tweet.getEntities().getUrls().get(0).getUrl();
         String resolved = driller.resolve(firstUrl);
         updateText = String.format(
-          "%s %s",
-          tweet.getText(),
-          resolved
+            "%s %s",
+            tweet.getText(),
+            resolved
         );
       }
     }
@@ -390,7 +402,7 @@ public class TwitterStandardClient implements StreamClient {
 
     if (attachImage) {
       if (tweet.getEntities().getMedia() != null &&
-        !tweet.getEntities().getMedia().isEmpty()) {
+          !tweet.getEntities().getMedia().isEmpty()) {
         for (Media media : tweet.getEntities().getMedia()) {
           File temp = File.createTempFile("download_", "");
           // TODO: rethink - as resources are not indefinite
@@ -403,6 +415,89 @@ public class TwitterStandardClient implements StreamClient {
     }
 
     return twitter.updateStatus(update);
+  }
+
+  /**
+   * Returns latest tweets from public account.
+   * It will fail if account in not public.
+   *
+   * @param account twitter account to get tweets for
+   * @return all latest tweets
+   * @throws Exception
+   * @deprecated re-think!
+   */
+  @Deprecated
+  public List<Tweet> getLatestTweets(String account) throws Exception {
+    if (underTest) {
+      return testingStub(null);
+    }
+    try {
+      Twitter twitter = new TwitterFactory().getInstance();
+      return Lists.transform(
+          getLatestStatuses(twitter, account),
+          new StatusToTweetFunction()
+      );
+    } catch (Exception e) {
+      log.warn(
+          String.format(
+              "Cannot extract statuses for %s account. " +
+                  "Probably this is not public. Trying to extract via account itself",
+              account
+          )
+      );
+      throw e;
+    }
+  }
+
+  /**
+   * @param account user account to get latest tweets for
+   * @return list of latest tweets posted
+   * @throws Exception
+   */
+  public List<Tweet> getLatestTweets(TwitterAccount account)
+      throws Exception {
+    if (underTest) {
+      return testingStub(null);
+    }
+
+    List<Tweet> statuses = Lists.newArrayList();
+    try {
+      Properties props = new Properties();
+      props.put(LocalSettings.OAUTH_CONSUMER_KEY, account.getConsumerKey());
+      props.put(
+          LocalSettings.OAUTH_CONSUMER_SECRET,
+          account.getConsumerSecret()
+      );
+
+      TwitterFactory tf = new TwitterFactory(new PropertyConfiguration(props));
+      Twitter twitter = tf.getInstance(
+          new AccessToken(
+              account.getAccessToken(),
+              account.getAccessTokenSecret()
+          )
+      );
+      statuses = Lists.transform(
+          getLatestStatuses(twitter, account.getAccount()),
+          new StatusToTweetFunction()
+      );
+    } catch (Exception e) {
+      log.error(
+          String.format(
+              "Cannot extract statuses for %s account.",
+              account.getAccount()
+          ),
+          e
+      );
+    }
+    return statuses;
+  }
+
+  private List<Status> getLatestStatuses(
+      Twitter client,
+      String twitterAccount
+  ) throws Exception {
+    Paging paging = new Paging(1, 200);
+    return client.getUserTimeline(twitterAccount, paging);
   }
 
   private Client proxyHttpClient() {

@@ -8,17 +8,21 @@ import com.google.gson.annotations.SerializedName;
 @SuppressWarnings("UnusedDeclaration")
 public class Urls {
 
-    @SerializedName("expanded_url")
-    private String url;
+  @SerializedName("expanded_url")
+  private String url;
 
-    public Urls() {
-    }
+  public Urls() {
+  }
 
-    public String getUrl() {
-        return url;
-    }
+  public Urls(String url) {
+    this.url = url;
+  }
 
-    public void setUrl(String url) {
-        this.url = url;
-    }
+  public String getUrl() {
+    return url;
+  }
+
+  public void setUrl(String url) {
+    this.url = url;
+  }
 }

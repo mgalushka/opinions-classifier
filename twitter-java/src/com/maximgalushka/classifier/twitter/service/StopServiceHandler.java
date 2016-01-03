@@ -1,6 +1,7 @@
 package com.maximgalushka.classifier.twitter.service;
 
 import com.maximgalushka.classifier.twitter.LocalSettings;
+import com.maximgalushka.classifier.twitter.client.TwitterStandardClient;
 import com.maximgalushka.classifier.twitter.stream.TwitterStreamProcessor;
 import org.apache.log4j.Logger;
 
@@ -22,6 +23,7 @@ public class StopServiceHandler implements Runnable {
   private ExecutorService pool = Executors.newFixedThreadPool(1);
 
   private TwitterStreamProcessor processor;
+  private TwitterStandardClient twitterClient;
 
   public StopServiceHandler() {
   }
@@ -52,6 +54,11 @@ public class StopServiceHandler implements Runnable {
               TIMEOUT
             )
           );
+          // stopping hosebird client
+          twitterClient.stopHosebird();
+          Thread.sleep(TIMEOUT);
+
+          // stopping everything
           processor.sendStopSignal();
           Thread.sleep(TIMEOUT);
 
@@ -79,5 +86,13 @@ public class StopServiceHandler implements Runnable {
 
   public void setProcessor(TwitterStreamProcessor processor) {
     this.processor = processor;
+  }
+
+  public TwitterStandardClient getTwitterClient() {
+    return twitterClient;
+  }
+
+  public void setTwitterClient(TwitterStandardClient twitterClient) {
+    this.twitterClient = twitterClient;
   }
 }

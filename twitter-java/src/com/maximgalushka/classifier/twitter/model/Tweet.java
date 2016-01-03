@@ -3,6 +3,9 @@ package com.maximgalushka.classifier.twitter.model;
 import com.google.gson.annotations.SerializedName;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.util.CollectionUtils;
+import twitter4j.MediaEntity;
+import twitter4j.Status;
+import twitter4j.URLEntity;
 
 /**
  * @author Maxim Galushka
@@ -119,6 +122,35 @@ public class Tweet {
 
   public long getAccountId() {
     return accountId;
+  }
+
+  public static Tweet fromStatus(Status status) {
+    Tweet tweet = new Tweet(status.getId(), status.getText());
+    tweet.setAccountId(status.getUser().getId());
+
+    User author = new User();
+    author.setScreenName(status.getUser().getScreenName());
+    author.setName(status.getUser().getName());
+    tweet.setAuthor(author);
+
+    Entities entities = new Entities();
+
+    Urls urls = new Urls();
+    for (URLEntity urlEnt : status.getURLEntities()) {
+      entities.getUrls().add(new Urls(urlEnt.getDisplayURL()));
+    }
+
+    Media media = new Media();
+    for (MediaEntity mediaEnt : status.getMediaEntities()) {
+      entities.getMedia().add(new Media(mediaEnt.getDisplayURL()));
+    }
+
+    tweet.setEntities(entities);
+    tweet.setRetweeted(status.isRetweet());
+    tweet.setRetweetCount(status.getRetweetCount());
+    tweet.setFavouriteCount(status.getFavoriteCount());
+
+    return tweet;
   }
 
   @Override

@@ -148,6 +148,17 @@
         <property name="storage" ref="storage"/>
     </bean>
 
+    <bean id="topicsFinder"
+          class="com.maximgalushka.classifier.topics.TopicsFinderImpl">
+    </bean>
+
+    <bean id="topicExtractor"
+          class="com.maximgalushka.classifier.topics.UserTopicsExtractor">
+        <property name="storage" ref="storage"/>
+        <property name="finder" ref="topicsFinder"/>
+        <property name="twitterClient" ref="twitter-stream-client"/>
+    </bean>
+
     <bean id="scheduler"
           class="com.maximgalushka.classifier.twitter.service.TweetPublishScheduler">
         <property name="settings" ref="settings"/>
@@ -168,6 +179,7 @@
         <property name="settings" ref="settings"/>
         <!--property name="pool" ref="taskExecutor"/-->
         <property name="processor" ref="twitter-stream-processor"/>
+        <property name="twitterClient" ref="twitter-stream-client"/>
     </bean>
 
 

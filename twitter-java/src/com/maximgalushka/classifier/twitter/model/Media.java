@@ -8,17 +8,21 @@ import com.google.gson.annotations.SerializedName;
 @SuppressWarnings("UnusedDeclaration")
 public class Media {
 
-    @SerializedName("media_url")
-    private String url;
+  @SerializedName("media_url")
+  private String url;
 
-    public Media() {
-    }
+  public Media() {
+  }
 
-    public String getUrl() {
-        return url;
-    }
+  public Media(String url) {
+    this.url = url;
+  }
 
-    public void setUrl(String url) {
-        this.url = url;
-    }
+  public String getUrl() {
+    return url;
+  }
+
+  public void setUrl(String url) {
+    this.url = url;
+  }
 }

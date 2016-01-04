@@ -2,7 +2,7 @@ var tt = tt || {};
 
 tt.core = function () {
 
-    var API = "http://localhost:8092/easy";
+    var API = "http://lightbot.co:8092/easy";
     var QUICK_UPDATE_FADE_OUT = 4000;
 
     var showStatus = function (data, status) {

@@ -3,7 +3,7 @@ var tt = tt || {};
 tt.core = function () {
 
     // Need corresponding apache configuration to support this - see README
-    var API = "easy";
+    var API = "/easy";
 
     var QUICK_UPDATE_FADE_OUT = 4000;
 

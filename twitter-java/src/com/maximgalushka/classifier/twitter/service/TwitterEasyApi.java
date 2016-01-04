@@ -70,9 +70,10 @@ public class TwitterEasyApi implements Container {
   public void handle(
     Request request, Response response
   ) {
+    headers(response);
+    PrintStream body = null;
     try {
-      headers(response);
-      PrintStream body = response.getPrintStream();
+      body = response.getPrintStream();
 
       String action = request.getPath().getName();
       Long tweetId = Long.parseLong(request.getParameter("tweetId"));
@@ -125,6 +126,10 @@ public class TwitterEasyApi implements Container {
       log.trace("Response sent");
     } catch (Exception e) {
       e.printStackTrace();
+      if (body != null) {
+        body.println(gson.toJson("ERROR"));
+        body.close();
+      }
     }
   }
 }

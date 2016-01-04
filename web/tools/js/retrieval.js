@@ -5,7 +5,7 @@ tt.retrieval = function () {
     var API = "article.php?tweet_id=";
 
     // Need corresponding apache configuration to support this - see README
-    var TWITTER_EMBED = "easy/embed?";
+    var TWITTER_EMBED = "/easy/embed?";
 
     var retrieveContent = function (accountId, url, tweet_id, obj) {
         // for twitter links - just use service to get embedded representation

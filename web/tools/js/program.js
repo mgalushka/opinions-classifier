@@ -77,7 +77,7 @@ $(document).ready(function () {
         if (url) {
             console.log("Retrieving content for " + url);
             tt.core.statusUpdate(tweetId, '', 'interesting', ACCOUNT_ID, $(this));
-            tt.retrieval.retrieveContent(ACCOUNT_ID, url, $(this));
+            tt.retrieval.retrieveContent(ACCOUNT_ID, url, tweetId, $(this));
         }
     })
 

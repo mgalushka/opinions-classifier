@@ -2,7 +2,9 @@ var tt = tt || {};
 
 tt.core = function () {
 
-    var API = "http://lightbot.co:8092/easy";
+    // Need corresponding apache configuration to support this - see README
+    var API = "easy";
+
     var QUICK_UPDATE_FADE_OUT = 4000;
 
     var showStatus = function (data, status) {

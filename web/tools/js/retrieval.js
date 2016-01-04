@@ -2,10 +2,12 @@ var tt = tt || {};
 
 tt.retrieval = function () {
 
-    var API = "http://lightbot.co:8080/retrieve?text=";
-    var TWITTER_EMBED = "http://lightbot.co:8092/easy/embed?";
+    var API = "article.php?tweet_id=";
 
-    var retrieveContent = function (accountId, url, obj) {
+    // Need corresponding apache configuration to support this - see README
+    var TWITTER_EMBED = "easy/embed?";
+
+    var retrieveContent = function (accountId, url, tweet_id, obj) {
         // for twitter links - just use service to get embedded representation
         if (url.indexOf("twitter.com") > 0) {
             var tweetId = url.substring(url.lastIndexOf("/") + 1, url.length);
@@ -20,7 +22,7 @@ tt.retrieval = function () {
             });
         } else {
             $.ajax({
-                url: API + url,
+                url: API + tweet_id,
                 method: 'GET',
                 success: function (data) {
                     obj.html(data);

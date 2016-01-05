@@ -47,7 +47,7 @@ public class AuthorizeAppTool {
 
     RequestToken requestToken = null;
     try {
-      requestToken = twitter.getOAuthRequestToken();
+      requestToken = twitter.getOAuthRequestToken("oob");
     } catch (Exception e) {
       System.out.println("Are the consumer key and secret correct?");
       e.printStackTrace();

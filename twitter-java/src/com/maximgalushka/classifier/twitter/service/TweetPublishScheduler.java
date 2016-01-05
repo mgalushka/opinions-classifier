@@ -232,6 +232,11 @@ public class TweetPublishScheduler implements Runnable {
               "Tweet action failed.",
               ex
             );
+            storage.updatePublished(
+              tweet.getData().getId(),
+              -1,
+              false
+            );
           }
           if (status != null) {
             long publishedId = status.getId();

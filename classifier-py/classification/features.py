@@ -1,7 +1,12 @@
 import re
 from bs4 import BeautifulSoup
 from nltk.corpus import stopwords
-from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import (
+    CountVectorizer,
+    TfidfTransformer,
+    TfidfVectorizer,
+)
+
 
 def top_words_features(top_words, txt):
     document_words = set(txt)
@@ -9,6 +14,7 @@ def top_words_features(top_words, txt):
     for word in top_words:
         features[u'contains({0})'.format(word)] = (word in document_words)
     return features
+
 
 def tweet_to_words(document):
     # Function to convert a raw review to a string of words
@@ -41,15 +47,16 @@ def tweet_to_words(document):
         features[word] = True
     return features
 
+
 def bag_of_words(documents):
     # Initialize the "CountVectorizer" object, which is scikit-learn's
     # bag of words tool.
     vectorizer = CountVectorizer(
-        analyzer = "word",
-        tokenizer = None,
-        preprocessor = None,
-        stop_words = None,
-        max_features = 5000
+            analyzer="word",
+            tokenizer=None,
+            preprocessor=None,
+            stop_words=stopwords.words("english"),
+            max_features=5000,
     )
 
     # fit_transform() does two functions: First, it fits the model
@@ -63,5 +70,13 @@ def bag_of_words(documents):
     return train_data_features.toarray()
 
 
+def tf_idf_words(documents):
+    counts = bag_of_words(documents)
+    transformer = TfidfTransformer()
+    return transformer.fit_transform(counts).toarray()
 
-#print(tweet_to_words('Let\'s try to test this. !What is this?@'))
+
+def tf_idf_vectorizer(documents):
+    vectorizer = TfidfVectorizer(min_df=1)
+    vectorizer.fit_transform(documents)
+    return transformer.fit_transform(counts).toarray()

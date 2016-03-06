@@ -22,7 +22,7 @@ def tweet_to_words(document):
     # the output is a single string (a preprocessed movie review)
     #
     # 1. Remove HTML
-    tweet_text = u"".join(document)
+    tweet_text = u" ".join(document)
 
     print(u"Word: [{0}]".format(tweet_text))
     review_text = BeautifulSoup(tweet_text).get_text()

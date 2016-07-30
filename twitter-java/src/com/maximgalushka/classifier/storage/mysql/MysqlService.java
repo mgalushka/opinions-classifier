@@ -417,12 +417,19 @@ public class MysqlService {
               long id = set.getLong(1);
               long accountId = set.getLong(2);
               String text = set.getString(3);
-              Tweet original = gson.fromJson(set.getString(4), Tweet.class);
-              original.setAccountId(accountId);
+
+              String json = set.getString(4);
+              Tweet original = new Tweet();
+              if (json != null) {
+                original = gson.fromJson(set.getString(4), Tweet.class);
+                original.setAccountId(accountId);
+              }
+
               boolean retweet = (set.getInt(5) == 1);
               if (!retweet) {
                 original.setText(text);
               }
+
               ScheduledTweet scheduled = new ScheduledTweet(original, retweet);
               scheduled.setScheduled(set.getTimestamp(6));
               unscheduled.add(scheduled);

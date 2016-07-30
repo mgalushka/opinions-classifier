@@ -1,5 +1,5 @@
 CREATE TABLE `tweets_scheduled` (
-	`id` BIGINT(20) NOT NULL,
+	`id` BIGINT(20) NOT NULL AUTO_INCREMENT,
 	`account_id` BIGINT(20) NOT NULL,
 	`published_id` BIGINT(20) NULL DEFAULT NULL,
 	`text` TEXT NULL,
@@ -9,7 +9,7 @@ CREATE TABLE `tweets_scheduled` (
 	`scheduled` TINYINT(4) NULL DEFAULT NULL,
 	`published` TINYINT(4) NOT NULL DEFAULT '0',
 	`status` TINYINT(4) NULL DEFAULT NULL,
-	`priority` INT(11) NOT NULL DEFAULT '0',
+	`priority` DECIMAL(7,5) NOT NULL DEFAULT '0.00000',
 	`created_timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	`scheduled_timestamp` TIMESTAMP NULL DEFAULT NULL,
 	`published_timestamp` TIMESTAMP NULL DEFAULT NULL,
@@ -19,4 +19,5 @@ CREATE TABLE `tweets_scheduled` (
 )
 COLLATE='utf8_general_ci'
 ENGINE=InnoDB
+AUTO_INCREMENT=26
 ;

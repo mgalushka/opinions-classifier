@@ -6,7 +6,7 @@ CREATE TABLE `tweets_scheduled` (
 	`media` TEXT NULL,
 	`original_json` TEXT NULL,
 	`retweet` TINYINT(4) NULL DEFAULT NULL,
-	`scheduled` TINYINT(4) NULL DEFAULT NULL
+	`scheduled` TINYINT(4) NULL DEFAULT NULL,
 	`published` TINYINT(4) NOT NULL DEFAULT '0',
 	`status` TINYINT(4) NULL DEFAULT NUll,
 	`created_timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,

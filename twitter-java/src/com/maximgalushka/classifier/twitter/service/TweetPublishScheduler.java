@@ -249,6 +249,7 @@ public class TweetPublishScheduler implements Runnable {
           }
         } catch (Exception e) {
           log.error(e);
+          e.printStackTrace();
         }
       },
       delay, TimeUnit.MILLISECONDS

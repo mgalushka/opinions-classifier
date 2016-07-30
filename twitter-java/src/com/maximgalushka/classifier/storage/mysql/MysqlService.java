@@ -422,9 +422,8 @@ public class MysqlService {
               Tweet original = new Tweet();
               if (json != null) {
                 original = gson.fromJson(set.getString(4), Tweet.class);
-                original.setAccountId(accountId);
               }
-
+              original.setAccountId(accountId);
               boolean retweet = (set.getInt(5) == 1);
               if (!retweet) {
                 original.setText(text);

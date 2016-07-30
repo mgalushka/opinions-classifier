@@ -387,7 +387,8 @@ public class MysqlService {
             "select id, account_id, text, original_json, retweet, " +
                 "scheduled_timestamp " +
                 "from tweets_scheduled " +
-                "where account_id = %d AND scheduled = 0",
+                "where account_id = %d AND scheduled = 0 " +
+                "order by priority desc",
             accountId
         )
     );

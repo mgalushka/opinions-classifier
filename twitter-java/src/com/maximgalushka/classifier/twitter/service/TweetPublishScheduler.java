@@ -271,7 +271,7 @@ public class TweetPublishScheduler implements Runnable {
     TweetPublishScheduler scheduler = (TweetPublishScheduler)
         ac.getBean("scheduler");
 
-    pool.scheduleWithFixedDelay(scheduler, 0, 1, TimeUnit.HOURS);
+    pool.scheduleWithFixedDelay(scheduler, 0, 1, TimeUnit.MINUTES);
     log.debug("Twitter scheduler started");
   }
 }

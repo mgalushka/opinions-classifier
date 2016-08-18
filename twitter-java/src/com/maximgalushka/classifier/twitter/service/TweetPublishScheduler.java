@@ -25,10 +25,12 @@ import java.util.concurrent.TimeUnit;
  */
 public class TweetPublishScheduler implements Runnable {
   public static final Logger log =
-    Logger.getLogger(TweetPublishScheduler.class);
+      Logger.getLogger(TweetPublishScheduler.class);
 
   private static final ScheduledExecutorService pool =
-    Executors.newScheduledThreadPool(2);
+      Executors.newScheduledThreadPool(2);
+
+  private boolean started = false;
 
   private StorageService storage;
   @SuppressWarnings({"FieldCanBeLocal", "UnusedDeclaration"})
@@ -75,62 +77,66 @@ public class TweetPublishScheduler implements Runnable {
    */
   public void scheduleForAccount(long accountId) {
     log.debug(
-      String.format(
-        "Picking scheduled but unpublished tweets for account %d,",
-        accountId
-      )
+        String.format(
+            "Picking scheduled but unpublished tweets for account %d,",
+            accountId
+        )
     );
     List<ScheduledTweet> unpublished = storage.getScheduledUnpublishedTweets(
-      accountId
+        accountId
     );
     log.debug(
-      String.format(
-        "Scheduled but unpublished tweets for account [%d]:\n%s",
-        accountId,
-        unpublished.size() == 0 ? "[none]" : unpublished
-      )
+        String.format(
+            "Scheduled but unpublished tweets for account [%d]:\n%s",
+            accountId,
+            unpublished.size() == 0 ? "[none]" : unpublished
+        )
     );
-    unpublished.forEach(this::schedule);
+    // schedule unpublished tweets only once at application startup and no more after that
+    if (!started) {
+      unpublished.forEach(this::schedule);
+      started = true;
+    }
 
     log.debug(
-      String.format(
-        "Getting unscheduled tweets for account [%d]",
-        accountId
-      )
+        String.format(
+            "Getting unscheduled tweets for account [%d]",
+            accountId
+        )
     );
     List<ScheduledTweet> tweets = storage.getUnscheduledTweets(accountId);
     log.debug(
-      String.format(
-        "Unscheduled tweets for account [%d]:\n%s",
-        accountId,
-        tweets.size() == 0 ? "[none]" : tweets
-      )
+        String.format(
+            "Unscheduled tweets for account [%d]:\n%s",
+            accountId,
+            tweets.size() == 0 ? "[none]" : tweets
+        )
     );
     Date latestNew = storage.getLatestPublishedOrScheduledTimestamp(
-      accountId,
-      false
+        accountId,
+        false
     );
     Date latestRT = storage.getLatestPublishedOrScheduledTimestamp(
-      accountId,
-      true
+        accountId,
+        true
     );
 
     Calendar latestNewCalendar = fromDate(latestNew);
     Calendar latestRTCalendar = fromDate(latestRT);
 
     log.debug(
-      String.format(
-        "Latest new tweet timestamp for account [%d]: [%s]",
-        accountId,
-        SDF.format(latestNew)
-      )
+        String.format(
+            "Latest new tweet timestamp for account [%d]: [%s]",
+            accountId,
+            SDF.format(latestNew)
+        )
     );
     log.debug(
-      String.format(
-        "Latest re-tweet timestamp for account [%d]: [%s]",
-        accountId,
-        SDF.format(latestRT)
-      )
+        String.format(
+            "Latest re-tweet timestamp for account [%d]: [%s]",
+            accountId,
+            SDF.format(latestRT)
+        )
     );
 
     for (ScheduledTweet tweet : tweets) {
@@ -150,11 +156,11 @@ public class TweetPublishScheduler implements Runnable {
       tweet.setScheduled(scheduled);
       schedule(tweet);
       log.debug(
-        String.format(
-          "Scheduled for account [%d]: %s",
-          accountId,
-          tweet
-        )
+          String.format(
+              "Scheduled for account [%d]: %s",
+              accountId,
+              tweet
+          )
       );
     }
   }
@@ -166,7 +172,7 @@ public class TweetPublishScheduler implements Runnable {
   }
 
   private static final SimpleDateFormat SDF =
-    new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+      new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
   private static void adjust(Calendar init) {
     int h = init.get(Calendar.HOUR_OF_DAY);
@@ -174,11 +180,11 @@ public class TweetPublishScheduler implements Runnable {
       Date before = init.getTime();
       init.add(Calendar.HOUR, 7);
       log.debug(
-        String.format(
-          "Date [%s] is not during working hours, adjusting to [%s]",
-          SDF.format(before),
-          SDF.format(init.getTime())
-        )
+          String.format(
+              "Date [%s] is not during working hours, adjusting to [%s]",
+              SDF.format(before),
+              SDF.format(init.getTime())
+          )
       );
     }
   }
@@ -187,8 +193,8 @@ public class TweetPublishScheduler implements Runnable {
 
   private int minutesShift(boolean retweet) {
     int interval = retweet ?
-      RETWEETS_INTERVAL_HOURS :
-      NEW_TWEETS_INTERVAL_HOURS;
+        RETWEETS_INTERVAL_HOURS :
+        NEW_TWEETS_INTERVAL_HOURS;
     int MIN = 60 * interval - 30;
     return r.nextInt(60) + MIN;
   }
@@ -199,71 +205,71 @@ public class TweetPublishScheduler implements Runnable {
     long delay = scheduled - current;
     if (delay < 0) {
       log.error(
-        String.format(
-          "Tweet %s is scheduled in the PAST. Ignoring.",
-          tweet
-        )
+          String.format(
+              "Tweet %s is scheduled in the PAST. Ignoring.",
+              tweet
+          )
       );
     }
     pool.schedule(
-      () -> {
-        try {
-          log.debug(
-            String.format(
-              "Publishing to actual account: %s",
-              tweet
-            )
-          );
-          boolean retweet = tweet.isRetweet();
-          Status status = null;
-          boolean success = true;
+        () -> {
           try {
-            TwitterAccount account = storage.getAccountById(
-              tweet.getData().getAccountId()
+            log.debug(
+                String.format(
+                    "Publishing to actual account: %s",
+                    tweet
+                )
             );
-            if (retweet) {
-              status = twitter.retweet(account, tweet.getData().getId());
-            } else {
-              status = twitter.post(account, tweet.getData(), false, false);
+            boolean retweet = tweet.isRetweet();
+            Status status = null;
+            boolean success = true;
+            try {
+              TwitterAccount account = storage.getAccountById(
+                  tweet.getData().getAccountId()
+              );
+              if (retweet) {
+                status = twitter.retweet(account, tweet.getData().getId());
+              } else {
+                status = twitter.post(account, tweet.getData(), false, false);
+              }
+            } catch (TwitterException ex) {
+              success = false;
+              log.error(
+                  "Tweet action failed.",
+                  ex
+              );
+              storage.updatePublished(
+                  tweet.getData().getId(),
+                  -1,
+                  false
+              );
             }
-          } catch (TwitterException ex) {
-            success = false;
-            log.error(
-              "Tweet action failed.",
-              ex
-            );
-            storage.updatePublished(
-              tweet.getData().getId(),
-              -1,
-              false
-            );
+            if (status != null) {
+              long publishedId = status.getId();
+              //noinspection ConstantConditions
+              storage.updatePublished(
+                  tweet.getData().getId(),
+                  publishedId,
+                  success
+              );
+            }
+          } catch (Exception e) {
+            log.error(e);
+            e.printStackTrace();
           }
-          if (status != null) {
-            long publishedId = status.getId();
-            //noinspection ConstantConditions
-            storage.updatePublished(
-              tweet.getData().getId(),
-              publishedId,
-              success
-            );
-          }
-        } catch (Exception e) {
-          log.error(e);
-          e.printStackTrace();
-        }
-      },
-      delay, TimeUnit.MILLISECONDS
+        },
+        delay, TimeUnit.MILLISECONDS
     );
   }
 
   public static void main(String[] args) {
     ApplicationContext ac =
-      new ClassPathXmlApplicationContext(
-        "spring/classifier-services.xml"
-      );
+        new ClassPathXmlApplicationContext(
+            "spring/classifier-services.xml"
+        );
 
     TweetPublishScheduler scheduler = (TweetPublishScheduler)
-      ac.getBean("scheduler");
+        ac.getBean("scheduler");
 
     pool.scheduleWithFixedDelay(scheduler, 0, 1, TimeUnit.HOURS);
     log.debug("Twitter scheduler started");

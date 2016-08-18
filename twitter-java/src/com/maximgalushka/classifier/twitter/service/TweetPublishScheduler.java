@@ -210,6 +210,14 @@ public class TweetPublishScheduler implements Runnable {
               tweet
           )
       );
+    } else {
+      log.debug(
+          String.format(
+              "Tweet %s is scheduled to run in %d sec.",
+              tweet,
+              delay
+          )
+      );
     }
     pool.schedule(
         () -> {

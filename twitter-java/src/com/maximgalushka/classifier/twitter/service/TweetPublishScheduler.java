@@ -215,7 +215,7 @@ public class TweetPublishScheduler implements Runnable {
           String.format(
               "Tweet %s is scheduled to run in %d sec.",
               tweet,
-              delay
+              delay / 1000
           )
       );
     }
@@ -279,7 +279,7 @@ public class TweetPublishScheduler implements Runnable {
     TweetPublishScheduler scheduler = (TweetPublishScheduler)
         ac.getBean("scheduler");
 
-    pool.scheduleWithFixedDelay(scheduler, 0, 1, TimeUnit.MINUTES);
+    pool.scheduleWithFixedDelay(scheduler, 0, 1, TimeUnit.HOURS);
     log.debug("Twitter scheduler started");
   }
 }

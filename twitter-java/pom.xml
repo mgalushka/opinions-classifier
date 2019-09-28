@@ -84,10 +84,10 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.3.5</version>
-        </dependency>
+           <groupId>org.apache.httpcomponents</groupId>
+           <artifactId>httpclient</artifactId>
+           <version>[4.3.6,)</version>
+         </dependency>
 
         <dependency>
             <groupId>org.htmlparser</groupId>
